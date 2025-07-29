@@ -1,0 +1,43 @@
+---
+alwaysApply: true
+---
+
+# Aturan Pengembangan
+
+## Prinsip Dasar
+
+1. **Jangan mengubah kode yang tidak diminta** - Hanya lakukan perubahan yang secara eksplisit diminta
+2. **Konsultasi sebelum perubahan** - Jika ada rekomendasi atau perubahan di luar permintaan, tanyakan terlebih dahulu
+3. **Tidak ada improvisasi** - Jangan menambahkan fitur atau perubahan yang tidak diminta
+
+## Standar Pengembangan
+
+4. **Gunakan komponen yang sudah ada** - Manfaatkan komponen dan styling yang sudah tersedia untuk konsistensi
+5. **Routing menggunakan GoRouter** - Ikuti pola routing yang sudah ditetapkan dengan GoRouter
+6. **Arsitektur BLoC dengan Usecases** - Gunakan Arsitektur BLoC dengan menggunakan konsep Usecase
+7. **Database schema** - Untuk perubahan database, periksa skema di `dbschema.sql`
+
+## Quality Assurance
+
+7. **Flutter analyze** - Setiap ada perubahan, jalankan `flutter analyze` dan perbaiki masalah yang ditemukan
+8. **Logging perubahan** - Setiap ada perubahan yang signifikan, simpan di folder `/logs/{tanggal_chat}.md`
+
+# Aturan Pengembangan
+
+## Prinsip Dasar
+
+1. **Jangan mengubah kode yang tidak diminta** - Hanya lakukan perubahan yang secara eksplisit diminta
+2. **Konsultasi sebelum perubahan** - Jika ada rekomendasi atau perubahan di luar permintaan, tanyakan terlebih dahulu
+3. **Tidak ada improvisasi** - Jangan menambahkan fitur atau perubahan yang tidak diminta
+
+## Standar Pengembangan
+
+4. **Gunakan komponen yang sudah ada** - Manfaatkan komponen dan styling yang sudah tersedia untuk konsistensi
+5. **Routing menggunakan GoRouter** - Ikuti pola routing yang sudah ditetapkan dengan GoRouter
+6. **Arsitektur BLoC dengan Usecases** - Gunakan Arsitektur BLoC dengan menggunakan konsep Usecase
+7. **Database schema** - Untuk perubahan database, periksa skema di `dbschema.sql`
+
+## Quality Assurance
+
+7. **Flutter analyze** - Setiap ada perubahan, jalankan `flutter analyze` dan perbaiki masalah yang ditemukan
+8. **Logging perubahan** - Setiap ada perubahan yang signifikan, simpan di folder `/logs/{tanggal_chat}.md`

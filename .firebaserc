@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "ourbit-9ac6d"
+  },
+  "targets": {
+    "ourbit-9ac6d": {
+      "hosting": {
+        "ourbit-cashier": [
+          "ourbit-cashier"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
