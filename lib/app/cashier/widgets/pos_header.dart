@@ -33,7 +33,7 @@ class PosHeader extends StatelessWidget implements PreferredSizeWidget {
               color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.point_of_sale,
               color: AppColors.primary,
               size: 24,

@@ -78,7 +78,7 @@ class _OrganizationPageState extends State<OrganizationPage> {
                     ),
                     child: Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.business,
                           color: AppColors.primary,
                           size: 24,

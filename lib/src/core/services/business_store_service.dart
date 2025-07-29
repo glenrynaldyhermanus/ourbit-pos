@@ -47,7 +47,6 @@ class BusinessStoreService {
         'roleAssignment': roleAssignment,
       };
     } catch (e) {
-      print('Error getting user business and store: $e');
       throw Exception('Failed to get user business and store data');
     }
   }
@@ -86,7 +85,6 @@ class BusinessStoreService {
 
       return (response as List).cast<Map<String, dynamic>>();
     } catch (e) {
-      print('Error getting business stores: $e');
       throw Exception('Failed to get business stores');
     }
   }
@@ -112,7 +110,6 @@ class BusinessStoreService {
       await LocalStorageService.saveStoreData(roleAssignmentResponse['store']);
       await LocalStorageService.saveRoleAssignmentData(roleAssignmentResponse);
     } catch (e) {
-      print('Error switching store: $e');
       throw Exception('Failed to switch store');
     }
   }

@@ -229,7 +229,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                                       fit: BoxFit.cover,
                                                       errorBuilder: (context,
                                                           error, stackTrace) {
-                                                        return Icon(
+                                                        return const Icon(
                                                           Icons
                                                               .inventory_2_outlined,
                                                           size: 24,
@@ -239,7 +239,7 @@ class _ProductsPageState extends State<ProductsPage> {
                                                       },
                                                     ),
                                                   )
-                                                : Icon(
+                                                : const Icon(
                                                     Icons.inventory_2_outlined,
                                                     size: 24,
                                                     color: AppColors.primary,

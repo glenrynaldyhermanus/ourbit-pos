@@ -47,14 +47,14 @@ class _PaymentPageState extends State<PaymentPage>
 
   Future<void> _loadData() async {
     try {
-      print('=== Loading Payment Data ===');
+      // === Loading Payment Data ===
 
       // Load cart items
       final cashierState = context.read<CashierBloc>().state;
-      print('CashierState type: ${cashierState.runtimeType}');
+      // CashierState type: ${cashierState.runtimeType}
 
       if (cashierState is CashierLoaded) {
-        print('Cart items count: ${cashierState.cartItems.length}');
+        // Cart items count: ${cashierState.cartItems.length}
         cartItems = cashierState.cartItems
             .map((item) => {
                   'id': item.id,
@@ -67,9 +67,9 @@ class _PaymentPageState extends State<PaymentPage>
                   }
                 })
             .toList();
-        print('Processed cart items: ${cartItems.length}');
+        // Processed cart items: ${cartItems.length}
       } else {
-        print('CashierState is not CashierLoaded: ${cashierState.runtimeType}');
+        // CashierState is not CashierLoaded: ${cashierState.runtimeType}
         // Fallback: try to load cart from database directly
         final storeId = await SupabaseService.getStoreId();
         if (storeId != null) {
@@ -90,7 +90,7 @@ class _PaymentPageState extends State<PaymentPage>
                     }
                   })
               .toList();
-          print('Loaded cart from database: ${cartItems.length} items');
+          // Loaded cart from database: ${cartItems.length} items
         }
       }
 
@@ -98,17 +98,17 @@ class _PaymentPageState extends State<PaymentPage>
       final paymentTypesResponse =
           await SupabaseService.client.from('payment_types').select('*');
       paymentTypes = List<Map<String, dynamic>>.from(paymentTypesResponse);
-      print('Payment types loaded: ${paymentTypes.length}');
+      // Payment types loaded: ${paymentTypes.length}
 
       // Load payment methods
       final paymentMethodsResponse =
           await SupabaseService.client.from('payment_methods').select('*');
       paymentMethods = List<Map<String, dynamic>>.from(paymentMethodsResponse);
-      print('Payment methods loaded: ${paymentMethods.length}');
+      // Payment methods loaded: ${paymentMethods.length}
 
       // Load store payment methods
       final storeId = await SupabaseService.getStoreId();
-      print('Store ID: $storeId');
+      // Store ID: $storeId
       if (storeId != null) {
         final storePaymentMethodsResponse = await SupabaseService.client
             .from('store_payment_methods')
@@ -116,18 +116,17 @@ class _PaymentPageState extends State<PaymentPage>
             .eq('store_id', storeId);
         storePaymentMethods =
             List<Map<String, dynamic>>.from(storePaymentMethodsResponse);
-        print('Store payment methods loaded: ${storePaymentMethods.length}');
+        // Store payment methods loaded: ${storePaymentMethods.length}
         if (storePaymentMethods.isNotEmpty) {
-          print('First payment method: ${storePaymentMethods.first}');
+          // First payment method: ${storePaymentMethods.first}
         }
       } else {
-        print('Store ID is null!');
+        // Store ID is null!
       }
 
       // If no store payment methods, use all payment methods as fallback
       if (storePaymentMethods.isEmpty && paymentMethods.isNotEmpty) {
-        print(
-            'No store payment methods found, using all payment methods as fallback');
+        // No store payment methods found, using all payment methods as fallback
         storePaymentMethods = paymentMethods
             .map((method) => {
                   'id': method['id'],
@@ -135,7 +134,7 @@ class _PaymentPageState extends State<PaymentPage>
                   'payment_methods': method,
                 })
             .toList();
-        print('Fallback payment methods: ${storePaymentMethods.length}');
+        // Fallback payment methods: ${storePaymentMethods.length}
       }
 
       setState(() {
@@ -143,7 +142,7 @@ class _PaymentPageState extends State<PaymentPage>
       });
       _animationController.forward();
     } catch (e) {
-      print('Error loading payment data: $e');
+      // Error loading payment data: $e
       setState(() {
         isLoading = false;
       });
@@ -274,7 +273,7 @@ class _PaymentPageState extends State<PaymentPage>
         context.go('/success');
       }
     } catch (e) {
-      print('Error processing payment: $e');
+      // Error processing payment: $e
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),

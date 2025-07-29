@@ -12,20 +12,17 @@ class AppInitializationService {
       final hasToken = await TokenService.handleTokenFromUrl();
 
       if (hasToken) {
-        print('Token berhasil diproses dari URL');
         return true;
       }
 
       // Cek apakah ada token yang tersimpan
       final hasStoredToken = await TokenService.isTokenValid();
       if (hasStoredToken) {
-        print('Token valid ditemukan di local storage');
         return true;
       }
 
       return false;
     } catch (e) {
-      print('Error during app initialization: $e');
       return false;
     }
   }

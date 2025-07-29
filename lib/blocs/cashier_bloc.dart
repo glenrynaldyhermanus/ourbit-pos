@@ -42,13 +42,13 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
     LoadProducts event,
     Emitter<CashierState> emit,
   ) async {
-    print('Loading products...');
+    // Loading products...
     emit(CashierLoading());
     try {
       final products = await _getProductsUseCase();
-      print('Products loaded: ${products.length}');
+      // Products loaded: ${products.length}
       final cartItems = await _getCartUseCase();
-      print('Cart items loaded: ${cartItems.length}');
+      // Cart items loaded: ${cartItems.length}
       final sortedCartItems = _sortCartItems(cartItems);
       final totals = _calculateTotals(sortedCartItems);
 
@@ -60,9 +60,9 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
         discount: totals['discount']!,
         finalTotal: totals['finalTotal']!,
       ));
-      print('CashierLoaded state emitted with ${products.length} products');
+      // CashierLoaded state emitted with ${products.length} products
     } catch (e) {
-      print('Error in _onLoadProducts: $e');
+      // Error in _onLoadProducts: $e
       emit(CashierError(e.toString()));
     }
   }
@@ -95,22 +95,21 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
     AddToCart event,
     Emitter<CashierState> emit,
   ) async {
-    print(
-        '_onAddToCart called with productId: ${event.productId}, quantity: ${event.quantity}');
+    // _onAddToCart called with productId: ${event.productId}, quantity: ${event.quantity}
     if (state is CashierLoaded) {
       final currentState = state as CashierLoaded;
       try {
-        print('Calling addToCartUseCase...');
+        // Calling addToCartUseCase...
         await _addToCartUseCase(event.productId, event.quantity);
-        print('addToCartUseCase completed');
+        // addToCartUseCase completed
 
-        print('Calling getCartUseCase...');
+        // Calling getCartUseCase...
         final cartItems = await _getCartUseCase();
-        print('getCartUseCase completed, cart items: ${cartItems.length}');
+        // getCartUseCase completed, cart items: ${cartItems.length}
         final sortedCartItems = _sortCartItems(cartItems);
 
         final totals = _calculateTotals(sortedCartItems);
-        print('Calculated totals: $totals');
+        // Calculated totals: $totals
 
         emit(currentState.copyWith(
           cartItems: sortedCartItems,
@@ -119,13 +118,13 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
           discount: totals['discount']!,
           finalTotal: totals['finalTotal']!,
         ));
-        print('State updated with new cart items');
+        // State updated with new cart items
       } catch (e) {
-        print('Error in _onAddToCart: $e');
+        // Error in _onAddToCart: $e
         emit(CashierError(e.toString()));
       }
     } else {
-      print('State is not CashierLoaded, current state: ${state.runtimeType}');
+      // State is not CashierLoaded, current state: ${state.runtimeType}
     }
   }
 
@@ -208,7 +207,7 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
   Map<String, double> _calculateTotals(List<CartItem> cartItems) {
     final total = cartItems.fold(0.0, (sum, item) => sum + item.totalPrice);
     final tax = total * AppConfig.taxRate;
-    final discount = 0.0; // Can be implemented later
+    const discount = 0.0; // Can be implemented later
     final finalTotal = total + tax - discount;
 
     return {

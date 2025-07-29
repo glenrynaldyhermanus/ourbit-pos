@@ -170,7 +170,7 @@ class _ProductsManagementPageState extends State<ProductsManagementPage> {
                     ),
                     child: Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.inventory_2,
                           color: AppColors.primary,
                           size: 24,
@@ -376,7 +376,7 @@ class _ProductsManagementPageState extends State<ProductsManagementPage> {
                                                                       (context,
                                                                           error,
                                                                           stackTrace) {
-                                                                    return Icon(
+                                                                    return const Icon(
                                                                       Icons
                                                                           .inventory_2_outlined,
                                                                       size: 24,
@@ -386,7 +386,7 @@ class _ProductsManagementPageState extends State<ProductsManagementPage> {
                                                                   },
                                                                 ),
                                                               )
-                                                            : Icon(
+                                                            : const Icon(
                                                                 Icons
                                                                     .inventory_2_outlined,
                                                                 size: 24,

@@ -16,11 +16,6 @@ import 'package:ourbit_pos/src/data/usecases/sign_in_usecase.dart';
 import 'package:ourbit_pos/src/data/usecases/sign_out_usecase.dart';
 import 'package:ourbit_pos/src/data/usecases/update_cart_quantity_usecase.dart';
 import 'package:ourbit_pos/src/data/usecases/get_user_business_store_usecase.dart';
-import 'package:ourbit_pos/src/data/usecases/get_current_store_id_usecase.dart';
-import 'package:ourbit_pos/src/data/usecases/get_current_business_id_usecase.dart';
-import 'package:ourbit_pos/src/data/usecases/has_valid_business_store_usecase.dart';
-import 'package:ourbit_pos/src/data/usecases/get_business_stores_usecase.dart';
-import 'package:ourbit_pos/src/data/usecases/switch_store_usecase.dart';
 import 'package:ourbit_pos/src/data/usecases/get_all_products_usecase.dart';
 import 'package:ourbit_pos/src/data/usecases/get_categories_usecase.dart';
 import 'package:ourbit_pos/src/data/usecases/get_customers_usecase.dart';
@@ -60,15 +55,6 @@ class DependencyInjection {
     // Initialize business store use cases
     final getUserBusinessStoreUseCase =
         GetUserBusinessStoreUseCase(businessStoreService);
-    final getCurrentStoreIdUseCase =
-        GetCurrentStoreIdUseCase(businessStoreService);
-    final getCurrentBusinessIdUseCase =
-        GetCurrentBusinessIdUseCase(businessStoreService);
-    final hasValidBusinessStoreUseCase =
-        HasValidBusinessStoreUseCase(businessStoreService);
-    final getBusinessStoresUseCase =
-        GetBusinessStoresUseCase(businessStoreService);
-    final switchStoreUseCase = SwitchStoreUseCase(businessStoreService);
 
     // Initialize management use cases
     final getAllProductsUseCase = GetAllProductsUseCase(managementRepository);

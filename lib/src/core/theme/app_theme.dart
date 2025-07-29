@@ -68,18 +68,16 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      colorScheme: ColorScheme.light(
+      colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.secondary,
         tertiary: AppColors.tertiary,
         surface: AppColors.surfaceBackground,
-        background: AppColors.surfaceBackground,
         error: AppColors.error,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onTertiary: AppColors.tertiaryText,
         onSurface: AppColors.primaryText,
-        onBackground: AppColors.primaryText,
         onError: Colors.white,
       ),
       textTheme: const TextTheme().copyWith(
@@ -259,18 +257,16 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      colorScheme: ColorScheme.dark(
+      colorScheme: const ColorScheme.dark(
         primary: AppColors.darkPrimary,
         secondary: AppColors.darkSecondary,
         tertiary: AppColors.darkTertiary,
         surface: AppColors.darkSurfaceBackground,
-        background: AppColors.darkSurfaceBackground,
         error: AppColors.darkError,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onTertiary: AppColors.darkTertiaryText,
         onSurface: AppColors.darkPrimaryText,
-        onBackground: AppColors.darkPrimaryText,
         onError: Colors.white,
       ),
       textTheme: const TextTheme().copyWith(

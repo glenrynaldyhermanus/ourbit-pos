@@ -17,7 +17,6 @@ class AuthenticateWithTokenUseCase {
       // Authenticate dengan token
       return await _authRepository.authenticateWithToken(token);
     } catch (e) {
-      print('AuthenticateWithTokenUseCase error: $e');
       return null;
     }
   }

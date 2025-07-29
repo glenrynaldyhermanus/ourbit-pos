@@ -12,16 +12,12 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<AppUser?> signIn(String email, String password) async {
     try {
-      print('Attempting to sign in with email: $email');
-
       final response = await _supabaseClient.auth.signInWithPassword(
         email: email,
         password: password,
       );
 
       if (response.user != null) {
-        print('Sign in successful for user: ${response.user!.email}');
-
         // Load and cache user data after successful login
         await SupabaseService.loadUserDataAfterLogin();
 
@@ -35,15 +31,8 @@ class AuthRepositoryImpl implements AuthRepository {
         );
       }
 
-      print('Sign in failed: No user returned');
       return null;
     } catch (e) {
-      print('Sign in error: $e');
-      print('Error type: ${e.runtimeType}');
-      if (e is AuthException) {
-        print('Auth error message: ${e.message}');
-        print('Auth error status code: ${e.statusCode}');
-      }
       throw Exception('Failed to sign in: ${e.toString()}');
     }
   }
@@ -101,7 +90,6 @@ class AuthRepositoryImpl implements AuthRepository {
       final user = _supabaseClient.auth.currentUser;
       return user != null;
     } catch (e) {
-      print('Token validation failed: $e');
       return false;
     }
   }
@@ -128,7 +116,6 @@ class AuthRepositoryImpl implements AuthRepository {
         avatar: user.userMetadata?['avatar_url'],
       );
     } catch (e) {
-      print('Authentication with token failed: $e');
       return null;
     }
   }

@@ -49,8 +49,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           await _getUserBusinessStoreUseCase.execute();
           emit(Authenticated(user));
         } catch (businessError) {
-          print('Warning: Could not get business/store data: $businessError');
-          // Still emit authenticated even if business data fails
           emit(Authenticated(user));
         }
       } else {

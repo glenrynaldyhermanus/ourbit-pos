@@ -267,7 +267,7 @@ class PosCart extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: IconButton(
-                          icon: Icon(
+                          icon: const Icon(
                             Icons.remove,
                             size: 16,
                             color: AppColors.primary,
@@ -292,7 +292,7 @@ class PosCart extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: IconButton(
-                          icon: Icon(
+                          icon: const Icon(
                             Icons.add,
                             size: 16,
                             color: AppColors.primary,

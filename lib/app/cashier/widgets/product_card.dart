@@ -128,7 +128,7 @@ class ProductCard extends StatelessWidget {
             : AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Icon(
+      child: const Icon(
         Icons.inventory_2_outlined,
         size: 28,
         color: AppColors.primary,

@@ -13,10 +13,8 @@ class PosRepositoryImpl implements PosRepository {
   @override
   Future<List<Product>> getProducts() async {
     try {
-      print('Fetching products from Supabase...');
       final storeId = await LocalStorageService.getStoreId();
       if (storeId == null) {
-        print('Store ID not found, returning empty list');
         return [];
       }
 
@@ -27,13 +25,10 @@ class PosRepositoryImpl implements PosRepository {
           .eq('is_active', true)
           .order('created_at', ascending: false);
 
-      print('Products response: $response');
       final products =
           (response as List).map((json) => Product.fromJson(json)).toList();
-      print('Parsed products count: ${products.length}');
       return products;
     } catch (e) {
-      print('Error fetching products: $e');
       // TODO: gunakan logger jika perlu
       return [];
     }

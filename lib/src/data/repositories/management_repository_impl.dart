@@ -25,7 +25,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
 
       return (response as List).map((json) => Product.fromJson(json)).toList();
     } catch (e) {
-      print('Error fetching products: $e');
       throw Exception('Failed to fetch products');
     }
   }
@@ -41,7 +40,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
 
       return Product.fromJson(response);
     } catch (e) {
-      print('Error fetching product: $e');
       throw Exception('Failed to fetch product');
     }
   }
@@ -62,7 +60,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
 
       await _supabaseClient.from('products').insert(productDataWithStore);
     } catch (e) {
-      print('Error creating product: $e');
       throw Exception('Failed to create product');
     }
   }
@@ -73,7 +70,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
     try {
       await _supabaseClient.from('products').update(productData).eq('id', id);
     } catch (e) {
-      print('Error updating product: $e');
       throw Exception('Failed to update product');
     }
   }
@@ -83,7 +79,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
     try {
       await _supabaseClient.from('products').delete().eq('id', id);
     } catch (e) {
-      print('Error deleting product: $e');
       throw Exception('Failed to delete product');
     }
   }
@@ -117,7 +112,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
           .toList()
           .cast<Map<String, dynamic>>();
     } catch (e) {
-      print('Error fetching categories: $e');
       throw Exception('Failed to fetch categories');
     }
   }
@@ -139,7 +133,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
 
       await _supabaseClient.from('categories').insert(categoryDataWithBusiness);
     } catch (e) {
-      print('Error creating category: $e');
       throw Exception('Failed to create category');
     }
   }
@@ -153,7 +146,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
           .update(categoryData)
           .eq('id', id);
     } catch (e) {
-      print('Error updating category: $e');
       throw Exception('Failed to update category');
     }
   }
@@ -163,7 +155,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
     try {
       await _supabaseClient.from('categories').delete().eq('id', id);
     } catch (e) {
-      print('Error deleting category: $e');
       throw Exception('Failed to delete category');
     }
   }
@@ -186,7 +177,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
 
       return (response as List).cast<Map<String, dynamic>>();
     } catch (e) {
-      print('Error fetching customers: $e');
       throw Exception('Failed to fetch customers');
     }
   }
@@ -207,7 +197,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
 
       await _supabaseClient.from('customers').insert(customerDataWithBusiness);
     } catch (e) {
-      print('Error creating customer: $e');
       throw Exception('Failed to create customer');
     }
   }
@@ -218,7 +207,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
     try {
       await _supabaseClient.from('customers').update(customerData).eq('id', id);
     } catch (e) {
-      print('Error updating customer: $e');
       throw Exception('Failed to update customer');
     }
   }
@@ -228,7 +216,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
     try {
       await _supabaseClient.from('customers').delete().eq('id', id);
     } catch (e) {
-      print('Error deleting customer: $e');
       throw Exception('Failed to delete customer');
     }
   }
@@ -251,7 +238,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
 
       return (response as List).cast<Map<String, dynamic>>();
     } catch (e) {
-      print('Error fetching suppliers: $e');
       throw Exception('Failed to fetch suppliers');
     }
   }
@@ -272,7 +258,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
 
       await _supabaseClient.from('suppliers').insert(supplierDataWithBusiness);
     } catch (e) {
-      print('Error creating supplier: $e');
       throw Exception('Failed to create supplier');
     }
   }
@@ -283,7 +268,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
     try {
       await _supabaseClient.from('suppliers').update(supplierData).eq('id', id);
     } catch (e) {
-      print('Error updating supplier: $e');
       throw Exception('Failed to update supplier');
     }
   }
@@ -293,7 +277,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
     try {
       await _supabaseClient.from('suppliers').delete().eq('id', id);
     } catch (e) {
-      print('Error deleting supplier: $e');
       throw Exception('Failed to delete supplier');
     }
   }
@@ -309,7 +292,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
 
       return (response as List).cast<Map<String, dynamic>>();
     } catch (e) {
-      print('Error fetching inventory: $e');
       throw Exception('Failed to fetch inventory');
     }
   }
@@ -321,7 +303,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
           .from('products')
           .update({'stock': newStock}).eq('id', productId);
     } catch (e) {
-      print('Error updating stock: $e');
       throw Exception('Failed to update stock');
     }
   }
@@ -343,7 +324,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
           .from('products')
           .update({'stock': newStock}).eq('id', productId);
     } catch (e) {
-      print('Error adding stock: $e');
       throw Exception('Failed to add stock');
     }
   }
@@ -366,7 +346,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
 
       return (response as List).cast<Map<String, dynamic>>();
     } catch (e) {
-      print('Error fetching discounts: $e');
       throw Exception('Failed to fetch discounts');
     }
   }
@@ -387,7 +366,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
 
       await _supabaseClient.from('discounts').insert(discountDataWithBusiness);
     } catch (e) {
-      print('Error creating discount: $e');
       throw Exception('Failed to create discount');
     }
   }
@@ -398,7 +376,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
     try {
       await _supabaseClient.from('discounts').update(discountData).eq('id', id);
     } catch (e) {
-      print('Error updating discount: $e');
       throw Exception('Failed to update discount');
     }
   }
@@ -408,7 +385,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
     try {
       await _supabaseClient.from('discounts').delete().eq('id', id);
     } catch (e) {
-      print('Error deleting discount: $e');
       throw Exception('Failed to delete discount');
     }
   }
@@ -420,7 +396,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
           .from('discounts')
           .update({'is_active': isActive}).eq('id', id);
     } catch (e) {
-      print('Error toggling discount status: $e');
       throw Exception('Failed to toggle discount status');
     }
   }
@@ -442,7 +417,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
 
       return (response as List).cast<Map<String, dynamic>>();
     } catch (e) {
-      print('Error fetching expenses: $e');
       throw Exception('Failed to fetch expenses');
     }
   }
@@ -462,7 +436,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
 
       await _supabaseClient.from('expenses').insert(expenseDataWithStore);
     } catch (e) {
-      print('Error creating expense: $e');
       throw Exception('Failed to create expense');
     }
   }
@@ -473,7 +446,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
     try {
       await _supabaseClient.from('expenses').update(expenseData).eq('id', id);
     } catch (e) {
-      print('Error updating expense: $e');
       throw Exception('Failed to update expense');
     }
   }
@@ -483,7 +455,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
     try {
       await _supabaseClient.from('expenses').delete().eq('id', id);
     } catch (e) {
-      print('Error deleting expense: $e');
       throw Exception('Failed to delete expense');
     }
   }
@@ -496,7 +467,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
         'paid_at': DateTime.now().toIso8601String()
       }).eq('id', id);
     } catch (e) {
-      print('Error marking expense as paid: $e');
       throw Exception('Failed to mark expense as paid');
     }
   }
@@ -531,7 +501,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
           .toList()
           .cast<Map<String, dynamic>>();
     } catch (e) {
-      print('Error fetching loyalty programs: $e');
       throw Exception('Failed to fetch loyalty programs');
     }
   }
@@ -554,7 +523,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
           .from('loyalty_programs')
           .insert(programDataWithBusiness);
     } catch (e) {
-      print('Error creating loyalty program: $e');
       throw Exception('Failed to create loyalty program');
     }
   }
@@ -568,7 +536,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
           .update(programData)
           .eq('id', id);
     } catch (e) {
-      print('Error updating loyalty program: $e');
       throw Exception('Failed to update loyalty program');
     }
   }
@@ -578,7 +545,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
     try {
       await _supabaseClient.from('loyalty_programs').delete().eq('id', id);
     } catch (e) {
-      print('Error deleting loyalty program: $e');
       throw Exception('Failed to delete loyalty program');
     }
   }
@@ -590,7 +556,6 @@ class ManagementRepositoryImpl implements ManagementRepository {
           .from('loyalty_programs')
           .update({'is_active': isActive}).eq('id', id);
     } catch (e) {
-      print('Error toggling loyalty program status: $e');
       throw Exception('Failed to toggle loyalty program status');
     }
   }

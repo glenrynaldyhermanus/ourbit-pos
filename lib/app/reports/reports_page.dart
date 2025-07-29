@@ -102,7 +102,7 @@ class _ReportsPageState extends State<ReportsPage> {
                     ),
                     child: Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.analytics,
                           color: AppColors.primary,
                           size: 24,

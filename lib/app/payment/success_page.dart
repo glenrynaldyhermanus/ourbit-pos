@@ -74,10 +74,10 @@ class _SuccessPageState extends State<SuccessPage>
                           width: 4,
                         ),
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.check,
                         size: 60,
-                        color: Colors.green[600],
+                        color: Colors.green,
                       ),
                     ),
                   ),
@@ -129,13 +129,12 @@ class _SuccessPageState extends State<SuccessPage>
                         Expanded(
                           child: OurbitButton(
                             onPressed: () => context.go('/pos'),
-                            child: Row(
+                            child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.point_of_sale,
-                                    color: Colors.white),
-                                const SizedBox(width: 8),
-                                const Text(
+                                Icon(Icons.point_of_sale, color: Colors.white),
+                                SizedBox(width: 8),
+                                Text(
                                   'Kembali ke Kasir',
                                   style: TextStyle(
                                     color: Colors.white,

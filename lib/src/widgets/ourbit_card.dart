@@ -73,12 +73,12 @@ class _OurbitCardState extends State<OurbitCard> {
     if (_isHovered) {
       return [
         BoxShadow(
-          color: Colors.black26.withOpacity(0.25),
+          color: Colors.black26.withValues(alpha: 0.25),
           blurRadius: 20,
           offset: const Offset(0, 8),
         ),
         BoxShadow(
-          color: Colors.black26.withOpacity(0.15),
+          color: Colors.black26.withValues(alpha: 0.15),
           blurRadius: 40,
           offset: const Offset(0, 16),
         ),
@@ -86,7 +86,7 @@ class _OurbitCardState extends State<OurbitCard> {
     } else {
       return [
         BoxShadow(
-          color: Colors.black26.withOpacity(0.15),
+          color: Colors.black26.withValues(alpha: 0.15),
           blurRadius: 12,
           offset: const Offset(0, 4),
         ),
@@ -98,29 +98,6 @@ class _OurbitCardState extends State<OurbitCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-
-    Widget cardContent = Container(
-      margin: widget.margin,
-      decoration: BoxDecoration(
-        color: widget.backgroundColor ??
-            (isDark
-                ? AppColors.darkPrimaryBackground
-                : AppColors.secondaryBackground),
-        borderRadius: widget.borderRadius ?? BorderRadius.circular(20),
-        border: widget.border ??
-            Border.all(
-              color: isDark ? AppColors.darkBorder : AppColors.border,
-              width: 1,
-            ),
-        boxShadow: _getBoxShadows(),
-      ),
-      child: widget.child != null
-          ? Padding(
-              padding: widget.padding ?? const EdgeInsets.all(20),
-              child: widget.child,
-            )
-          : null,
-    );
 
     // Jika ada onTap, wrap dengan gesture detector
     if (widget.onTap != null) {

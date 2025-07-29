@@ -23,16 +23,10 @@ class TokenService {
       final token = uri.queryParameters['token'];
       final expiry = uri.queryParameters['expiry'];
 
-      print('Checking token from URL:');
-      print('Token: ${token != null ? 'Present' : 'Not found'}');
-      print('Expiry: $expiry');
-
       if (token != null && expiry != null) {
         // Validasi expiry
         final expiryTime = DateTime.tryParse(expiry);
         if (expiryTime != null && expiryTime.isAfter(DateTime.now())) {
-          print('Token is valid, processing...');
-
           // Token masih valid
           await _saveToken(token, expiryTime);
 
@@ -41,23 +35,15 @@ class TokenService {
 
           // Verify user is authenticated before clearing URL
           if (await SupabaseService.isUserAuthenticated()) {
-            print('User authenticated successfully, clearing URL parameters');
             _clearUrlParameters();
             return true;
           } else {
-            print('User authentication failed after token processing');
             return false;
           }
-        } else {
-          print('Token expired or invalid expiry format');
-        }
-      } else {
-        print('Token or expiry not found in URL parameters');
-      }
-
+        } else {}
+      } else {}
       return false;
     } catch (e) {
-      print('Error handling token from URL: $e');
       return false;
     }
   }
@@ -80,10 +66,7 @@ class TokenService {
 
       // Load user data
       await SupabaseService.loadUserDataAfterLogin();
-
-      print('Token berhasil diproses dari URL');
     } catch (e) {
-      print('Error loading user data from token: $e');
       throw Exception('Failed to load user data from token');
     }
   }
@@ -128,7 +111,6 @@ class TokenService {
         // Remove hash fragment immediately
         final cleanUrl = currentUrl.split('#')[0];
         TokenServiceWeb.replaceState(cleanUrl);
-        print('Hash fragment removed, clean URL: $cleanUrl');
       }
     }
   }
@@ -142,7 +124,6 @@ class TokenService {
         final path = currentUrl.split('#/')[1];
         final newUrl = '${currentUrl.split('#')[0]}/$path';
         TokenServiceWeb.replaceState(newUrl);
-        print('Converted hash URL to path URL: $newUrl');
       }
     }
   }
@@ -155,7 +136,6 @@ class TokenService {
       // Remove hash fragment as well
       final cleanUrl = newUri.toString().split('#')[0];
       TokenServiceWeb.replaceState(cleanUrl);
-      print('URL parameters cleared, redirecting to: $cleanUrl');
     }
   }
 

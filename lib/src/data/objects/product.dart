@@ -48,10 +48,6 @@ class Product {
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
-    print('Parsing product: ${json['name']}');
-    print('Categories data: ${json['categories']}');
-    print('Category name: ${json['categories']?['name']}');
-
     return Product(
       id: json['id'] ?? '',
       name: json['name'] ?? '',

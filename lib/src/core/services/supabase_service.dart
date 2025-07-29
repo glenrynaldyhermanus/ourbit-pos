@@ -155,7 +155,7 @@ class SupabaseService {
     try {
       final user = client.auth.currentUser;
       if (user == null) {
-        print('No current user found');
+        // No current user found
         return;
       }
 
@@ -167,7 +167,7 @@ class SupabaseService {
         'avatar': user.userMetadata?['avatar'],
       };
       await LocalStorageService.saveUserData(userData);
-      print('User data saved to local storage');
+      // User data saved to local storage
 
       // Get role assignment data
       final roleResponse = await client
@@ -178,23 +178,23 @@ class SupabaseService {
           .single();
 
       await LocalStorageService.saveRoleAssignmentData(roleResponse);
-      print('Role assignment data saved to local storage');
+      // Role assignment data saved to local storage
 
       // Save business data
       final businessData = roleResponse['businesses'];
       if (businessData != null) {
         await LocalStorageService.saveBusinessData(businessData);
-        print('Business data saved to local storage');
+        // Business data saved to local storage
       }
 
       // Save store data
       final storeData = roleResponse['stores'];
       if (storeData != null) {
         await LocalStorageService.saveStoreData(storeData);
-        print('Store data saved to local storage');
+        // Store data saved to local storage
       }
     } catch (e) {
-      print('Error in loadUserDataAfterLogin: $e');
+      // Error in loadUserDataAfterLogin: $e
       // Don't throw exception here to avoid breaking the login flow
     }
   }
@@ -212,33 +212,33 @@ class SupabaseService {
       // This is a workaround since we only have access token
       try {
         await client.auth.refreshSession(token);
-        print('Session token set successfully via refreshSession');
+        // Session token set successfully via refreshSession
         return;
       } catch (e) {
-        print('refreshSession failed: $e');
+        // refreshSession failed: $e
       }
 
       // Method 2: Try setSession with access_token format
       try {
         // Format as session object
         await client.auth.setSession(token);
-        print('Session token set successfully via setSession');
+        // Session token set successfully via setSession
         return;
       } catch (e) {
-        print('setSession failed: $e');
+        // setSession failed: $e
       }
 
       // Method 3: Get user info and manually trigger auth state change
       final response = await client.auth.getUser(token);
 
       if (response.user != null) {
-        print('Session token set successfully via getUser');
-        print('Current user after getUser: ${response.user!.email}');
+        // Session token set successfully via getUser
+        // Current user after getUser: ${response.user!.email}
       } else {
         throw Exception('Invalid token - no user found');
       }
     } catch (e) {
-      print('Error setting session token: $e');
+      // Error setting session token: $e
       throw Exception('Failed to set session token: ${e.toString()}');
     }
   }
@@ -249,7 +249,7 @@ class SupabaseService {
       final user = client.auth.currentUser;
       return user != null;
     } catch (e) {
-      print('Error checking user authentication: $e');
+      // Error checking user authentication: $e
       return false;
     }
   }

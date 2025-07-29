@@ -164,7 +164,7 @@ class _ManagementPageState extends State<ManagementPage> {
                     ),
                     child: Row(
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.inventory_2,
                           color: AppColors.primary,
                           size: 24,
@@ -385,7 +385,7 @@ class _ManagementPageState extends State<ManagementPage> {
           children: [
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.inventory_2_outlined,
                   size: 24,
                   color: AppColors.primary,
@@ -479,7 +479,7 @@ class _ManagementPageState extends State<ManagementPage> {
               // Header
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.warehouse_outlined,
                     size: 24,
                     color: AppColors.primary,
@@ -578,7 +578,7 @@ class _ManagementPageState extends State<ManagementPage> {
                                         .withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  child: Icon(
+                                  child: const Icon(
                                     Icons.inventory_2,
                                     color: AppColors.primary,
                                     size: 20,
@@ -794,7 +794,7 @@ class _ManagementPageState extends State<ManagementPage> {
               // Header
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.category_outlined,
                     size: 24,
                     color: AppColors.primary,
@@ -929,7 +929,7 @@ class _ManagementPageState extends State<ManagementPage> {
         // Header
         Row(
           children: [
-            Icon(
+            const Icon(
               Icons.people_outline,
               size: 24,
               color: AppColors.primary,
@@ -1095,7 +1095,7 @@ class _ManagementPageState extends State<ManagementPage> {
         // Header
         Row(
           children: [
-            Icon(
+            const Icon(
               Icons.local_shipping_outlined,
               size: 24,
               color: AppColors.primary,
@@ -1203,7 +1203,7 @@ class _ManagementPageState extends State<ManagementPage> {
                               color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Icon(
+                            child: const Icon(
                               Icons.business,
                               color: AppColors.primary,
                               size: 20,
@@ -1354,7 +1354,7 @@ class _ManagementPageState extends State<ManagementPage> {
         // Header
         Row(
           children: [
-            Icon(
+            const Icon(
               Icons.local_offer_outlined,
               size: 24,
               color: AppColors.primary,
@@ -1577,7 +1577,7 @@ class _ManagementPageState extends State<ManagementPage> {
         // Header
         Row(
           children: [
-            Icon(
+            const Icon(
               Icons.receipt_long_outlined,
               size: 24,
               color: AppColors.primary,
@@ -1878,7 +1878,7 @@ class _ManagementPageState extends State<ManagementPage> {
         // Header
         Row(
           children: [
-            Icon(
+            const Icon(
               Icons.money_off_outlined,
               size: 24,
               color: AppColors.primary,
@@ -1918,7 +1918,7 @@ class _ManagementPageState extends State<ManagementPage> {
                     children: [
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.trending_up,
                             color: Colors.red,
                             size: 20,
@@ -1959,7 +1959,7 @@ class _ManagementPageState extends State<ManagementPage> {
                     children: [
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.category,
                             color: Colors.blue,
                             size: 20,
@@ -2000,7 +2000,7 @@ class _ManagementPageState extends State<ManagementPage> {
                     children: [
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.receipt,
                             color: Colors.orange,
                             size: 20,
@@ -2150,7 +2150,7 @@ class _ManagementPageState extends State<ManagementPage> {
         // Header
         Row(
           children: [
-            Icon(
+            const Icon(
               Icons.card_giftcard_outlined,
               size: 24,
               color: AppColors.primary,

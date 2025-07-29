@@ -104,10 +104,10 @@ class _PaymentDialogState extends State<PaymentDialog> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: AppColors.primary.withOpacity(0.3),
+                  color: AppColors.primary.withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
@@ -174,7 +174,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppColors.primary.withOpacity(0.1)
+                          ? AppColors.primary.withValues(alpha: 0.1)
                           : (isDark ? AppColors.darkMuted : AppColors.muted),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(

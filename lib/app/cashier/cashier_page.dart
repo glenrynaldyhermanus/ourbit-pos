@@ -246,15 +246,16 @@ class _CashierPageState extends State<CashierPage> {
                                               Expanded(
                                                 flex: 2,
                                                 child: TextField(
-                                                  decoration: InputDecoration(
+                                                  decoration:
+                                                      const InputDecoration(
                                                     labelText:
                                                         'Search Products',
                                                     hintText:
                                                         'Type product name...',
-                                                    prefixIcon: const Icon(
-                                                        Icons.search),
+                                                    prefixIcon:
+                                                        Icon(Icons.search),
                                                     border:
-                                                        const OutlineInputBorder(),
+                                                        OutlineInputBorder(),
                                                   ),
                                                   onChanged: (value) {
                                                     context
