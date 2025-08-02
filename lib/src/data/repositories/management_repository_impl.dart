@@ -110,7 +110,8 @@ class ManagementRepositoryImpl implements ManagementRepository {
             };
           })
           .toList()
-          .cast<Map<String, dynamic>>();
+          .map((item) => Map<String, dynamic>.from(item))
+          .toList();
     } catch (e) {
       throw Exception('Failed to fetch categories');
     }
@@ -175,7 +176,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
           .eq('business_id', businessId)
           .order('name', ascending: true);
 
-      return (response as List).cast<Map<String, dynamic>>();
+      return List<Map<String, dynamic>>.from(response);
     } catch (e) {
       throw Exception('Failed to fetch customers');
     }
@@ -236,7 +237,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
           .eq('business_id', businessId)
           .order('name', ascending: true);
 
-      return (response as List).cast<Map<String, dynamic>>();
+      return List<Map<String, dynamic>>.from(response);
     } catch (e) {
       throw Exception('Failed to fetch suppliers');
     }
@@ -290,7 +291,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
           .select('id, name, stock, min_stock, categories(name)')
           .order('name', ascending: true);
 
-      return (response as List).cast<Map<String, dynamic>>();
+      return List<Map<String, dynamic>>.from(response);
     } catch (e) {
       throw Exception('Failed to fetch inventory');
     }
@@ -344,7 +345,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
           .eq('business_id', businessId)
           .order('created_at', ascending: false);
 
-      return (response as List).cast<Map<String, dynamic>>();
+      return List<Map<String, dynamic>>.from(response);
     } catch (e) {
       throw Exception('Failed to fetch discounts');
     }
@@ -415,7 +416,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
           .eq('store_id', storeId)
           .order('created_at', ascending: false);
 
-      return (response as List).cast<Map<String, dynamic>>();
+      return List<Map<String, dynamic>>.from(response);
     } catch (e) {
       throw Exception('Failed to fetch expenses');
     }

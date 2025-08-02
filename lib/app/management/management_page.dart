@@ -326,14 +326,9 @@ class _ManagementPageState extends State<ManagementPage> {
                         ),
                         // Right Panel - Content
                         Expanded(
-                          child: SingleChildScrollView(
+                          child: Padding(
                             padding: const EdgeInsets.all(24),
-                            child: Column(
-                              children: [
-                                _buildContent(isDark),
-                                const SizedBox(height: 24), // Bottom padding
-                              ],
-                            ),
+                            child: _buildContent(isDark),
                           ),
                         ),
                       ],
@@ -352,6 +347,17 @@ class _ManagementPageState extends State<ManagementPage> {
     final selectedItem =
         _menuItems.firstWhere((item) => item.id == _selectedMenu);
 
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildContentByMenu(isDark, selectedItem),
+          const SizedBox(height: 24), // Bottom padding
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContentByMenu(bool isDark, ManagementMenuItem selectedItem) {
     switch (_selectedMenu) {
       case 'products':
         return _buildProductsContent(isDark);
@@ -550,7 +556,7 @@ class _ManagementPageState extends State<ManagementPage> {
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount:
                         MediaQuery.of(context).size.width < 1200 ? 2 : 3,
-                    childAspectRatio: 2.5,
+                    childAspectRatio: 3.0,
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
                   ),
@@ -567,6 +573,7 @@ class _ManagementPageState extends State<ManagementPage> {
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Row(
                               children: [
@@ -994,7 +1001,7 @@ class _ManagementPageState extends State<ManagementPage> {
         const SizedBox(height: 16),
         // Customers Table
         SizedBox(
-          height: 600, // Fixed height for table
+          height: 600,
           child: OurbitCard(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -1125,7 +1132,7 @@ class _ManagementPageState extends State<ManagementPage> {
         const SizedBox(height: 24),
         // Suppliers Grid
         SizedBox(
-          height: 600, // Fixed height for grid
+          height: 600,
           child: GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: MediaQuery.of(context).size.width < 1200 ? 1 : 2,
@@ -1384,7 +1391,7 @@ class _ManagementPageState extends State<ManagementPage> {
         const SizedBox(height: 24),
         // Discounts List
         SizedBox(
-          height: 600, // Fixed height for list
+          height: 600,
           child: ListView.builder(
             itemCount: 6, // Sample data
             itemBuilder: (context, index) {
@@ -1607,7 +1614,7 @@ class _ManagementPageState extends State<ManagementPage> {
         const SizedBox(height: 24),
         // Tax Settings Form
         SizedBox(
-          height: 600, // Fixed height for form
+          height: 600,
           child: Row(
             children: [
               // Left Panel - Tax Rules
@@ -2036,7 +2043,7 @@ class _ManagementPageState extends State<ManagementPage> {
         const SizedBox(height: 24),
         // Expenses Table
         SizedBox(
-          height: 600, // Fixed height for table
+          height: 600,
           child: OurbitCard(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -2180,7 +2187,7 @@ class _ManagementPageState extends State<ManagementPage> {
         const SizedBox(height: 24),
         // Loyalty Programs Grid
         SizedBox(
-          height: 600, // Fixed height for grid
+          height: 600,
           child: GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: MediaQuery.of(context).size.width < 1200 ? 1 : 2,

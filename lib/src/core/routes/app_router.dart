@@ -6,7 +6,6 @@ import 'package:ourbit_pos/app/management/management_page.dart';
 import 'package:ourbit_pos/app/organization/organization_page.dart';
 import 'package:ourbit_pos/app/payment/payment_page.dart';
 import 'package:ourbit_pos/app/payment/success_page.dart';
-import 'package:ourbit_pos/app/products/products_page.dart';
 import 'package:ourbit_pos/app/management/products_management_page.dart';
 import 'package:ourbit_pos/app/reports/reports_page.dart';
 import 'package:flutter/foundation.dart';
@@ -16,7 +15,6 @@ import 'package:ourbit_pos/src/core/services/supabase_service.dart';
 class AppRouter {
   static const String loginRoute = '/login';
   static const String posRoute = '/pos';
-  static const String productsRoute = '/products';
   static const String managementRoute = '/management';
   static const String organizationRoute = '/organization';
   static const String reportsRoute = '/reports';
@@ -106,15 +104,6 @@ class AppRouter {
           context,
           state,
           const CashierPage(),
-        ),
-      ),
-      GoRoute(
-        path: productsRoute,
-        name: 'products',
-        pageBuilder: (context, state) => _buildPageWithFadeTransition(
-          context,
-          state,
-          const ProductsPage(),
         ),
       ),
       GoRoute(
