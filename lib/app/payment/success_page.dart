@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ourbit_pos/src/widgets/ourbit_button.dart';
-import 'package:ourbit_pos/src/widgets/ourbit_card.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
+import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
 
 class SuccessPage extends StatefulWidget {
   const SuccessPage({super.key});
@@ -127,23 +127,10 @@ class _SuccessPageState extends State<SuccessPage>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Expanded(
-                          child: OurbitButton(
+                          child: OurbitButton.primary(
                             onPressed: () => context.go('/pos'),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.point_of_sale, color: Colors.white),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Kembali ke Kasir',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            label: 'Kembali ke Kasir',
+                            leadingIcon: const Icon(Icons.point_of_sale, color: Colors.white),
                           ),
                         ),
                       ],

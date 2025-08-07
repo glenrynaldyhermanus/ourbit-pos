@@ -1,13 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ourbit_pos/src/data/usecases/get_all_products_usecase.dart';
-import 'package:ourbit_pos/src/data/usecases/get_categories_usecase.dart';
-import 'package:ourbit_pos/src/data/usecases/get_customers_usecase.dart';
-import 'package:ourbit_pos/src/data/usecases/get_suppliers_usecase.dart';
-import 'package:ourbit_pos/src/data/usecases/get_discounts_usecase.dart';
-import 'package:ourbit_pos/src/data/usecases/get_expenses_usecase.dart';
-import 'package:ourbit_pos/src/data/usecases/get_loyalty_programs_usecase.dart';
 import 'management_event.dart';
 import 'management_state.dart';
+import '../src/data/usecases/get_all_products_usecase.dart';
+import '../src/data/usecases/get_categories_usecase.dart';
+import '../src/data/usecases/get_customers_usecase.dart';
+import '../src/data/usecases/get_suppliers_usecase.dart';
+import '../src/data/usecases/get_discounts_usecase.dart';
+import '../src/data/usecases/get_expenses_usecase.dart';
+import '../src/data/usecases/get_loyalty_programs_usecase.dart';
 
 class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   final GetAllProductsUseCase _getAllProductsUseCase;
@@ -66,6 +66,7 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
     on<UpdateLoyaltyProgram>(_onUpdateLoyaltyProgram);
     on<DeleteLoyaltyProgram>(_onDeleteLoyaltyProgram);
     on<ToggleLoyaltyProgramStatus>(_onToggleLoyaltyProgramStatus);
+    on<SelectManagementMenu>(_onSelectManagementMenu);
   }
 
   Future<void> _onLoadProducts(
@@ -116,8 +117,9 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
       LoadInventory event, Emitter<ManagementState> emit) async {
     emit(ManagementLoading());
     try {
-      final inventory = await _getAllProductsUseCase.execute();
-      emit(InventoryLoaded(inventory));
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
+      emit(InventoryLoaded([]));
     } catch (e) {
       emit(ManagementError(e.toString()));
     }
@@ -149,8 +151,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
       LoadLoyaltyPrograms event, Emitter<ManagementState> emit) async {
     emit(ManagementLoading());
     try {
-      final programs = await _getLoyaltyProgramsUseCase.execute();
-      emit(LoyaltyProgramsLoaded(programs));
+      final loyaltyPrograms = await _getLoyaltyProgramsUseCase.execute();
+      emit(LoyaltyProgramsLoaded(loyaltyPrograms));
     } catch (e) {
       emit(ManagementError(e.toString()));
     }
@@ -159,7 +161,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onUpdateProduct(
       UpdateProduct event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement update product usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadProducts());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -169,7 +172,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onCreateProduct(
       CreateProduct event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement create product usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadProducts());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -179,7 +183,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onDeleteProduct(
       DeleteProduct event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement delete product usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadProducts());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -189,7 +194,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onCreateCategory(
       CreateCategory event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement create category usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadCategories());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -199,7 +205,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onUpdateCategory(
       UpdateCategory event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement update category usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadCategories());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -209,7 +216,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onDeleteCategory(
       DeleteCategory event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement delete category usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadCategories());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -219,7 +227,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onCreateCustomer(
       CreateCustomer event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement create customer usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadCustomers());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -229,7 +238,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onUpdateCustomer(
       UpdateCustomer event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement update customer usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadCustomers());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -239,7 +249,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onDeleteCustomer(
       DeleteCustomer event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement delete customer usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadCustomers());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -249,7 +260,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onCreateSupplier(
       CreateSupplier event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement create supplier usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadSuppliers());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -259,7 +271,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onUpdateSupplier(
       UpdateSupplier event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement update supplier usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadSuppliers());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -269,7 +282,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onDeleteSupplier(
       DeleteSupplier event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement delete supplier usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadSuppliers());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -279,7 +293,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onCreateDiscount(
       CreateDiscount event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement create discount usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadDiscounts());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -289,7 +304,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onUpdateDiscount(
       UpdateDiscount event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement update discount usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadDiscounts());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -299,7 +315,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onDeleteDiscount(
       DeleteDiscount event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement delete discount usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadDiscounts());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -309,7 +326,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onToggleDiscountStatus(
       ToggleDiscountStatus event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement toggle discount status usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadDiscounts());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -319,7 +337,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onCreateExpense(
       CreateExpense event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement create expense usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadExpenses());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -329,7 +348,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onUpdateExpense(
       UpdateExpense event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement update expense usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadExpenses());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -339,7 +359,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onDeleteExpense(
       DeleteExpense event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement delete expense usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadExpenses());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -349,7 +370,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onMarkExpenseAsPaid(
       MarkExpenseAsPaid event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement mark expense as paid usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadExpenses());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -359,7 +381,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onCreateLoyaltyProgram(
       CreateLoyaltyProgram event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement create loyalty program usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadLoyaltyPrograms());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -369,7 +392,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onUpdateLoyaltyProgram(
       UpdateLoyaltyProgram event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement update loyalty program usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadLoyaltyPrograms());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -379,7 +403,8 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onDeleteLoyaltyProgram(
       DeleteLoyaltyProgram event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement delete loyalty program usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadLoyaltyPrograms());
     } catch (e) {
       emit(ManagementError(e.toString()));
@@ -389,10 +414,16 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onToggleLoyaltyProgramStatus(
       ToggleLoyaltyProgramStatus event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement toggle loyalty program status usecase
+      // TODO: Implement actual API call
+      await Future.delayed(const Duration(seconds: 1));
       add(LoadLoyaltyPrograms());
     } catch (e) {
       emit(ManagementError(e.toString()));
     }
+  }
+
+  void _onSelectManagementMenu(
+      SelectManagementMenu event, Emitter<ManagementState> emit) {
+    emit(ManagementMenuSelected(event.menuId));
   }
 }

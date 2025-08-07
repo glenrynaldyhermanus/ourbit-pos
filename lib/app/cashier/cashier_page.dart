@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as material;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:ourbit_pos/app/cashier/widgets/pos_cart.dart';
 import 'package:ourbit_pos/app/cashier/widgets/pos_header.dart';
 import 'package:ourbit_pos/app/cashier/widgets/product_card.dart';
@@ -11,7 +12,11 @@ import 'package:ourbit_pos/src/core/services/local_storage_service.dart';
 import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/core/utils/responsive.dart';
 import 'package:ourbit_pos/src/data/objects/product.dart';
-import 'package:ourbit_pos/src/widgets/app_sidebar.dart';
+import 'package:ourbit_pos/src/widgets/navigation/sidebar.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
+import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_circular_progress.dart';
+import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_toast.dart';
 
 class CashierPage extends StatefulWidget {
   const CashierPage({super.key});
@@ -140,16 +145,15 @@ class _CashierPageState extends State<CashierPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == material.Brightness.dark;
 
     return BlocListener<CashierBloc, CashierState>(
       listener: (context, state) {
         if (state is CashierError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error: ${state.message}'),
-              backgroundColor: AppColors.error,
-            ),
+          OurbitToast.error(
+            context: context,
+            title: 'Error',
+            content: state.message,
           );
         }
       },
@@ -157,12 +161,12 @@ class _CashierPageState extends State<CashierPage> {
         builder: (context, state) {
           if (state is CashierInitial) {
             context.read<CashierBloc>().add(LoadProducts());
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: OurbitCircularProgress());
           }
 
           if (state is CashierLoading) {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: OurbitCircularProgress(),
             );
           }
 
@@ -195,10 +199,10 @@ class _CashierPageState extends State<CashierPage> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  ElevatedButton(
+                  OurbitButton(
                     onPressed: () =>
                         context.read<CashierBloc>().add(LoadProducts()),
-                    child: const Text('Retry'),
+                    label: 'Retry',
                   ),
                 ],
               ),
@@ -207,14 +211,14 @@ class _CashierPageState extends State<CashierPage> {
 
           if (state is CashierLoaded) {
             return Scaffold(
-              body: Container(
+              child: Container(
                 color: isDark
                     ? AppColors.darkSurfaceBackground
                     : AppColors.surfaceBackground,
                 child: Row(
                   children: [
                     // Sidebar - hanya tampil jika bukan web
-                    if (!Responsive.isWeb()) const AppSidebar(),
+                    if (!Responsive.isWeb()) const Sidebar(),
                     // Main Content
                     Expanded(
                       child: Column(
@@ -245,73 +249,112 @@ class _CashierPageState extends State<CashierPage> {
                                               // Search Field
                                               Expanded(
                                                 flex: 2,
-                                                child: TextField(
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    labelText:
-                                                        'Search Products',
-                                                    hintText:
-                                                        'Type product name...',
-                                                    prefixIcon:
-                                                        Icon(Icons.search),
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                  ),
+                                                child: OurbitTextInput(
+                                                  placeholder:
+                                                      'Type product name...',
+                                                  label: 'Search Products',
+                                                  leading:
+                                                      const Icon(Icons.search),
                                                   onChanged: (value) {
                                                     context
                                                         .read<CashierBloc>()
                                                         .add(SearchProducts(
-                                                            value));
+                                                            value ?? ''));
                                                   },
                                                 ),
                                               ),
-                                              const SizedBox(width: 16),
+                                              const Gap(16),
                                               // Category Filter
                                               Expanded(
                                                 flex: 1,
-                                                child: DropdownButtonFormField<
-                                                    String>(
-                                                  value:
-                                                      state.selectedCategory ==
-                                                              'all'
-                                                          ? 'All'
-                                                          : state
-                                                              .selectedCategory,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    labelText: 'Category',
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                    contentPadding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 12,
-                                                            vertical: 8),
+                                                child: Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 8),
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color:
+                                                            AppColors.border),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
                                                   ),
-                                                  isExpanded: true,
-                                                  items: _getCategories(state)
-                                                      .map((category) {
-                                                    return DropdownMenuItem(
-                                                      value: category,
-                                                      child: Text(
-                                                        category,
-                                                        style: _getSystemFont(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w500,
+                                                  child: GestureDetector(
+                                                    onTap: () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (context) =>
+                                                            AlertDialog(
+                                                          title: const Text(
+                                                              'Select Category'),
+                                                          content: SizedBox(
+                                                            width: double
+                                                                .maxFinite,
+                                                            child: ListView
+                                                                .builder(
+                                                              shrinkWrap: true,
+                                                              itemCount:
+                                                                  _getCategories(
+                                                                          state)
+                                                                      .length,
+                                                              itemBuilder:
+                                                                  (context,
+                                                                      index) {
+                                                                final category =
+                                                                    _getCategories(
+                                                                            state)[
+                                                                        index];
+                                                                return GestureDetector(
+                                                                  onTap: () {
+                                                                    context
+                                                                        .read<
+                                                                            CashierBloc>()
+                                                                        .add(FilterByCategory(
+                                                                            category));
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child:
+                                                                      Container(
+                                                                    padding: const EdgeInsets
+                                                                        .symmetric(
+                                                                        vertical:
+                                                                            12,
+                                                                        horizontal:
+                                                                            16),
+                                                                    child: Text(
+                                                                        category),
+                                                                  ),
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
                                                         ),
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                    );
-                                                  }).toList(),
-                                                  onChanged: (value) {
-                                                    if (value != null) {
-                                                      context
-                                                          .read<CashierBloc>()
-                                                          .add(FilterByCategory(
-                                                              value));
-                                                    }
-                                                  },
+                                                      );
+                                                    },
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          state.selectedCategory ==
+                                                                  'all'
+                                                              ? 'All'
+                                                              : state
+                                                                  .selectedCategory,
+                                                          style: _getSystemFont(
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                        const Icon(Icons
+                                                            .arrow_drop_down),
+                                                      ],
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
                                             ],
@@ -377,7 +420,7 @@ class _CashierPageState extends State<CashierPage> {
           }
 
           return const Center(
-            child: CircularProgressIndicator(),
+            child: OurbitCircularProgress(),
           );
         },
       ),

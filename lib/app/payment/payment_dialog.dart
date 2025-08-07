@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as material;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ourbit_pos/src/core/theme/app_theme.dart';
-
-import 'package:ourbit_pos/src/widgets/ourbit_button.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class PaymentDialog extends StatefulWidget {
   final double total;
@@ -67,9 +68,9 @@ class _PaymentDialogState extends State<PaymentDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+    final isDark = theme.brightness == material.Brightness.dark;
 
-    return Dialog(
+    return material.Dialog(
       child: Container(
         width: 500,
         padding: const EdgeInsets.all(24),
@@ -163,7 +164,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
                 final method = _paymentMethods[index];
                 final isSelected = _selectedMethod == method.name;
 
-                return InkWell(
+                return material.InkWell(
                   onTap: () {
                     setState(() {
                       _selectedMethod = method.name;
@@ -255,16 +256,10 @@ class _PaymentDialogState extends State<PaymentDialog> {
                 ),
               ),
               const SizedBox(height: 8),
-              TextField(
+              OurbitTextInput(
                 controller: _amountController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  hintText: 'Enter amount received',
-                  prefixIcon: const Icon(Icons.attach_money),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+                placeholder: 'Enter amount received',
+                leading: const Icon(Icons.attach_money),
               ),
               const SizedBox(height: 8),
               if (double.tryParse(_amountController.text) != null &&
@@ -284,19 +279,19 @@ class _PaymentDialogState extends State<PaymentDialog> {
             Row(
               children: [
                 Expanded(
-                  child: OurbitOutlineButton(
-                    text: 'Cancel',
+                  child: OurbitButton.outline(
                     onPressed: () => Navigator.of(context).pop(),
+                    label: 'Cancel',
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: OurbitPrimaryButton(
-                    text: 'Process Payment',
+                  child: OurbitButton.primary(
                     onPressed: () {
                       Navigator.of(context).pop();
                       widget.onProcessPayment();
                     },
+                    label: 'Process Payment',
                   ),
                 ),
               ],

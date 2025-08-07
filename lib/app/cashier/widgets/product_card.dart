@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/data/objects/product.dart';
-import 'package:ourbit_pos/src/widgets/ourbit_card.dart';
+import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -30,9 +30,10 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return OurbitCard(
+    return GestureDetector(
       onTap: onTap,
-      child: OurbitCardContent(
+      child: OurbitCard(
+        padding: const EdgeInsets.all(12),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,

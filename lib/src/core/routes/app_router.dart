@@ -3,10 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:ourbit_pos/app/cashier/cashier_page.dart';
 import 'package:ourbit_pos/app/login/login_page.dart';
 import 'package:ourbit_pos/app/management/management_page.dart';
+
 import 'package:ourbit_pos/app/organization/organization_page.dart';
 import 'package:ourbit_pos/app/payment/payment_page.dart';
 import 'package:ourbit_pos/app/payment/success_page.dart';
-import 'package:ourbit_pos/app/management/products_management_page.dart';
 import 'package:ourbit_pos/app/reports/reports_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ourbit_pos/src/core/services/token_service.dart';
@@ -104,15 +104,6 @@ class AppRouter {
           context,
           state,
           const CashierPage(),
-        ),
-      ),
-      GoRoute(
-        path: '/management/products',
-        name: 'management_products',
-        pageBuilder: (context, state) => _buildPageWithFadeTransition(
-          context,
-          state,
-          const ProductsManagementPage(),
         ),
       ),
       GoRoute(

@@ -92,3 +92,12 @@ class LoyaltyProgramsLoaded extends ManagementState {
   @override
   List<Object?> get props => [programs];
 }
+
+class ManagementMenuSelected extends ManagementState {
+  final String selectedMenu;
+
+  const ManagementMenuSelected(this.selectedMenu);
+
+  @override
+  List<Object?> get props => [selectedMenu];
+}

@@ -317,3 +317,14 @@ class ToggleLoyaltyProgramStatus extends ManagementEvent {
   @override
   List<Object?> get props => [programId, isActive];
 }
+
+class SelectManagementMenu extends ManagementEvent {
+  final String menuId;
+
+  const SelectManagementMenu({
+    required this.menuId,
+  });
+
+  @override
+  List<Object?> get props => [menuId];
+}

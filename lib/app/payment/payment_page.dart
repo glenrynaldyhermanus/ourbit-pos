@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:ourbit_pos/blocs/cashier_bloc.dart';
 import 'package:ourbit_pos/blocs/cashier_state.dart';
 import 'package:ourbit_pos/src/core/services/supabase_service.dart';
-import 'package:ourbit_pos/src/widgets/ourbit_button.dart';
-import 'package:ourbit_pos/src/widgets/ourbit_card.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
+import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -591,34 +591,10 @@ class _PaymentPageState extends State<PaymentPage>
                     // Process Payment Button
                     SizedBox(
                       width: double.infinity,
-                      child: OurbitButton(
+                      child: OurbitButton.primary(
                         onPressed: isProcessing ? null : _processPayment,
-                        child: isProcessing
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white),
-                                ),
-                              )
-                            : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.payment,
-                                      color: Colors.white),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Bayar ${_formatCurrency(total)}',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                        label: 'Bayar ${_formatCurrency(total)}',
+                        leadingIcon: const Icon(Icons.payment, color: Colors.white),
                       ),
                     ),
                   ],

@@ -6,38 +6,26 @@ alwaysApply: true
 
 ## Prinsip Dasar
 
-1. **Jangan mengubah kode yang tidak diminta** - Hanya lakukan perubahan yang secara eksplisit diminta
-2. **Konsultasi sebelum perubahan** - Jika ada rekomendasi atau perubahan di luar permintaan, tanyakan terlebih dahulu
-3. **Tidak ada improvisasi** - Jangan menambahkan fitur atau perubahan yang tidak diminta
+**Jangan mengubah kode yang tidak diminta** - Hanya lakukan perubahan yang secara eksplisit diminta
+**Konsultasi sebelum perubahan** - Jika ada rekomendasi atau perubahan di luar permintaan, tanyakan terlebih dahulu
+**Tidak ada improvisasi** - Jangan menambahkan fitur atau perubahan yang tidak diminta
+**Bahasa Indonesia** - Semua label, button dan text di aplikasi ini harus berbahasa Indonesia
 
 ## Standar Pengembangan
 
-4. **Gunakan komponen yang sudah ada** - Manfaatkan komponen dan styling yang sudah tersedia untuk konsistensi
-5. **Routing menggunakan GoRouter** - Ikuti pola routing yang sudah ditetapkan dengan GoRouter
-6. **Arsitektur BLoC dengan Usecases** - Gunakan Arsitektur BLoC dengan menggunakan konsep Usecase
-7. **Database schema** - Untuk perubahan database, periksa skema di `dbschema.sql`
+**Gunakan komponen yang sudah ada** - Manfaatkan komponen dan styling yang sudah tersedia untuk konsistensi
+**Routing menggunakan GoRouter** - Ikuti pola routing yang sudah ditetapkan dengan GoRouter
+**Arsitektur BLoC dengan Usecases** - Gunakan Arsitektur BLoC untuk state management dengan menggunakan konsep Usecase
+**Database schema** - Untuk perubahan database, periksa skema di `database/schema.sql`
 
 ## Quality Assurance
 
-7. **Flutter analyze** - Setiap ada perubahan, jalankan `flutter analyze` dan perbaiki masalah yang ditemukan
-8. **Logging perubahan** - Setiap ada perubahan yang signifikan, simpan di folder `/logs/{tanggal_chat}.md`
+**Flutter analyze** - Setiap ada perubahan, jalankan `flutter analyze` dan perbaiki masalah yang ditemukan
 
-# Aturan Pengembangan
+## UI Guidelines
 
-## Prinsip Dasar
-
-1. **Jangan mengubah kode yang tidak diminta** - Hanya lakukan perubahan yang secara eksplisit diminta
-2. **Konsultasi sebelum perubahan** - Jika ada rekomendasi atau perubahan di luar permintaan, tanyakan terlebih dahulu
-3. **Tidak ada improvisasi** - Jangan menambahkan fitur atau perubahan yang tidak diminta
-
-## Standar Pengembangan
-
-4. **Gunakan komponen yang sudah ada** - Manfaatkan komponen dan styling yang sudah tersedia untuk konsistensi
-5. **Routing menggunakan GoRouter** - Ikuti pola routing yang sudah ditetapkan dengan GoRouter
-6. **Arsitektur BLoC dengan Usecases** - Gunakan Arsitektur BLoC dengan menggunakan konsep Usecase
-7. **Database schema** - Untuk perubahan database, periksa skema di `dbschema.sql`
-
-## Quality Assurance
-
-7. **Flutter analyze** - Setiap ada perubahan, jalankan `flutter analyze` dan perbaiki masalah yang ditemukan
-8. **Logging perubahan** - Setiap ada perubahan yang signifikan, simpan di folder `/logs/{tanggal_chat}.md`
+**Gunakan Ourbit Custom Widget First** - Selalu prioritaskan widget custom milik Ourbit yang ada di folder /src/widgets.
+**Gunakan shadcn_flutter Next** - Jika Ourbit widget tidak tersedia, baru gunakan widget dari shadcn_flutter.
+**Gunakan Built In Flutter Widget Last** - Terakhir sekali jika widget di kedua source diatas tidak ada baru gunakan widget Flutter.
+**Cara Menggunakan shadcn** - Cek shadcn-rule.mdc untuk penggunaan widget Ourbit dan Shadcn.
+**Default UI Import** - Kalau sudah pakai import 'package:shadcn_flutter/shadcn_flutter.dart', tidak perlu import 'package:flutter/material.dart' lagi, kalau masih perlu import material, dibuat seperti ini import 'package:flutter/material.dart' as material

@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as material;
 import 'package:go_router/go_router.dart';
 import 'package:ourbit_pos/src/core/theme/app_theme.dart';
-import 'package:ourbit_pos/src/widgets/app_sidebar.dart';
-import 'package:ourbit_pos/src/widgets/ourbit_card.dart';
+import 'package:ourbit_pos/src/widgets/navigation/sidebar.dart';
+import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_icon_button.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class OrganizationPage extends StatefulWidget {
   const OrganizationPage({super.key});
@@ -44,17 +46,17 @@ class _OrganizationPageState extends State<OrganizationPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == material.Brightness.dark;
 
     return Scaffold(
-      body: Container(
+      child: Container(
         color: isDark
             ? AppColors.darkSurfaceBackground
             : AppColors.surfaceBackground,
         child: Row(
           children: [
             // Sidebar
-            const AppSidebar(),
+            const Sidebar(),
             // Main Content
             Expanded(
               child: Column(
@@ -92,10 +94,9 @@ class _OrganizationPageState extends State<OrganizationPage> {
                           ),
                         ),
                         const Spacer(),
-                        IconButton(
+                        OurbitIconButton.ghost(
                           icon: const Icon(Icons.close),
                           onPressed: () => context.go('/pos'),
-                          tooltip: 'Kembali ke POS',
                         ),
                       ],
                     ),
@@ -144,9 +145,9 @@ class _OrganizationPageState extends State<OrganizationPage> {
 
                                     return Container(
                                       margin: const EdgeInsets.only(bottom: 8),
-                                      child: Material(
+                                      child: material.Material(
                                         color: Colors.transparent,
-                                        child: InkWell(
+                                        child: material.InkWell(
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           onTap: () {

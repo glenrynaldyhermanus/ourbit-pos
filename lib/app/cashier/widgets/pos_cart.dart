@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ourbit_pos/blocs/cashier_state.dart';
 import 'package:ourbit_pos/src/core/theme/app_theme.dart';
-import 'package:ourbit_pos/src/widgets/ourbit_button.dart';
-import 'package:ourbit_pos/src/widgets/ourbit_card.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
+import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
 
 class PosCart extends StatelessWidget {
   final CashierLoaded state;
@@ -40,35 +40,39 @@ class PosCart extends StatelessWidget {
         // Cart Items
         Expanded(
           child: OurbitCard(
+            padding: const EdgeInsets.all(16),
             child: Column(
               children: [
                 // Cart Header
-                OurbitCardHeader(
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.shopping_cart_outlined,
-                        color: AppColors.primary,
-                        size: 24,
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.shopping_cart_outlined,
+                      color: AppColors.primary,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Cart',
+                      style: _getSystemFont(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
                       ),
-                      const SizedBox(width: 12),
-                      const OurbitCardTitle(
-                        text: 'Cart',
-                      ),
-                      const Spacer(),
-                      if (state.cartItems.isNotEmpty)
-                        IconButton(
-                          icon: Icon(
-                            Icons.clear_rounded,
-                            color: isDark
-                                ? AppColors.darkSecondaryText
-                                : AppColors.secondaryText,
-                          ),
-                          onPressed: onClearCart,
+                    ),
+                    const Spacer(),
+                    if (state.cartItems.isNotEmpty)
+                      IconButton(
+                        icon: Icon(
+                          Icons.clear_rounded,
+                          color: isDark
+                              ? AppColors.darkSecondaryText
+                              : AppColors.secondaryText,
                         ),
-                    ],
-                  ),
+                        onPressed: onClearCart,
+                      ),
+                  ],
                 ),
+                const SizedBox(height: 16),
                 // Cart Content
                 Expanded(
                   child: state.cartItems.isEmpty
@@ -82,83 +86,82 @@ class PosCart extends StatelessWidget {
         const SizedBox(height: 16),
         // Totals
         OurbitCard(
-          child: OurbitCardContent(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Subtotal:',
-                      style: _getSystemFont(
-                        fontSize: 14,
-                        color: isDark
-                            ? AppColors.darkSecondaryText
-                            : AppColors.secondaryText,
-                      ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Subtotal:',
+                    style: _getSystemFont(
+                      fontSize: 14,
+                      color: isDark
+                          ? AppColors.darkSecondaryText
+                          : AppColors.secondaryText,
                     ),
-                    Text(
-                      _formatCurrency(state.total),
-                      style: _getSystemFont(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
+                  ),
+                  Text(
+                    _formatCurrency(state.total),
+                    style: _getSystemFont(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                     ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Tax (10%):',
-                      style: _getSystemFont(
-                        fontSize: 14,
-                        color: isDark
-                            ? AppColors.darkSecondaryText
-                            : AppColors.secondaryText,
-                      ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Tax (10%):',
+                    style: _getSystemFont(
+                      fontSize: 14,
+                      color: isDark
+                          ? AppColors.darkSecondaryText
+                          : AppColors.secondaryText,
                     ),
-                    Text(
-                      _formatCurrency(state.tax),
-                      style: _getSystemFont(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
+                  ),
+                  Text(
+                    _formatCurrency(state.tax),
+                    style: _getSystemFont(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                     ),
-                  ],
-                ),
-                const Divider(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Total:',
-                      style: _getSystemFont(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  ),
+                ],
+              ),
+              const Divider(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Total:',
+                    style: _getSystemFont(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                     ),
-                    Text(
-                      _formatCurrency(state.finalTotal),
-                      style: _getSystemFont(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
-                      ),
+                  ),
+                  Text(
+                    _formatCurrency(state.finalTotal),
+                    style: _getSystemFont(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 16),
         // Payment Button
         SizedBox(
           width: double.infinity,
-          child: OurbitPrimaryButton(
-            text: 'Process Payment',
+          child: OurbitButton(
+            label: 'Process Payment',
             onPressed: state.cartItems.isEmpty ? null : onProcessPayment,
           ),
         ),
@@ -167,41 +170,38 @@ class PosCart extends StatelessWidget {
   }
 
   Widget _buildEmptyCart(bool isDark) {
-    return OurbitCardContent(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.shopping_cart_outlined,
-              size: 64,
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.shopping_cart_outlined,
+            size: 64,
+            color:
+                isDark ? AppColors.darkSecondaryText : AppColors.secondaryText,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Cart is empty',
+            style: _getSystemFont(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
               color: isDark
                   ? AppColors.darkSecondaryText
                   : AppColors.secondaryText,
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Cart is empty',
-              style: _getSystemFont(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: isDark
-                    ? AppColors.darkSecondaryText
-                    : AppColors.secondaryText,
-              ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Add items to get started',
+            style: _getSystemFont(
+              fontSize: 14,
+              color: isDark
+                  ? AppColors.darkSecondaryText
+                  : AppColors.secondaryText,
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Add items to get started',
-              style: _getSystemFont(
-                fontSize: 14,
-                color: isDark
-                    ? AppColors.darkSecondaryText
-                    : AppColors.secondaryText,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
