@@ -6,6 +6,23 @@ class LocalStorageService {
   static const String _businessKey = 'business_data';
   static const String _storeKey = 'store_data';
   static const String _roleAssignmentKey = 'role_assignment_data';
+  static const String _themeKey = 'theme_preference';
+
+  // Theme preference
+  static Future<void> saveThemePreference(bool isDarkMode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_themeKey, isDarkMode);
+  }
+
+  static Future<bool?> getThemePreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_themeKey);
+  }
+
+  static Future<void> clearThemePreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_themeKey);
+  }
 
   // User data
   static Future<void> saveUserData(Map<String, dynamic> userData) async {
@@ -82,5 +99,6 @@ class LocalStorageService {
     await prefs.remove(_businessKey);
     await prefs.remove(_storeKey);
     await prefs.remove(_roleAssignmentKey);
+    await prefs.remove(_themeKey);
   }
 }

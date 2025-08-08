@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitToggle extends StatelessWidget {
   final bool value;
@@ -14,10 +17,14 @@ class OurbitToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Toggle(
-      value: value,
-      onChanged: onChanged,
-      child: child,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return Toggle(
+          value: value,
+          onChanged: onChanged,
+          child: child,
+        );
+      },
     );
   }
 }

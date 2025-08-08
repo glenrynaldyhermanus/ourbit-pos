@@ -5,6 +5,7 @@ import 'package:ourbit_pos/src/data/usecases/add_to_cart_usecase.dart';
 import 'package:ourbit_pos/src/data/usecases/clear_cart_usecase.dart';
 import 'package:ourbit_pos/src/data/usecases/get_cart_usecase.dart';
 import 'package:ourbit_pos/src/data/usecases/get_products_usecase.dart';
+import 'package:ourbit_pos/src/data/usecases/get_categories_by_store_usecase.dart';
 import 'package:ourbit_pos/src/data/usecases/update_cart_quantity_usecase.dart';
 
 import 'cashier_event.dart';
@@ -12,6 +13,7 @@ import 'cashier_state.dart';
 
 class CashierBloc extends Bloc<CashierEvent, CashierState> {
   final GetProductsUseCase _getProductsUseCase;
+  final GetCategoriesByStoreUseCase _getCategoriesByStoreUseCase;
   final GetCartUseCase _getCartUseCase;
   final AddToCartUseCase _addToCartUseCase;
   final UpdateCartQuantityUseCase _updateCartQuantityUseCase;
@@ -19,17 +21,20 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
 
   CashierBloc({
     required GetProductsUseCase getProductsUseCase,
+    required GetCategoriesByStoreUseCase getCategoriesByStoreUseCase,
     required GetCartUseCase getCartUseCase,
     required AddToCartUseCase addToCartUseCase,
     required UpdateCartQuantityUseCase updateCartQuantityUseCase,
     required ClearCartUseCase clearCartUseCase,
   })  : _getProductsUseCase = getProductsUseCase,
+        _getCategoriesByStoreUseCase = getCategoriesByStoreUseCase,
         _getCartUseCase = getCartUseCase,
         _addToCartUseCase = addToCartUseCase,
         _updateCartQuantityUseCase = updateCartQuantityUseCase,
         _clearCartUseCase = clearCartUseCase,
         super(CashierInitial()) {
     on<LoadProducts>(_onLoadProducts);
+    on<LoadCategories>(_onLoadCategories);
     on<LoadCart>(_onLoadCart);
     on<AddToCart>(_onAddToCart);
     on<UpdateCartQuantity>(_onUpdateCartQuantity);
@@ -47,6 +52,8 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
     try {
       final products = await _getProductsUseCase();
       // Products loaded: ${products.length}
+      final categories = await _getCategoriesByStoreUseCase();
+      // Categories loaded: ${categories.length}
       final cartItems = await _getCartUseCase();
       // Cart items loaded: ${cartItems.length}
       final sortedCartItems = _sortCartItems(cartItems);
@@ -54,6 +61,7 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
 
       emit(CashierLoaded(
         products: products,
+        categories: categories,
         cartItems: sortedCartItems,
         total: totals['total']!,
         tax: totals['tax']!,
@@ -64,6 +72,21 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
     } catch (e) {
       // Error in _onLoadProducts: $e
       emit(CashierError(e.toString()));
+    }
+  }
+
+  Future<void> _onLoadCategories(
+    LoadCategories event,
+    Emitter<CashierState> emit,
+  ) async {
+    if (state is CashierLoaded) {
+      final currentState = state as CashierLoaded;
+      try {
+        final categories = await _getCategoriesByStoreUseCase();
+        emit(currentState.copyWith(categories: categories));
+      } catch (e) {
+        emit(CashierError(e.toString()));
+      }
     }
   }
 

@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitRadioGroup<T> extends StatelessWidget {
   final T? value;
@@ -14,10 +17,14 @@ class OurbitRadioGroup<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RadioGroup<T>(
-      value: value,
-      onChanged: onChanged,
-      child: child,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return RadioGroup<T>(
+          value: value,
+          onChanged: onChanged,
+          child: child,
+        );
+      },
     );
   }
 }
@@ -34,9 +41,13 @@ class OurbitRadioItem<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RadioItem<T>(
-      value: value,
-      trailing: trailing,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return RadioItem<T>(
+          value: value,
+          trailing: trailing,
+        );
+      },
     );
   }
 }

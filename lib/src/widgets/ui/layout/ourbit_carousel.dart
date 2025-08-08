@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitCarousel extends StatelessWidget {
   final CarouselController controller;
@@ -22,14 +25,18 @@ class OurbitCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Carousel(
-      controller: controller,
-      itemCount: itemCount,
-      itemBuilder: itemBuilder,
-      transition: transition,
-      autoplaySpeed: autoplaySpeed,
-      duration: duration,
-      direction: direction,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return Carousel(
+          controller: controller,
+          itemCount: itemCount,
+          itemBuilder: itemBuilder,
+          transition: transition,
+          autoplaySpeed: autoplaySpeed,
+          duration: duration,
+          direction: direction,
+        );
+      },
     );
   }
 }

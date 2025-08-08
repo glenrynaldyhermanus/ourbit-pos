@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ourbit_pos/src/core/services/supabase_service.dart';
+import 'package:ourbit_pos/src/core/services/local_storage_service.dart';
 
 // Conditional import untuk dart:html hanya di web
 import 'token_service_web.dart' if (dart.library.io) 'token_service_stub.dart';
@@ -90,10 +91,73 @@ class TokenService {
     return null;
   }
 
+  /// Refresh session if needed
+  static Future<bool> refreshSessionIfNeeded() async {
+    try {
+      final session = SupabaseService.client.auth.currentSession;
+      if (session == null) return false;
+
+      // Check if session will expire in the next 10 minutes
+      if (session.expiresAt != null) {
+        final expiryTime =
+            DateTime.fromMillisecondsSinceEpoch(session.expiresAt!);
+        final now = DateTime.now();
+        final timeUntilExpiry = expiryTime.difference(now);
+
+        // If session expires in less than 10 minutes, try to refresh
+        if (timeUntilExpiry.inMinutes < 10) {
+          try {
+            await SupabaseService.client.auth.refreshSession();
+            return true;
+          } catch (e) {
+            // Refresh failed, session might be invalid
+            return false;
+          }
+        }
+      }
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   /// Validasi token yang tersimpan
   static Future<bool> isTokenValid() async {
-    final token = await getStoredToken();
-    return token != null;
+    try {
+      // First check if Supabase session is still valid
+      final user = SupabaseService.client.auth.currentUser;
+      if (user == null) {
+        // No current user, clear any stored tokens
+        await clearToken();
+        return false;
+      }
+
+      // Check if session is still valid by trying to get user info
+      final session = SupabaseService.client.auth.currentSession;
+      if (session == null) {
+        // No valid session, clear stored tokens
+        await clearToken();
+        return false;
+      }
+
+      // Check if session is expired
+      if (session.expiresAt != null &&
+          DateTime.fromMillisecondsSinceEpoch(session.expiresAt!)
+              .isBefore(DateTime.now())) {
+        // Session expired, clear stored tokens
+        await clearToken();
+        return false;
+      }
+
+      // Session is valid, also check stored token for consistency
+      final storedToken = await getStoredToken();
+      return storedToken != null;
+    } catch (e) {
+      // Error during validation, assume invalid
+      await clearToken();
+      return false;
+    }
   }
 
   /// Clear token dari local storage
@@ -101,6 +165,20 @@ class TokenService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
     await prefs.remove(_tokenExpiryKey);
+  }
+
+  /// Force logout dan clear semua data
+  static Future<void> forceLogout() async {
+    try {
+      // Clear Supabase session
+      await SupabaseService.client.auth.signOut();
+    } catch (e) {
+      // Ignore errors during logout
+    }
+
+    // Clear all local data
+    await clearToken();
+    await LocalStorageService.clearAllData();
   }
 
   /// Handle hash fragment di awal untuk mencegah GoRouter confusion

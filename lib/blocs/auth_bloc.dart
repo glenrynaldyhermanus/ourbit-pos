@@ -40,7 +40,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     SignInRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(AuthLoading());
+    emit(const AuthLoading(isCheckingAuth: false));
     try {
       final user = await _signInUseCase(event.email, event.password);
       if (user != null) {
@@ -49,10 +49,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           await _getUserBusinessStoreUseCase.execute();
           emit(Authenticated(user));
         } catch (businessError) {
-          emit(Authenticated(user));
+          // Handle specific business/store access errors
+          emit(AuthError(businessError.toString()));
         }
       } else {
-        emit(const AuthError('Invalid credentials'));
+        emit(const AuthError('Email atau password salah'));
       }
     } catch (e) {
       emit(AuthError(e.toString()));
@@ -63,7 +64,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     SignOutRequested event,
     Emitter<AuthState> emit,
   ) async {
-    emit(AuthLoading());
+    emit(const AuthLoading(isCheckingAuth: false));
     try {
       await _signOutUseCase();
       emit(Unauthenticated());
@@ -76,7 +77,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     CheckAuthStatus event,
     Emitter<AuthState> emit,
   ) async {
-    emit(AuthLoading());
+    emit(const AuthLoading(isCheckingAuth: true));
     try {
       final isAuthenticated = await _isAuthenticatedUseCase();
       if (isAuthenticated) {
@@ -98,7 +99,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthenticateWithToken event,
     Emitter<AuthState> emit,
   ) async {
-    emit(AuthLoading());
+    emit(const AuthLoading(isCheckingAuth: false));
     try {
       final user = await _authenticateWithTokenUseCase.execute(event.token);
       if (user != null) {

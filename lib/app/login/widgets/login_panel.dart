@@ -9,7 +9,10 @@ import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/core/utils/responsive.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_theme_toggle.dart';
 import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_toast.dart';
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
+import 'package:provider/provider.dart';
 
 class LoginPanel extends StatefulWidget {
   const LoginPanel({super.key});
@@ -144,228 +147,258 @@ class _LoginPanelState extends State<LoginPanel> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state is Authenticated) {
-          setState(() {
-            _isLoading = false;
-          });
-          context.go('/pos');
-        } else if (state is AuthError) {
-          setState(() {
-            _isLoading = false;
-          });
-          OurbitToast.error(
-            context: context,
-            title: 'Login Gagal',
-            content: state.message,
-          );
-        } else if (state is AuthLoading) {
+    return BlocListener<AuthBloc, AuthState>(listener: (context, state) {
+      if (state is Authenticated) {
+        setState(() {
+          _isLoading = false;
+        });
+        context.go('/pos');
+      } else if (state is AuthError) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        // Show toast for all errors
+        OurbitToast.error(
+          context: context,
+          title: 'Login Gagal',
+          content: state.message,
+        );
+      } else if (state is AuthLoading) {
+        // Hanya set loading jika bukan pengecekan auth status
+        if (!state.isCheckingAuth) {
           setState(() {
             _isLoading = true;
           });
         }
-      },
-      child: Container(
-        constraints: BoxConstraints(
-          maxWidth: Responsive.isMobile(context) ? double.infinity : 400,
-        ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-        ),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth:
-                      Responsive.isMobile(context) ? double.infinity : 400,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Logo Section (only show on desktop)
-                    AnimatedBuilder(
-                      animation: _logoController,
-                      builder: (context, child) {
-                        return Transform.scale(
-                          scale: _logoScaleAnimation.value,
-                          child: Transform.rotate(
-                            angle: _logoRotationAnimation.value,
-                            child: Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                color: AppColors.primary,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.primary
-                                        .withValues(alpha: 0.3),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 8),
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.point_of_sale,
-                                color: Colors.white,
-                                size: 40,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
+      }
+    }, child: Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return Container(
+            constraints: BoxConstraints(
+              maxWidth: Responsive.isMobile(context) ? double.infinity : 400,
+            ),
+            decoration: BoxDecoration(
+              color: themeService.isDarkMode
+                  ? AppColors.darkSurfaceBackground
+                  : AppColors.surfaceBackground,
+            ),
+            child: SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth:
+                          Responsive.isMobile(context) ? double.infinity : 400,
                     ),
-
-                    const Gap(40),
-
-                    // Title Section (only on mobile)
-                    SlideTransition(
-                      position: _formSlideAnimation,
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: const Column(
-                          children: [
-                            Text(
-                              'Selamat Datang Kembali',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primaryText,
-                                letterSpacing: -0.5,
-                              ),
-                            ),
-                            Gap(8),
-                            Text(
-                              'Masuk ke akun Ourbit POS Anda',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.secondaryText,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const Gap(32),
-
-                    // Login Form
-                    SlideTransition(
-                      position: _formSlideAnimation,
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: Form(
-                          onSubmit: (context, values) {
-                            _handleLogin();
-                          },
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  // Username field
-                                  OurbitFormField(
-                                    fieldKey: _usernameKey,
-                                    label: 'Username',
-                                    placeholder: 'Username',
-                                    controller: _usernameController,
-                                    showErrors: const {
-                                      FormValidationMode.changed,
-                                      FormValidationMode.submitted
-                                    },
-                                    onSubmitted: (value) {
-                                      // Focus to password field when Enter is pressed
-                                      FocusScope.of(context).nextFocus();
-                                    },
-                                  ),
-
-                                  // Password field
-                                  OurbitFormField(
-                                    fieldKey: _passwordKey,
-                                    label: 'Password',
-                                    placeholder: 'Password',
-                                    obscureText: !_isPasswordVisible,
-                                    controller: _passwordController,
-                                    showErrors: const {
-                                      FormValidationMode.changed,
-                                      FormValidationMode.submitted
-                                    },
-                                    onSubmitted: (value) {
-                                      // Trigger login directly when Enter is pressed
-                                      if (!_isLoading) {
-                                        _handleLogin();
-                                      }
-                                    },
-                                    features: [
-                                      InputFeature.trailing(
-                                        IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              _isPasswordVisible =
-                                                  !_isPasswordVisible;
-                                            });
-                                          },
-                                          icon: Icon(
-                                            _isPasswordVisible
-                                                ? LucideIcons.eyeOff
-                                                : LucideIcons.eye,
-                                          ),
-                                          variance: ButtonVariance.ghost,
-                                        ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Logo Section (only show on desktop)
+                        AnimatedBuilder(
+                          animation: _logoController,
+                          builder: (context, child) {
+                            return Transform.scale(
+                              scale: _logoScaleAnimation.value,
+                              child: Transform.rotate(
+                                angle: _logoRotationAnimation.value,
+                                child: Container(
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.primary
+                                            .withValues(alpha: 0.3),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 8),
                                       ),
                                     ],
                                   ),
-                                ],
-                              ).gap(24),
-                              const Gap(24),
-                              FormErrorBuilder(
-                                builder: (context, errors, child) {
-                                  return OurbitButton(
-                                    onPressed: errors.isEmpty && !_isLoading
-                                        ? _handleLogin
-                                        : null,
-                                    label: 'Masuk',
-                                    isLoading: _isLoading,
-                                    trailingIcon: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color:
-                                            Colors.white.withValues(alpha: 0.2),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: const Text(
-                                        '↵',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
+                                  child: const Icon(
+                                    Icons.point_of_sale,
+                                    color: Colors.white,
+                                    size: 40,
+                                  ),
+                                ),
                               ),
-                            ],
+                            );
+                          },
+                        ),
+
+                        const Gap(40),
+
+                        // Title Section (only on mobile)
+                        SlideTransition(
+                          position: _formSlideAnimation,
+                          child: FadeTransition(
+                            opacity: _fadeAnimation,
+                            child: Column(
+                              children: [
+                                Text(
+                                  'Selamat Datang Kembali',
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    color: themeService.isDarkMode
+                                        ? AppColors.darkPrimaryText
+                                        : AppColors.primaryText,
+                                    letterSpacing: -0.5,
+                                  ),
+                                ),
+                                const Gap(8),
+                                Text(
+                                  'Masuk ke akun Ourbit POS Anda',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: themeService.isDarkMode
+                                        ? AppColors.darkSecondaryText
+                                        : AppColors.secondaryText,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ),
 
-                    const Gap(32),
-                  ],
+                        const Gap(32),
+
+                        // Login Form
+                        SlideTransition(
+                          position: _formSlideAnimation,
+                          child: FadeTransition(
+                            opacity: _fadeAnimation,
+                            child: Form(
+                              onSubmit: (context, values) {
+                                _handleLogin();
+                              },
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      // Username field
+                                      OurbitFormField(
+                                        fieldKey: _usernameKey,
+                                        label: 'Email',
+                                        placeholder: 'Email',
+                                        controller: _usernameController,
+                                        showErrors: const {
+                                          FormValidationMode.changed,
+                                          FormValidationMode.submitted
+                                        },
+                                        onSubmitted: (value) {
+                                          // Focus to password field when Enter is pressed
+                                          FocusScope.of(context).nextFocus();
+                                        },
+                                      ),
+
+                                      // Password field
+                                      OurbitFormField(
+                                        fieldKey: _passwordKey,
+                                        label: 'Password',
+                                        placeholder: 'Password',
+                                        obscureText: !_isPasswordVisible,
+                                        controller: _passwordController,
+                                        showErrors: const {
+                                          FormValidationMode.changed,
+                                          FormValidationMode.submitted
+                                        },
+                                        onSubmitted: (value) {
+                                          // Trigger login directly when Enter is pressed
+                                          if (!_isLoading) {
+                                            _handleLogin();
+                                          }
+                                        },
+                                        features: [
+                                          InputFeature.trailing(
+                                            IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  _isPasswordVisible =
+                                                      !_isPasswordVisible;
+                                                });
+                                              },
+                                              icon: Icon(
+                                                _isPasswordVisible
+                                                    ? LucideIcons.eyeOff
+                                                    : LucideIcons.eye,
+                                              ),
+                                              variance: ButtonVariance.ghost,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ).gap(24),
+                                  const Gap(24),
+                                  FormErrorBuilder(
+                                    builder: (context, errors, child) {
+                                      return OurbitButton(
+                                        onPressed: errors.isEmpty && !_isLoading
+                                            ? _handleLogin
+                                            : null,
+                                        label: 'Masuk',
+                                        isLoading: _isLoading,
+                                        trailingIcon: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white
+                                                .withValues(alpha: 0.2),
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                          child: const Text(
+                                            '↵',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const Gap(32),
+
+                        // Theme Toggle Section
+                        SlideTransition(
+                          position: _formSlideAnimation,
+                          child: FadeTransition(
+                            opacity: _fadeAnimation,
+                            child: const Center(
+                              child: OurbitThemeToggle(
+                                size: 40,
+                                showTooltip: true,
+                                variant: OurbitThemeToggleVariant.ghost,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const Gap(32),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-        ),
-      ),
-    );
+            ));
+      },
+    ));
   }
 }

@@ -1,5 +1,8 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter/gestures.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitTable extends StatelessWidget {
   final List<TableRow> rows;
@@ -35,24 +38,28 @@ class OurbitTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        final theme = Theme.of(context);
 
-    return Container(
-      constraints: BoxConstraints(
-        minWidth: minWidth ?? 600,
-        maxWidth: maxWidth ?? double.infinity,
-        minHeight: minHeight ?? 200,
-        maxHeight: maxHeight ?? double.infinity,
-      ),
-      decoration: BoxDecoration(
-        color: backgroundColor ?? theme.colorScheme.card,
-        borderRadius: borderRadius ?? theme.borderRadiusLg,
-        border: Border.all(
-          color: borderColor ?? theme.colorScheme.border,
-          width: 1,
-        ),
-      ),
-      child: scrollable ? _buildScrollableTable() : _buildBasicTable(),
+        return Container(
+          constraints: BoxConstraints(
+            minWidth: minWidth ?? 600,
+            maxWidth: maxWidth ?? double.infinity,
+            minHeight: minHeight ?? 200,
+            maxHeight: maxHeight ?? double.infinity,
+          ),
+          decoration: BoxDecoration(
+            color: backgroundColor ?? theme.colorScheme.card,
+            borderRadius: borderRadius ?? theme.borderRadiusLg,
+            border: Border.all(
+              color: borderColor ?? theme.colorScheme.border,
+              width: 1,
+            ),
+          ),
+          child: scrollable ? _buildScrollableTable() : _buildBasicTable(),
+        );
+      },
     );
   }
 
@@ -128,41 +135,22 @@ class OurbitTableCell {
     final theme = Theme.of(context);
 
     return TableCell(
-      child: Container(
-        padding: padding ?? const EdgeInsets.all(12),
-        alignment: alignment ?? Alignment.centerLeft,
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          border: Border(
-            bottom: BorderSide(
-              color: theme.colorScheme.border,
-              width: 0.5,
+      child: Consumer<ThemeService>(
+        builder: (context, themeService, _) {
+          return Container(
+            padding: padding ?? const EdgeInsets.all(12),
+            alignment: alignment ?? Alignment.centerLeft,
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              border: Border(
+                bottom: BorderSide(
+                  color: theme.colorScheme.border,
+                  width: 0.5,
+                ),
+              ),
             ),
-          ),
-        ),
-        child: expanded
-            ? (isHeader
-                ? DefaultTextStyle(
-                    style: (textStyle ??
-                            const TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w600))
-                        .copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.foreground,
-                    ),
-                    child: child,
-                  )
-                : DefaultTextStyle(
-                    style:
-                        (textStyle ?? const TextStyle(fontSize: 12)).copyWith(
-                      color: theme.colorScheme.foreground,
-                    ),
-                    child: child,
-                  ))
-            : SizedBox(
-                width: width ??
-                    100, // Default width untuk cell yang tidak expanded
-                child: isHeader
+            child: expanded
+                ? (isHeader
                     ? DefaultTextStyle(
                         style: (textStyle ??
                                 const TextStyle(
@@ -179,8 +167,32 @@ class OurbitTableCell {
                           color: theme.colorScheme.foreground,
                         ),
                         child: child,
-                      ),
-              ),
+                      ))
+                : SizedBox(
+                    width: width ??
+                        100, // Default width untuk cell yang tidak expanded
+                    child: isHeader
+                        ? DefaultTextStyle(
+                            style: (textStyle ??
+                                    const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600))
+                                .copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.foreground,
+                            ),
+                            child: child,
+                          )
+                        : DefaultTextStyle(
+                            style: (textStyle ?? const TextStyle(fontSize: 12))
+                                .copyWith(
+                              color: theme.colorScheme.foreground,
+                            ),
+                            child: child,
+                          ),
+                  ),
+          );
+        },
       ),
     );
   }
@@ -199,17 +211,21 @@ class OurbitTableActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: padding ?? const EdgeInsets.symmetric(horizontal: 8),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: actions
-            .map((action) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: action,
-                ))
-            .toList(),
-      ),
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return Container(
+          padding: padding ?? const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: actions
+                .map((action) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: action,
+                    ))
+                .toList(),
+          ),
+        );
+      },
     );
   }
 }

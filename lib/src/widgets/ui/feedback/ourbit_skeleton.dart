@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitSkeleton extends StatelessWidget {
   final Widget child;
@@ -10,7 +13,19 @@ class OurbitSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return child.asSkeleton();
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        return Container(
+          decoration: BoxDecoration(
+            color: themeService.isDarkMode 
+                ? AppColors.darkTertiary 
+                : AppColors.muted,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: this.child.asSkeleton(),
+        );
+      },
+    );
   }
 }
 

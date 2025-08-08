@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 /// Custom Select Widget dengan efek bounce animation saat focus
 ///
@@ -114,49 +117,53 @@ class _OurbitSelectState<T> extends State<OurbitSelect<T>>
 
   @override
   Widget build(BuildContext context) {
-    Widget buildItem(BuildContext context, T item) {
-      return widget.itemBuilder(context, item);
-    }
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        Widget buildItem(BuildContext context, T item) {
+          return widget.itemBuilder(context, item);
+        }
 
-    return AnimatedBuilder(
-      animation: _bounceController,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _bounceAnimation.value,
-          child: Listener(
-            onPointerDown: (_) => _triggerBounceAnimation(),
-            child: Select<T>(
-              value: widget.value,
-              onChanged: widget.enabled ? _handleChanged : null,
-              placeholder: widget.placeholder,
-              constraints: widget.constraints,
-              itemBuilder: (context, item) => buildItem(context, item),
-              popup: SelectPopup.builder(
-                searchPlaceholder: widget.searchPlaceholder != null
-                    ? Text(widget.searchPlaceholder!)
-                    : null,
-                builder: (context, searchQuery) {
-                  final filteredItems = searchQuery == null
-                      ? widget.items
-                      : widget.items.where((item) {
-                          final itemText =
-                              buildItem(context, item).toString().toLowerCase();
-                          return itemText.contains(searchQuery.toLowerCase());
-                        }).toList();
+        return AnimatedBuilder(
+          animation: _bounceController,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _bounceAnimation.value,
+              child: Listener(
+                onPointerDown: (_) => _triggerBounceAnimation(),
+                child: Select<T>(
+                  value: widget.value,
+                  onChanged: widget.enabled ? _handleChanged : null,
+                  placeholder: widget.placeholder,
+                  constraints: widget.constraints,
+                  itemBuilder: (context, item) => buildItem(context, item),
+                  popup: SelectPopup.builder(
+                    searchPlaceholder: widget.searchPlaceholder != null
+                        ? Text(widget.searchPlaceholder!)
+                        : null,
+                    builder: (context, searchQuery) {
+                      final filteredItems = searchQuery == null
+                          ? widget.items
+                          : widget.items.where((item) {
+                              final itemText =
+                                  buildItem(context, item).toString().toLowerCase();
+                              return itemText.contains(searchQuery.toLowerCase());
+                            }).toList();
 
-                  return SelectItemList(
-                    children: [
-                      for (final item in filteredItems)
-                        SelectItemButton(
-                          value: item,
-                          child: buildItem(context, item),
-                        ),
-                    ],
-                  );
-                },
+                      return SelectItemList(
+                        children: [
+                          for (final item in filteredItems)
+                            SelectItemButton(
+                              value: item,
+                              child: buildItem(context, item),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );

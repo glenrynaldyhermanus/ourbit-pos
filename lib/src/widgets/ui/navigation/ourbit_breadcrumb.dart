@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitBreadcrumb extends StatelessWidget {
   final List<Widget> children;
@@ -12,9 +15,13 @@ class OurbitBreadcrumb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Breadcrumb(
-      separator: separator ?? Breadcrumb.arrowSeparator,
-      children: children,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return Breadcrumb(
+          separator: separator ?? Breadcrumb.arrowSeparator,
+          children: children,
+        );
+      },
     );
   }
 }

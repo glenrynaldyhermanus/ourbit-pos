@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 /// Custom Text Input Widget dengan efek shrink animation saat focus
 ///
@@ -174,33 +177,37 @@ class _OurbitTextInputState extends State<OurbitTextInput>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _bounceController,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _bounceAnimation.value,
-          child: Container(
-            width: widget.width,
-            height: widget.height,
-            padding: widget.padding,
-            child: TextField(
-              key: widget.fieldKey,
-              placeholder:
-                  widget.placeholder != null ? Text(widget.placeholder!) : null,
-              obscureText: widget.obscureText,
-              features: [
-                if (widget.leading != null)
-                  InputFeature.leading(widget.leading!),
-                ...?widget.features,
-              ],
-              onChanged: widget.onChanged,
-              onSubmitted: widget.onSubmitted,
-              controller: widget.controller,
-              focusNode: _focusNode,
-            ).constrained(
-              height: widget.height ?? 44,
-            ),
-          ),
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return AnimatedBuilder(
+          animation: _bounceController,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _bounceAnimation.value,
+              child: Container(
+                width: widget.width,
+                height: widget.height,
+                padding: widget.padding,
+                child: TextField(
+                  key: widget.fieldKey,
+                  placeholder:
+                      widget.placeholder != null ? Text(widget.placeholder!) : null,
+                  obscureText: widget.obscureText,
+                  features: [
+                    if (widget.leading != null)
+                      InputFeature.leading(widget.leading!),
+                    ...?widget.features,
+                  ],
+                  onChanged: widget.onChanged,
+                  onSubmitted: widget.onSubmitted,
+                  controller: widget.controller,
+                  focusNode: _focusNode,
+                ).constrained(
+                  height: widget.height ?? 44,
+                ),
+              ),
+            );
+          },
         );
       },
     );

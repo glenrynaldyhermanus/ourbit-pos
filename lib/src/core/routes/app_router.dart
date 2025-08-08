@@ -5,8 +5,8 @@ import 'package:ourbit_pos/app/login/login_page.dart';
 import 'package:ourbit_pos/app/management/management_page.dart';
 
 import 'package:ourbit_pos/app/organization/organization_page.dart';
-import 'package:ourbit_pos/app/payment/payment_page.dart';
-import 'package:ourbit_pos/app/payment/success_page.dart';
+import 'package:ourbit_pos/app/cashier/payment/payment_page.dart';
+import 'package:ourbit_pos/app/cashier/payment/success_page.dart';
 import 'package:ourbit_pos/app/reports/reports_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ourbit_pos/src/core/services/token_service.dart';

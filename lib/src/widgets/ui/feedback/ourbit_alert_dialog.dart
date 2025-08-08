@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitAlertDialog extends StatelessWidget {
   final Widget title;
@@ -18,10 +21,28 @@ class OurbitAlertDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: title,
-      content: content,
-      actions: actions,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        return AlertDialog(
+          title: DefaultTextStyle(
+            style: TextStyle(
+              color: themeService.isDarkMode
+                  ? AppColors.darkPrimaryText
+                  : AppColors.primaryText,
+            ),
+            child: title,
+          ),
+          content: DefaultTextStyle(
+            style: TextStyle(
+              color: themeService.isDarkMode
+                  ? AppColors.darkSecondaryText
+                  : AppColors.secondaryText,
+            ),
+            child: content,
+          ),
+          actions: actions,
+        );
+      },
     );
   }
 

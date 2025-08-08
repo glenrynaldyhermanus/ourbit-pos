@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitDotIndicator extends StatelessWidget {
   final int index;
@@ -14,10 +17,14 @@ class OurbitDotIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DotIndicator(
-      index: index,
-      length: length,
-      onChanged: onChanged,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return DotIndicator(
+          index: index,
+          length: length,
+          onChanged: onChanged,
+        );
+      },
     );
   }
 }

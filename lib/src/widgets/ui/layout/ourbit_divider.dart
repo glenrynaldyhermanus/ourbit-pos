@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitDivider extends StatelessWidget {
   final Widget? child;
@@ -12,10 +15,14 @@ class OurbitDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isVertical) {
-      return VerticalDivider(child: child);
-    }
-    return Divider(child: child);
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        if (isVertical) {
+          return VerticalDivider(child: child);
+        }
+        return Divider(child: child);
+      },
+    );
   }
 }
 

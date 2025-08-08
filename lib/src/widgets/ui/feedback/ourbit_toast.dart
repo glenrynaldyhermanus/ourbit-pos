@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 /// Custom toast widget untuk Ourbit
 /// Memudahkan penggunaan toast dengan hanya perlu memasukkan title dan content
@@ -20,18 +23,56 @@ class OurbitToast {
     showToast(
       context: context,
       builder: (context, overlay) {
-        return SurfaceCard(
-          child: Basic(
-            title: Text(title),
-            content: Text(content),
-            leading: _getIcon(type),
-            trailing: IconButton.ghost(
-              onPressed: () => overlay.close(),
-              icon: const Icon(Icons.close),
-              size: ButtonSize.small,
-            ),
-            trailingAlignment: Alignment.center,
-          ),
+        return Consumer<ThemeService>(
+          builder: (context, themeService, child) {
+            return SurfaceCard(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: themeService.isDarkMode 
+                      ? AppColors.darkSecondaryBackground 
+                      : AppColors.secondaryBackground,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: themeService.isDarkMode 
+                        ? AppColors.darkBorder 
+                        : AppColors.border,
+                    width: 1,
+                  ),
+                ),
+                padding: const EdgeInsets.all(16),
+                child: Basic(
+                  title: DefaultTextStyle(
+                    style: TextStyle(
+                      color: themeService.isDarkMode 
+                          ? AppColors.darkPrimaryText 
+                          : AppColors.primaryText,
+                    ),
+                    child: Text(title),
+                  ),
+                  content: DefaultTextStyle(
+                    style: TextStyle(
+                      color: themeService.isDarkMode 
+                          ? AppColors.darkSecondaryText 
+                          : AppColors.secondaryText,
+                    ),
+                    child: Text(content),
+                  ),
+                  leading: _getIcon(type),
+                  trailing: IconButton.ghost(
+                    onPressed: () => overlay.close(),
+                    icon: Icon(
+                      Icons.close,
+                      color: themeService.isDarkMode 
+                          ? AppColors.darkSecondaryText 
+                          : AppColors.secondaryText,
+                    ),
+                    size: ButtonSize.small,
+                  ),
+                  trailingAlignment: Alignment.center,
+                ),
+              ),
+            );
+          },
         );
       },
       location: location,

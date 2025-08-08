@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitSlider extends StatelessWidget {
   final SliderValue value;
@@ -14,10 +17,14 @@ class OurbitSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Slider(
-      value: value,
-      onChanged: onChanged,
-      divisions: divisions,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return Slider(
+          value: value,
+          onChanged: onChanged,
+          divisions: divisions,
+        );
+      },
     );
   }
 }

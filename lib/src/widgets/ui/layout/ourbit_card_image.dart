@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitCardImage extends StatelessWidget {
   final Widget image;
@@ -16,11 +19,15 @@ class OurbitCardImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CardImage(
-      onPressed: onPressed,
-      image: image,
-      title: title,
-      subtitle: subtitle,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return CardImage(
+          onPressed: onPressed,
+          image: image,
+          title: title,
+          subtitle: subtitle,
+        );
+      },
     );
   }
 }

@@ -3,16 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:ourbit_pos/app/cashier/widgets/pos_cart.dart';
-import 'package:ourbit_pos/app/cashier/widgets/pos_header.dart';
 import 'package:ourbit_pos/app/cashier/widgets/product_card.dart';
+import 'package:ourbit_pos/app/cashier/widgets/product_skeleton.dart';
+import 'package:ourbit_pos/app/cashier/widgets/cart_skeleton.dart';
 import 'package:ourbit_pos/blocs/cashier_bloc.dart';
 import 'package:ourbit_pos/blocs/cashier_event.dart';
 import 'package:ourbit_pos/blocs/cashier_state.dart';
-import 'package:ourbit_pos/src/core/services/local_storage_service.dart';
 import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/core/utils/responsive.dart';
 import 'package:ourbit_pos/src/data/objects/product.dart';
 import 'package:ourbit_pos/src/widgets/navigation/sidebar.dart';
+import 'package:ourbit_pos/src/widgets/navigation/appbar.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
 import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_circular_progress.dart';
@@ -26,15 +27,10 @@ class CashierPage extends StatefulWidget {
 }
 
 class _CashierPageState extends State<CashierPage> {
-  // Business, Store, and User data
-  String _businessName = '';
-  String _storeName = '';
-  String _cashierName = '';
-
   // Helper function untuk menggunakan system font
   TextStyle _getSystemFont({
     required double fontSize,
-    FontWeight? fontWeight,
+    material.FontWeight? fontWeight,
     Color? color,
   }) {
     return TextStyle(
@@ -47,37 +43,6 @@ class _CashierPageState extends State<CashierPage> {
   @override
   void initState() {
     super.initState();
-    _loadBusinessAndStoreData();
-  }
-
-  Future<void> _loadBusinessAndStoreData() async {
-    try {
-      // Load business data
-      final businessData = await LocalStorageService.getBusinessData();
-      if (businessData != null) {
-        setState(() {
-          _businessName = businessData['name'] ?? 'Unknown Business';
-        });
-      }
-
-      // Load store data
-      final storeData = await LocalStorageService.getStoreData();
-      if (storeData != null) {
-        setState(() {
-          _storeName = storeData['name'] ?? 'Unknown Store';
-        });
-      }
-
-      // Load user data
-      final userData = await LocalStorageService.getUserData();
-      if (userData != null) {
-        setState(() {
-          _cashierName = userData['name'] ?? 'Unknown Cashier';
-        });
-      }
-    } catch (e) {
-      //print('Error loading business/store data: $e');
-    }
   }
 
   void _addToCart(Product product) {
@@ -124,10 +89,8 @@ class _CashierPageState extends State<CashierPage> {
   }
 
   List<String> _getCategories(CashierLoaded state) {
-    final categories = state.products
-        .map((p) => p.categoryName ?? 'Uncategorized')
-        .toSet()
-        .toList();
+    final categories =
+        state.categories.map((c) => c['name'] as String).toList();
     categories.insert(0, 'All');
     return categories;
   }
@@ -165,8 +128,100 @@ class _CashierPageState extends State<CashierPage> {
           }
 
           if (state is CashierLoading) {
-            return const Center(
-              child: OurbitCircularProgress(),
+            return Scaffold(
+              child: Container(
+                color: isDark
+                    ? AppColors.darkSurfaceBackground
+                    : AppColors.surfaceBackground,
+                child: Row(
+                  children: [
+                    // Sidebar - hanya tampil jika bukan web
+                    if (!Responsive.isWeb()) const Sidebar(),
+                    // Main Content
+                    Expanded(
+                      child: Column(
+                        children: [
+                          // Page Header
+                          const OurbitAppBar(
+                            title: 'Cashier',
+                          ),
+                          // Content
+                          Expanded(
+                            child: SafeArea(
+                              child: Padding(
+                                padding: const EdgeInsets.all(24),
+                                child: Row(
+                                  children: [
+                                    // Products Section with Skeleton
+                                    Expanded(
+                                      flex: 2,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          // Search and Category Row Skeleton
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                flex: 2,
+                                                child: Container(
+                                                  height: 48,
+                                                  decoration: BoxDecoration(
+                                                    color: isDark
+                                                        ? AppColors
+                                                            .darkSecondaryBackground
+                                                        : AppColors
+                                                            .secondaryBackground,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                ),
+                                              ),
+                                              const Gap(16),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Container(
+                                                  height: 48,
+                                                  decoration: BoxDecoration(
+                                                    color: isDark
+                                                        ? AppColors
+                                                            .darkSecondaryBackground
+                                                        : AppColors
+                                                            .secondaryBackground,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 24),
+                                          // Products Grid Skeleton
+                                          const Expanded(
+                                            child: ProductSkeleton(),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 24),
+                                    // Cart Section with Skeleton
+                                    Expanded(
+                                      flex: 1,
+                                      child: const CartSkeleton(),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             );
           }
 
@@ -185,7 +240,7 @@ class _CashierPageState extends State<CashierPage> {
                     'Error loading data',
                     style: _getSystemFont(
                       fontSize: 18,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: material.FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -199,7 +254,7 @@ class _CashierPageState extends State<CashierPage> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  OurbitButton(
+                  OurbitButton.primary(
                     onPressed: () =>
                         context.read<CashierBloc>().add(LoadProducts()),
                     label: 'Retry',
@@ -224,10 +279,8 @@ class _CashierPageState extends State<CashierPage> {
                       child: Column(
                         children: [
                           // Page Header
-                          PosHeader(
-                            businessName: _businessName,
-                            storeName: _storeName,
-                            cashierName: _cashierName,
+                          const OurbitAppBar(
+                            title: 'Cashier',
                           ),
                           // Content
                           Expanded(
@@ -346,8 +399,9 @@ class _CashierPageState extends State<CashierPage> {
                                                                   .selectedCategory,
                                                           style: _getSystemFont(
                                                             fontSize: 14,
-                                                            fontWeight:
-                                                                FontWeight.w500,
+                                                            fontWeight: material
+                                                                .FontWeight
+                                                                .w500,
                                                           ),
                                                         ),
                                                         const Icon(Icons
@@ -366,6 +420,57 @@ class _CashierPageState extends State<CashierPage> {
                                               builder: (context) {
                                                 final filteredProducts =
                                                     _getFilteredProducts(state);
+
+                                                if (filteredProducts.isEmpty) {
+                                                  return Center(
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Icon(
+                                                          Icons
+                                                              .inventory_2_outlined,
+                                                          size: 64,
+                                                          color: isDark
+                                                              ? AppColors
+                                                                  .darkSecondaryText
+                                                              : AppColors
+                                                                  .secondaryText,
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 16),
+                                                        Text(
+                                                          'No products found',
+                                                          style: _getSystemFont(
+                                                            fontSize: 18,
+                                                            fontWeight: material
+                                                                .FontWeight
+                                                                .w600,
+                                                            color: isDark
+                                                                ? AppColors
+                                                                    .darkSecondaryText
+                                                                : AppColors
+                                                                    .secondaryText,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 8),
+                                                        Text(
+                                                          'Try adjusting your search or filter',
+                                                          style: _getSystemFont(
+                                                            fontSize: 14,
+                                                            color: isDark
+                                                                ? AppColors
+                                                                    .darkSecondaryText
+                                                                : AppColors
+                                                                    .secondaryText,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                }
 
                                                 return GridView.builder(
                                                   gridDelegate:

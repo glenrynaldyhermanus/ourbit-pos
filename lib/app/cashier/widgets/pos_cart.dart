@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as material;
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:ourbit_pos/blocs/cashier_state.dart';
 import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
-import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
 
 class PosCart extends StatelessWidget {
   final CashierLoaded state;
@@ -21,7 +21,7 @@ class PosCart extends StatelessWidget {
   // Helper function untuk menggunakan system font
   TextStyle _getSystemFont({
     required double fontSize,
-    FontWeight? fontWeight,
+    material.FontWeight? fontWeight,
     Color? color,
   }) {
     return TextStyle(
@@ -33,17 +33,36 @@ class PosCart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = Theme.of(context).brightness == material.Brightness.dark;
 
-    return Column(
-      children: [
-        // Cart Items
-        Expanded(
-          child: OurbitCard(
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.darkSurfaceBackground
+            : AppColors.surfaceBackground,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.border,
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          // Cart Header (Keranjang Belanja + Delete All)
+          Container(
             padding: const EdgeInsets.all(16),
-            child: Column(
+            decoration: BoxDecoration(
+              color: isDark
+                  ? AppColors.darkSecondaryBackground
+                  : AppColors.secondaryBackground,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Cart Header
                 Row(
                   children: [
                     const Icon(
@@ -53,119 +72,89 @@ class PosCart extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      'Cart',
+                      'Keranjang Belanja',
                       style: _getSystemFont(
                         fontSize: 18,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: material.FontWeight.w600,
                       ),
                     ),
-                    const Spacer(),
-                    if (state.cartItems.isNotEmpty)
-                      IconButton(
-                        icon: Icon(
-                          Icons.clear_rounded,
-                          color: isDark
-                              ? AppColors.darkSecondaryText
-                              : AppColors.secondaryText,
-                        ),
-                        onPressed: onClearCart,
+                  ],
+                ),
+                if (state.cartItems.isNotEmpty)
+                  OurbitButton.outline(
+                    onPressed: onClearCart,
+                    label: 'Hapus Semua',
+                    height: 32,
+                    leadingIcon: const Icon(
+                      Icons.delete_outline,
+                      size: 16,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          // Cart Items List (Expanded)
+          Expanded(
+            child: state.cartItems.isEmpty
+                ? _buildEmptyCart(isDark)
+                : _buildCartItems(isDark),
+          ),
+          // Cart Total
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? AppColors.darkSecondaryBackground
+                  : AppColors.secondaryBackground,
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12),
+              ),
+            ),
+            child: Column(
+              children: [
+                // Total row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Total:',
+                      style: _getSystemFont(
+                        fontSize: 16,
+                        fontWeight: material.FontWeight.w600,
                       ),
+                    ),
+                    Text(
+                      _formatCurrency(state.finalTotal),
+                      style: _getSystemFont(
+                        fontSize: 18,
+                        fontWeight: material.FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
-                // Cart Content
-                Expanded(
-                  child: state.cartItems.isEmpty
-                      ? _buildEmptyCart(isDark)
-                      : _buildCartItems(isDark),
+                // Pay Button
+                SizedBox(
+                  width: double.infinity,
+                  child: OurbitButton.primary(
+                    onPressed:
+                        state.cartItems.isNotEmpty ? onProcessPayment : null,
+                    label: 'Bayar',
+                    height: 48,
+                    leadingIcon: const Icon(
+                      Icons.payment,
+                      size: 20,
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
-        ),
-        const SizedBox(height: 16),
-        // Totals
-        OurbitCard(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Subtotal:',
-                    style: _getSystemFont(
-                      fontSize: 14,
-                      color: isDark
-                          ? AppColors.darkSecondaryText
-                          : AppColors.secondaryText,
-                    ),
-                  ),
-                  Text(
-                    _formatCurrency(state.total),
-                    style: _getSystemFont(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Tax (10%):',
-                    style: _getSystemFont(
-                      fontSize: 14,
-                      color: isDark
-                          ? AppColors.darkSecondaryText
-                          : AppColors.secondaryText,
-                    ),
-                  ),
-                  Text(
-                    _formatCurrency(state.tax),
-                    style: _getSystemFont(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-              const Divider(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Total:',
-                    style: _getSystemFont(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    _formatCurrency(state.finalTotal),
-                    style: _getSystemFont(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        // Payment Button
-        SizedBox(
-          width: double.infinity,
-          child: OurbitButton(
-            label: 'Process Payment',
-            onPressed: state.cartItems.isEmpty ? null : onProcessPayment,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -182,10 +171,10 @@ class PosCart extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Cart is empty',
+            'Keranjang Kosong',
             style: _getSystemFont(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
+              fontSize: 18,
+              fontWeight: material.FontWeight.w600,
               color: isDark
                   ? AppColors.darkSecondaryText
                   : AppColors.secondaryText,
@@ -193,13 +182,14 @@ class PosCart extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Add items to get started',
+            'Pilih produk untuk menambahkan ke keranjang',
             style: _getSystemFont(
               fontSize: 14,
               color: isDark
                   ? AppColors.darkSecondaryText
                   : AppColors.secondaryText,
             ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -212,103 +202,169 @@ class PosCart extends StatelessWidget {
       itemCount: state.cartItems.length,
       itemBuilder: (context, index) {
         final item = state.cartItems[index];
-        return Container(
+        return AnimatedContainer(
+          duration: Duration(milliseconds: 300 + (index * 100)),
+          curve: Curves.easeInOut,
           margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isDark
-                ? AppColors.darkSurfaceBackground
-                : AppColors.surfaceBackground,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      item.product.name,
-                      style: _getSystemFont(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    _formatCurrency(item.product.sellingPrice),
-                    style: _getSystemFont(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? AppColors.darkSecondaryBackground
+                  : AppColors.secondaryBackground,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: AppColors.border,
+                width: 1,
               ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Quantity',
-                    style: _getSystemFont(
-                      fontSize: 12,
-                      color: isDark
-                          ? AppColors.darkSecondaryText
-                          : AppColors.secondaryText,
-                    ),
+            ),
+            child: Row(
+              children: [
+                // Product image
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.darkMuted.withValues(alpha: 0.2)
+                        : AppColors.muted.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(6),
                   ),
-                  Row(
+                  child: item.product.imageUrl != null &&
+                          item.product.imageUrl!.isNotEmpty
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Image.network(
+                            item.product.imageUrl!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return _buildProductIcon(isDark);
+                            },
+                          ),
+                        )
+                      : _buildProductIcon(isDark),
+                ),
+                const SizedBox(width: 12),
+                // Product details
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(6),
+                      Text(
+                        item.product.name,
+                        style: _getSystemFont(
+                          fontSize: 14,
+                          fontWeight: material.FontWeight.w600,
                         ),
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.remove,
-                            size: 16,
-                            color: AppColors.primary,
-                          ),
-                          onPressed: () =>
-                              onUpdateQuantity(index, item.quantity - 1),
-                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          '${item.quantity}',
-                          style: _getSystemFont(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.add,
-                            size: 16,
-                            color: AppColors.primary,
-                          ),
-                          onPressed: () =>
-                              onUpdateQuantity(index, item.quantity + 1),
+                      const SizedBox(height: 4),
+                      Text(
+                        _formatCurrency(item.product.sellingPrice),
+                        style: _getSystemFont(
+                          fontSize: 12,
+                          color: AppColors.primary,
+                          fontWeight: material.FontWeight.w600,
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(width: 12),
+                // Quantity controls
+                Column(
+                  children: [
+                    // Quantity display
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? AppColors.darkSurfaceBackground
+                            : AppColors.surfaceBackground,
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color: AppColors.border,
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        '${item.quantity}',
+                        style: _getSystemFont(
+                          fontSize: 12,
+                          fontWeight: material.FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // +/- buttons
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () =>
+                              onUpdateQuantity(index, item.quantity - 1),
+                          child: Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: AppColors.error,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Icon(
+                              Icons.remove,
+                              size: 16,
+                              color: AppColors.secondaryBackground,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () =>
+                              onUpdateQuantity(index, item.quantity + 1),
+                          child: Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Icon(
+                              Icons.add,
+                              size: 16,
+                              color: AppColors.secondaryBackground,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildProductIcon(bool isDark) {
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.primary.withValues(alpha: 0.2)
+            : AppColors.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: const Icon(
+        Icons.inventory_2_outlined,
+        size: 20,
+        color: AppColors.primary,
+      ),
     );
   }
 

@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitLinearProgress extends StatelessWidget {
   final double? value;
@@ -14,11 +17,30 @@ class OurbitLinearProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: width,
-      child: LinearProgressIndicator(
-        value: value,
-      ),
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        return Container(
+          decoration: BoxDecoration(
+            color: themeService.isDarkMode 
+                ? AppColors.darkTertiary 
+                : AppColors.muted,
+            borderRadius: BorderRadius.circular(height / 2),
+            border: Border.all(
+              color: themeService.isDarkMode 
+                  ? AppColors.darkBorder 
+                  : AppColors.border,
+              width: 1,
+            ),
+          ),
+          padding: const EdgeInsets.all(8),
+          child: SizedBox(
+            width: width,
+            child: LinearProgressIndicator(
+              value: value,
+            ),
+          ),
+        );
+      },
     );
   }
 }

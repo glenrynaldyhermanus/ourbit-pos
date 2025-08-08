@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitCard extends StatelessWidget {
   final Widget child;
@@ -14,16 +17,20 @@ class OurbitCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget card = Card(
-      padding: padding,
-      child: child,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        Widget card = Card(
+          padding: padding,
+          child: child,
+        );
+
+        if (intrinsic) {
+          card = card.intrinsic();
+        }
+
+        return card;
+      },
     );
-
-    if (intrinsic) {
-      card = card.intrinsic();
-    }
-
-    return card;
   }
 }
 

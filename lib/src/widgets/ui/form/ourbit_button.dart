@@ -1,6 +1,8 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
 
 import 'package:ourbit_pos/src/core/theme/app_theme.dart';
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 enum OurbitButtonVariance {
   primary,
@@ -197,37 +199,47 @@ class _OurbitButtonState extends State<OurbitButton>
     }
   }
 
-  Color _getBackgroundColor() {
+  Color _getBackgroundColor(ThemeService themeService) {
     if (widget.isSelected) {
       switch (widget.variance) {
         case OurbitButtonVariance.primary:
-          return AppColors.primary;
+          return themeService.isDarkMode
+              ? AppColors.primary
+              : AppColors.primary;
         case OurbitButtonVariance.secondary:
-          return AppColors.secondary;
+          return themeService.isDarkMode
+              ? AppColors.secondary
+              : AppColors.secondary;
         case OurbitButtonVariance.outline:
-          return AppColors.primary.withValues(alpha: 0.1);
+          return themeService.isDarkMode
+              ? AppColors.primary.withValues(alpha: 0.2)
+              : AppColors.primary.withValues(alpha: 0.1);
         case OurbitButtonVariance.ghost:
-          return AppColors.primary.withValues(alpha: 0.1);
+          return themeService.isDarkMode
+              ? AppColors.primary.withValues(alpha: 0.2)
+              : AppColors.primary.withValues(alpha: 0.1);
         case OurbitButtonVariance.destructive:
-          return AppColors.error;
+          return themeService.isDarkMode ? AppColors.error : AppColors.error;
       }
     }
 
     switch (widget.variance) {
       case OurbitButtonVariance.primary:
-        return AppColors.primary;
+        return themeService.isDarkMode ? AppColors.primary : AppColors.primary;
       case OurbitButtonVariance.secondary:
-        return AppColors.secondary;
+        return themeService.isDarkMode
+            ? AppColors.secondary
+            : AppColors.secondary;
       case OurbitButtonVariance.outline:
         return Colors.transparent;
       case OurbitButtonVariance.ghost:
         return Colors.transparent;
       case OurbitButtonVariance.destructive:
-        return AppColors.error;
+        return themeService.isDarkMode ? AppColors.error : AppColors.error;
     }
   }
 
-  Border? _getBorder() {
+  Border? _getBorder(ThemeService themeService) {
     if (widget.isSelected) {
       switch (widget.variance) {
         case OurbitButtonVariance.primary:
@@ -237,7 +249,8 @@ class _OurbitButtonState extends State<OurbitButton>
           return null;
         case OurbitButtonVariance.outline:
           return Border.all(
-            color: AppColors.primary,
+            color:
+                themeService.isDarkMode ? AppColors.primary : AppColors.primary,
             width: 2,
           );
       }
@@ -251,45 +264,53 @@ class _OurbitButtonState extends State<OurbitButton>
         return null;
       case OurbitButtonVariance.outline:
         return Border.all(
-          color: AppColors.border,
+          color: themeService.isDarkMode ? AppColors.border : AppColors.border,
           width: 1,
         );
     }
   }
 
-  Color _getShadowColor() {
+  Color _getShadowColor(ThemeService themeService) {
     switch (widget.variance) {
       case OurbitButtonVariance.primary:
-        return AppColors.primary;
+        return themeService.isDarkMode ? AppColors.primary : AppColors.primary;
       case OurbitButtonVariance.secondary:
-        return AppColors.secondary;
+        return themeService.isDarkMode
+            ? AppColors.secondary
+            : AppColors.secondary;
       case OurbitButtonVariance.outline:
-        return AppColors.border;
+        return themeService.isDarkMode ? AppColors.border : AppColors.border;
       case OurbitButtonVariance.ghost:
-        return AppColors.muted;
+        return themeService.isDarkMode ? AppColors.muted : AppColors.muted;
       case OurbitButtonVariance.destructive:
-        return AppColors.error;
+        return themeService.isDarkMode ? AppColors.error : AppColors.error;
     }
   }
 
-  Color _getTextColor() {
+  Color _getTextColor(ThemeService themeService) {
     switch (widget.variance) {
       case OurbitButtonVariance.primary:
         return Colors.white;
       case OurbitButtonVariance.secondary:
-        return AppColors.primaryText;
+        return themeService.isDarkMode
+            ? AppColors.primaryText
+            : AppColors.primaryText;
       case OurbitButtonVariance.outline:
-        return AppColors.primaryText;
+        return themeService.isDarkMode
+            ? AppColors.primaryText
+            : AppColors.primaryText;
       case OurbitButtonVariance.ghost:
-        return AppColors.primaryText;
+        return themeService.isDarkMode
+            ? AppColors.primaryText
+            : AppColors.primaryText;
       case OurbitButtonVariance.destructive:
         return Colors.white;
     }
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(ThemeService themeService) {
     if (widget.isLoading) {
-      return const SizedBox(
+      return SizedBox(
         width: 20,
         height: 20,
         child: CircularProgressIndicator(
@@ -312,7 +333,7 @@ class _OurbitButtonState extends State<OurbitButton>
         widget.label,
         style: widget.textStyle ??
             TextStyle(
-              color: _getTextColor(),
+              color: _getTextColor(themeService),
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
@@ -334,57 +355,62 @@ class _OurbitButtonState extends State<OurbitButton>
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => _handleHover(true),
-      onExit: (_) => _handleHover(false),
-      child: AnimatedBuilder(
-        animation: Listenable.merge(
-            [_bounceAnimation, _hoverAnimation, _shadowAnimation]),
-        builder: (context, child) {
-          return Transform.translate(
-            offset: _hoverAnimation.value,
-            child: Transform.scale(
-              scale: _bounceAnimation.value,
-              child: Container(
-                width: widget.width,
-                height: widget.height,
-                padding: widget.padding ??
-                    const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: _getBackgroundColor(),
-                  border: _getBorder(),
-                  borderRadius: widget.borderRadius ?? BorderRadius.circular(8),
-                  boxShadow: _shadowAnimation.value > 0
-                      ? [
-                          BoxShadow(
-                            color: _getShadowColor().withValues(
-                                alpha: 0.3 * _shadowAnimation.value),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                            spreadRadius: 2,
-                          ),
-                          BoxShadow(
-                            color: _getShadowColor().withValues(
-                                alpha: 0.2 * _shadowAnimation.value),
-                            blurRadius: 24,
-                            offset: const Offset(0, 8),
-                            spreadRadius: 4,
-                          ),
-                        ]
-                      : null,
-                ),
-                child: GestureDetector(
-                  onTap: widget.onPressed != null ? _handleTap : null,
-                  behavior: HitTestBehavior.opaque,
-                  child: Center(
-                    child: _buildContent(),
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        return MouseRegion(
+          onEnter: (_) => _handleHover(true),
+          onExit: (_) => _handleHover(false),
+          child: AnimatedBuilder(
+            animation: Listenable.merge(
+                [_bounceAnimation, _hoverAnimation, _shadowAnimation]),
+            builder: (context, child) {
+              return Transform.translate(
+                offset: _hoverAnimation.value,
+                child: Transform.scale(
+                  scale: _bounceAnimation.value,
+                  child: Container(
+                    width: widget.width,
+                    height: widget.height,
+                    padding: widget.padding ??
+                        const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: _getBackgroundColor(themeService),
+                      border: _getBorder(themeService),
+                      borderRadius:
+                          widget.borderRadius ?? BorderRadius.circular(8),
+                      boxShadow: _shadowAnimation.value > 0
+                          ? [
+                              BoxShadow(
+                                color: _getShadowColor(themeService).withValues(
+                                    alpha: 0.3 * _shadowAnimation.value),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                                spreadRadius: 2,
+                              ),
+                              BoxShadow(
+                                color: _getShadowColor(themeService).withValues(
+                                    alpha: 0.2 * _shadowAnimation.value),
+                                blurRadius: 24,
+                                offset: const Offset(0, 8),
+                                spreadRadius: 4,
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: GestureDetector(
+                      onTap: widget.onPressed != null ? _handleTap : null,
+                      behavior: HitTestBehavior.opaque,
+                      child: Center(
+                        child: _buildContent(themeService),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

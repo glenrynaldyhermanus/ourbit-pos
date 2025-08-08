@@ -1,6 +1,8 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
 
 import 'package:ourbit_pos/src/core/theme/app_theme.dart';
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 enum OurbitIconButtonVariance {
   primary,
@@ -162,59 +164,59 @@ class _OurbitIconButtonState extends State<OurbitIconButton>
     }
   }
 
-  Color _getBackgroundColor() {
+  Color _getBackgroundColor(ThemeService themeService) {
     switch (widget.variance) {
       case OurbitIconButtonVariance.primary:
-        return AppColors.primary;
+        return themeService.isDarkMode ? AppColors.primary : AppColors.primary;
       case OurbitIconButtonVariance.secondary:
-        return AppColors.secondary;
+        return themeService.isDarkMode ? AppColors.secondary : AppColors.secondary;
       case OurbitIconButtonVariance.outline:
         return Colors.transparent;
       case OurbitIconButtonVariance.ghost:
         return Colors.transparent;
       case OurbitIconButtonVariance.destructive:
-        return AppColors.error;
+        return themeService.isDarkMode ? AppColors.error : AppColors.error;
     }
   }
 
-  Color _getIconColor() {
+  Color _getIconColor(ThemeService themeService) {
     switch (widget.variance) {
       case OurbitIconButtonVariance.primary:
         return Colors.white;
       case OurbitIconButtonVariance.secondary:
         return Colors.white;
       case OurbitIconButtonVariance.outline:
-        return AppColors.primaryText;
+        return themeService.isDarkMode ? AppColors.primaryText : AppColors.primaryText;
       case OurbitIconButtonVariance.ghost:
-        return AppColors.primaryText;
+        return themeService.isDarkMode ? AppColors.primaryText : AppColors.primaryText;
       case OurbitIconButtonVariance.destructive:
         return Colors.white;
     }
   }
 
-  Color _getShadowColor() {
+  Color _getShadowColor(ThemeService themeService) {
     switch (widget.variance) {
       case OurbitIconButtonVariance.primary:
-        return AppColors.primary;
+        return themeService.isDarkMode ? AppColors.primary : AppColors.primary;
       case OurbitIconButtonVariance.secondary:
-        return AppColors.secondary;
+        return themeService.isDarkMode ? AppColors.secondary : AppColors.secondary;
       case OurbitIconButtonVariance.outline:
-        return AppColors.border;
+        return themeService.isDarkMode ? AppColors.border : AppColors.border;
       case OurbitIconButtonVariance.ghost:
-        return AppColors.muted;
+        return themeService.isDarkMode ? AppColors.muted : AppColors.muted;
       case OurbitIconButtonVariance.destructive:
-        return AppColors.error;
+        return themeService.isDarkMode ? AppColors.error : AppColors.error;
     }
   }
 
-  Border? _getBorder() {
+  Border? _getBorder(ThemeService themeService) {
     switch (widget.variance) {
       case OurbitIconButtonVariance.primary:
       case OurbitIconButtonVariance.secondary:
       case OurbitIconButtonVariance.destructive:
         return null;
       case OurbitIconButtonVariance.outline:
-        return Border.all(color: AppColors.border);
+        return Border.all(color: themeService.isDarkMode ? AppColors.border : AppColors.border);
       case OurbitIconButtonVariance.ghost:
         return null;
     }
@@ -222,66 +224,70 @@ class _OurbitIconButtonState extends State<OurbitIconButton>
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => _handleHover(true),
-      onExit: (_) => _handleHover(false),
-      child: GestureDetector(
-        onTap: widget.onPressed != null ? _handleTap : null,
-        child: AnimatedBuilder(
-          animation: Listenable.merge(
-              [_bounceAnimation, _hoverAnimation, _shadowAnimation]),
-          builder: (context, child) {
-            return Transform.translate(
-              offset: _hoverAnimation.value,
-              child: Transform.scale(
-                scale: _bounceAnimation.value,
-                child: Container(
-                  width: widget.size,
-                  height: widget.size,
-                  decoration: BoxDecoration(
-                    color: _getBackgroundColor(),
-                    borderRadius:
-                        widget.borderRadius ?? BorderRadius.circular(8),
-                    border: _getBorder(),
-                    boxShadow: _shadowAnimation.value > 0
-                        ? [
-                            BoxShadow(
-                              color: _getShadowColor().withValues(
-                                  alpha: 0.3 * _shadowAnimation.value),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                              spreadRadius: 2,
-                            ),
-                            BoxShadow(
-                              color: _getShadowColor().withValues(
-                                  alpha: 0.2 * _shadowAnimation.value),
-                              blurRadius: 24,
-                              offset: const Offset(0, 8),
-                              spreadRadius: 4,
-                            ),
-                          ]
-                        : null,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        return MouseRegion(
+          onEnter: (_) => _handleHover(true),
+          onExit: (_) => _handleHover(false),
+          child: GestureDetector(
+            onTap: widget.onPressed != null ? _handleTap : null,
+            child: AnimatedBuilder(
+              animation: Listenable.merge(
+                  [_bounceAnimation, _hoverAnimation, _shadowAnimation]),
+              builder: (context, child) {
+                return Transform.translate(
+                  offset: _hoverAnimation.value,
+                  child: Transform.scale(
+                    scale: _bounceAnimation.value,
+                    child: Container(
+                      width: widget.size,
+                      height: widget.size,
+                      decoration: BoxDecoration(
+                        color: _getBackgroundColor(themeService),
+                        borderRadius:
+                            widget.borderRadius ?? BorderRadius.circular(8),
+                        border: _getBorder(themeService),
+                        boxShadow: _shadowAnimation.value > 0
+                            ? [
+                                BoxShadow(
+                                  color: _getShadowColor(themeService).withValues(
+                                      alpha: 0.3 * _shadowAnimation.value),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                  spreadRadius: 2,
+                                ),
+                                BoxShadow(
+                                  color: _getShadowColor(themeService).withValues(
+                                      alpha: 0.2 * _shadowAnimation.value),
+                                  blurRadius: 24,
+                                  offset: const Offset(0, 8),
+                                  spreadRadius: 4,
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: Center(
+                        child: widget.isLoading
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  onSurface: true,
+                                ),
+                              )
+                            : DefaultTextStyle(
+                                style: TextStyle(color: _getIconColor(themeService)),
+                                child: widget.icon,
+                              ),
+                      ),
+                    ),
                   ),
-                  child: Center(
-                    child: widget.isLoading
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              onSurface: true,
-                            ),
-                          )
-                        : DefaultTextStyle(
-                            style: TextStyle(color: _getIconColor()),
-                            child: widget.icon,
-                          ),
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }

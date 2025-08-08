@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitAvatarGroup extends StatelessWidget {
   final List<Avatar> children;
@@ -16,13 +19,32 @@ class OurbitAvatarGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final avatars = maxAvatars != null && children.length > maxAvatars!
-        ? children.take(maxAvatars!).toList()
-        : children;
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        final avatars = maxAvatars != null && children.length > maxAvatars!
+            ? children.take(maxAvatars!).toList()
+            : children;
 
-    return AvatarGroup(
-      alignment: alignment,
-      children: avatars,
+        return Container(
+          decoration: BoxDecoration(
+            color: themeService.isDarkMode
+                ? AppColors.darkSecondaryBackground
+                : AppColors.secondaryBackground,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: themeService.isDarkMode
+                  ? AppColors.darkBorder
+                  : AppColors.border,
+              width: 1,
+            ),
+          ),
+          padding: const EdgeInsets.all(12),
+          child: AvatarGroup(
+            alignment: alignment,
+            children: avatars,
+          ),
+        );
+      },
     );
   }
 }

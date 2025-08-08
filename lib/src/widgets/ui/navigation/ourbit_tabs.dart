@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitTabs extends StatelessWidget {
   final int index;
@@ -14,10 +17,14 @@ class OurbitTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Tabs(
-      index: index,
-      children: children,
-      onChanged: onChanged,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return Tabs(
+          index: index,
+          children: children,
+          onChanged: onChanged,
+        );
+      },
     );
   }
 }
@@ -32,7 +39,11 @@ class OurbitTabItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TabItem(child: child);
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return TabItem(child: child);
+      },
+    );
   }
 }
 

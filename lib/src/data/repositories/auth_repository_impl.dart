@@ -33,7 +33,22 @@ class AuthRepositoryImpl implements AuthRepository {
 
       return null;
     } catch (e) {
-      throw Exception('Failed to sign in: ${e.toString()}');
+      // Handle specific Supabase auth errors
+      if (e.toString().contains('Invalid login credentials')) {
+        throw Exception(
+            'Email atau password salah. Silakan cek kembali kredensial Anda.');
+      } else if (e.toString().contains('Email not confirmed')) {
+        throw Exception(
+            'Email belum dikonfirmasi. Silakan cek email Anda dan klik link konfirmasi.');
+      } else if (e.toString().contains('Too many requests')) {
+        throw Exception(
+            'Terlalu banyak percobaan login. Silakan coba lagi dalam beberapa menit.');
+      } else if (e.toString().contains('User not found')) {
+        throw Exception(
+            'User tidak ditemukan. Silakan daftar terlebih dahulu.');
+      } else {
+        throw Exception('Gagal login: ${e.toString()}');
+      }
     }
   }
 

@@ -4,6 +4,7 @@ import 'package:ourbit_pos/src/widgets/navigation/sidebar.dart';
 import 'package:ourbit_pos/blocs/management_bloc.dart';
 import 'package:ourbit_pos/blocs/management_event.dart';
 import 'package:ourbit_pos/blocs/management_state.dart';
+import 'package:ourbit_pos/src/widgets/navigation/appbar.dart';
 import 'widgets/management_menu_widget.dart';
 import 'products/products_content.dart';
 import 'inventory/inventory_content.dart';
@@ -31,56 +32,56 @@ class _ManagementPageState extends State<ManagementPage> {
     ManagementMenuItem(
       id: 'products',
       title: 'Produk',
-      icon: LucideIcons.shoppingBasket,
-      description: 'Kelola barang dan jasa toko kamu',
+      icon: Icons.inventory,
+      description: 'Kelola produk dan layanan',
     ),
     ManagementMenuItem(
       id: 'inventory',
-      title: 'Inventory',
-      icon: LucideIcons.warehouse,
-      description: 'Kelola stok barang',
+      title: 'Inventori',
+      icon: Icons.assessment,
+      description: 'Monitor stok dan inventori',
     ),
     ManagementMenuItem(
       id: 'categories',
       title: 'Kategori',
-      icon: LucideIcons.archive,
-      description: 'Kelola kategori barang dan jasa',
+      icon: Icons.category,
+      description: 'Kelola kategori produk',
     ),
     ManagementMenuItem(
       id: 'customers',
       title: 'Pelanggan',
-      icon: LucideIcons.userRound,
-      description: 'Kelola data pemilik hewan',
+      icon: Icons.people,
+      description: 'Kelola data pelanggan',
     ),
     ManagementMenuItem(
       id: 'suppliers',
       title: 'Supplier',
-      icon: LucideIcons.truck,
-      description: 'Kelola data supplier',
+      icon: Icons.business,
+      description: 'Kelola supplier dan vendor',
     ),
     ManagementMenuItem(
       id: 'discounts',
       title: 'Diskon',
-      icon: LucideIcons.tag,
+      icon: Icons.local_offer,
       description: 'Kelola diskon dan promo',
     ),
     ManagementMenuItem(
       id: 'taxes',
       title: 'Pajak',
-      icon: LucideIcons.scrollText,
-      description: 'Pengaturan pajak barang dan jasa',
+      icon: Icons.receipt,
+      description: 'Kelola pajak dan tarif',
     ),
     ManagementMenuItem(
       id: 'expenses',
-      title: 'Biaya',
-      icon: LucideIcons.banknote,
-      description: 'Kelola biaya operasional toko',
+      title: 'Pengeluaran',
+      icon: Icons.account_balance_wallet,
+      description: 'Kelola pengeluaran bisnis',
     ),
     ManagementMenuItem(
       id: 'loyalty',
-      title: 'Loyalty',
-      icon: LucideIcons.gift,
-      description: 'Program loyalitas pelanggan',
+      title: 'Loyalitas',
+      icon: Icons.card_giftcard,
+      description: 'Kelola program loyalitas',
     ),
   ];
 
@@ -105,7 +106,7 @@ class _ManagementPageState extends State<ManagementPage> {
             child: Column(
               children: [
                 // AppBar
-                const AppBar(),
+                const OurbitAppBar(),
 
                 // Content
                 Expanded(

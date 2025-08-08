@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 /// Custom Text Area Widget dengan efek shrink animation saat focus
 ///
@@ -162,32 +165,36 @@ class _OurbitTextAreaState extends State<OurbitTextArea>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _bounceController,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _bounceAnimation.value,
-          child: Container(
-            width: widget.width,
-            height: widget.height,
-            padding: widget.padding,
-            child: TextArea(
-              key: widget.fieldKey,
-              initialValue: widget.initialValue,
-              placeholder:
-                  widget.placeholder != null ? Text(widget.placeholder!) : null,
-              expandableWidth: widget.expandableWidth,
-              expandableHeight: widget.expandableHeight,
-              initialWidth: widget.initialWidth ?? 300,
-              initialHeight: widget.initialHeight ?? 200,
-              onChanged: widget.onChanged,
-              controller: widget.controller,
-              focusNode: _focusNode,
-            ).constrained(
-              width: widget.width,
-              height: widget.height,
-            ),
-          ),
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return AnimatedBuilder(
+          animation: _bounceController,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _bounceAnimation.value,
+              child: Container(
+                width: widget.width,
+                height: widget.height,
+                padding: widget.padding,
+                child: TextArea(
+                  key: widget.fieldKey,
+                  initialValue: widget.initialValue,
+                  placeholder:
+                      widget.placeholder != null ? Text(widget.placeholder!) : null,
+                  expandableWidth: widget.expandableWidth,
+                  expandableHeight: widget.expandableHeight,
+                  initialWidth: widget.initialWidth ?? 300,
+                  initialHeight: widget.initialHeight ?? 200,
+                  onChanged: widget.onChanged,
+                  controller: widget.controller,
+                  focusNode: _focusNode,
+                ).constrained(
+                  width: widget.width,
+                  height: widget.height,
+                ),
+              ),
+            );
+          },
         );
       },
     );

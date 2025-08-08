@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitCheckbox extends StatelessWidget {
   final CheckboxState state;
@@ -16,11 +19,15 @@ class OurbitCheckbox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Checkbox(
-      state: state,
-      onChanged: onChanged,
-      trailing: trailing,
-      tristate: tristate,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        return Checkbox(
+          state: state,
+          onChanged: onChanged,
+          trailing: trailing,
+          tristate: tristate,
+        );
+      },
     );
   }
 }

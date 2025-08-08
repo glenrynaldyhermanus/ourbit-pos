@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart' as shadcn;
+import 'package:provider/provider.dart';
+
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitDialog extends StatelessWidget {
   final String title;
@@ -24,33 +27,37 @@ class OurbitDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return shadcn.AlertDialog(
-      title: Text(title),
-      content: Text(content),
-      actions: [
-        OurbitButton.outline(
-          onPressed: () {
-            Navigator.of(context).pop();
-            onCancel?.call();
-          },
-          label: cancelText ?? 'Batal',
-        ),
-        isDestructive
-            ? OurbitButton.destructive(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  onConfirm?.call();
-                },
-                label: confirmText ?? 'Konfirmasi',
-              )
-            : OurbitButton.primary(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  onConfirm?.call();
-                },
-                label: confirmText ?? 'Konfirmasi',
-              ),
-      ],
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        return shadcn.AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            OurbitButton.outline(
+              onPressed: () {
+                Navigator.of(context).pop();
+                onCancel?.call();
+              },
+              label: cancelText ?? 'Batal',
+            ),
+            isDestructive
+                ? OurbitButton.destructive(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      onConfirm?.call();
+                    },
+                    label: confirmText ?? 'Konfirmasi',
+                  )
+                : OurbitButton.primary(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      onConfirm?.call();
+                    },
+                    label: confirmText ?? 'Konfirmasi',
+                  ),
+          ],
+        );
+      },
     );
   }
 

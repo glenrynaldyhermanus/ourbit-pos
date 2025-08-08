@@ -14,40 +14,64 @@ class BusinessStoreService {
         throw Exception('User not authenticated');
       }
 
-      // Get user's role assignments with business and store info
-      final roleAssignmentsResponse =
-          await _supabaseClient.from('role_assignments').select('''
-            *,
-            business:businesses(*),
-            store:stores(*),
-            role:roles(*)
-          ''').eq('user_id', user.id);
+      // Get user's role assignments
+      final roleAssignmentsResponse = await _supabaseClient
+          .from('role_assignments')
+          .select('*')
+          .eq('user_id', user.id);
 
+      // Check if user has role assignments
       if (roleAssignmentsResponse.isEmpty) {
-        throw Exception('No role assignments found for user');
+        throw Exception('Kamu tidak memiliki akses ke aplikasi POS');
       }
 
       // Get the first role assignment (assuming user has one primary assignment)
       final roleAssignment = roleAssignmentsResponse[0];
 
-      // Extract business and store data
-      final businessData = roleAssignment['business'] as Map<String, dynamic>;
-      final storeData = roleAssignment['store'] as Map<String, dynamic>;
-      final roleData = roleAssignment['role'] as Map<String, dynamic>;
+      // Get business data
+      final businessResponse = await _supabaseClient
+          .from('businesses')
+          .select('*')
+          .eq('id', roleAssignment['business_id'])
+          .single();
+
+      // Get store data
+      final storeResponse = await _supabaseClient
+          .from('stores')
+          .select('*')
+          .eq('id', roleAssignment['store_id'])
+          .single();
+
+      // Get role data
+      final roleResponse = await _supabaseClient
+          .from('roles')
+          .select('*')
+          .eq('id', roleAssignment['role_id'])
+          .single();
+
+      // Validate business exists and is not deleted
+      if (businessResponse['deleted_at'] != null) {
+        throw Exception('Bisnis tidak aktif atau tidak ditemukan');
+      }
+
+      // Validate store exists and is not deleted
+      if (storeResponse['deleted_at'] != null) {
+        throw Exception('Store tidak aktif atau tidak ditemukan');
+      }
 
       // Save to local storage
-      await LocalStorageService.saveBusinessData(businessData);
-      await LocalStorageService.saveStoreData(storeData);
+      await LocalStorageService.saveBusinessData(businessResponse);
+      await LocalStorageService.saveStoreData(storeResponse);
       await LocalStorageService.saveRoleAssignmentData(roleAssignment);
 
       return {
-        'business': businessData,
-        'store': storeData,
-        'role': roleData,
+        'business': businessResponse,
+        'store': storeResponse,
+        'role': roleResponse,
         'roleAssignment': roleAssignment,
       };
     } catch (e) {
-      throw Exception('Failed to get user business and store data');
+      throw Exception(e.toString());
     }
   }
 

@@ -16,6 +16,7 @@ class CashierLoading extends CashierState {}
 class CashierLoaded extends CashierState {
   final List<Product> products;
   final List<CartItem> cartItems;
+  final List<Map<String, dynamic>> categories;
   final String searchTerm;
   final String selectedCategory;
   final double total;
@@ -26,6 +27,7 @@ class CashierLoaded extends CashierState {
   const CashierLoaded({
     required this.products,
     required this.cartItems,
+    this.categories = const [],
     this.searchTerm = '',
     this.selectedCategory = 'all',
     required this.total,
@@ -37,6 +39,7 @@ class CashierLoaded extends CashierState {
   CashierLoaded copyWith({
     List<Product>? products,
     List<CartItem>? cartItems,
+    List<Map<String, dynamic>>? categories,
     String? searchTerm,
     String? selectedCategory,
     double? total,
@@ -47,6 +50,7 @@ class CashierLoaded extends CashierState {
     return CashierLoaded(
       products: products ?? this.products,
       cartItems: cartItems ?? this.cartItems,
+      categories: categories ?? this.categories,
       searchTerm: searchTerm ?? this.searchTerm,
       selectedCategory: selectedCategory ?? this.selectedCategory,
       total: total ?? this.total,
@@ -60,6 +64,7 @@ class CashierLoaded extends CashierState {
   List<Object?> get props => [
         products,
         cartItems,
+        categories,
         searchTerm,
         selectedCategory,
         total,

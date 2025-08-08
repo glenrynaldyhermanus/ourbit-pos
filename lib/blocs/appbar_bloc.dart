@@ -31,14 +31,20 @@ class AppBarBloc extends Bloc<AppBarEvent, AppBarState> {
       if (businessData != null && businessData['name'] != null) {
         businessName = businessData['name'];
       }
+
       if (storeData != null && storeData['name'] != null) {
         storeName = storeData['name'];
       }
+
       if (userData != null && userData['name'] != null) {
         userName = userData['name'];
+      } else if (userData != null && userData['email'] != null) {
+        // Fallback to email if name is not available
+        final email = userData['email'] as String;
+        userName = email.split('@')[0]; // Use email prefix as name
       }
 
-      // Get role name
+      // Get role name from role assignment data
       if (roleData != null && roleData['role'] != null) {
         final role = roleData['role'] as Map<String, dynamic>;
         final roleName = role['name'] as String?;

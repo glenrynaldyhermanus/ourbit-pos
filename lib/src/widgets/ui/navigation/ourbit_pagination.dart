@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitPagination extends StatelessWidget {
   final int page;
@@ -14,10 +17,14 @@ class OurbitPagination extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Pagination(
-      page: page,
-      totalPages: totalPages,
-      onPageChanged: onPageChanged,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return Pagination(
+          page: page,
+          totalPages: totalPages,
+          onPageChanged: onPageChanged,
+        );
+      },
     );
   }
 }

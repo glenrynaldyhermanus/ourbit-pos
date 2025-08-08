@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitAvatar extends StatelessWidget {
   final String? initials;
@@ -18,12 +21,20 @@ class OurbitAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Avatar(
-      initials: initials != null ? Avatar.getInitials(initials!) : '',
-      provider: provider,
-      backgroundColor: backgroundColor,
-      size: size,
-      badge: badge,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        final defaultBackgroundColor = themeService.isDarkMode 
+            ? AppColors.darkTertiary 
+            : AppColors.muted;
+            
+        return Avatar(
+          initials: initials != null ? Avatar.getInitials(initials!) : '',
+          provider: provider,
+          backgroundColor: backgroundColor ?? defaultBackgroundColor,
+          size: size,
+          badge: badge,
+        );
+      },
     );
   }
 }
@@ -42,10 +53,18 @@ class OurbitAvatarBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AvatarBadge(
-      size: size,
-      color: color,
-      child: child,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        final badgeColor = themeService.isDarkMode 
+            ? AppColors.darkPrimary 
+            : AppColors.primary;
+            
+        return AvatarBadge(
+          size: size,
+          color: color != AppColors.primary ? color : badgeColor,
+          child: child,
+        );
+      },
     );
   }
 }

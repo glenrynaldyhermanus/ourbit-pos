@@ -1,4 +1,6 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitCircularProgress extends StatelessWidget {
   final double? value;
@@ -12,9 +14,16 @@ class OurbitCircularProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CircularProgressIndicator(
-      value: value,
-      size: size,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, child) {
+        return SizedBox(
+          width: size,
+          height: size,
+          child: CircularProgressIndicator(
+            value: value,
+          ),
+        );
+      },
     );
   }
 }

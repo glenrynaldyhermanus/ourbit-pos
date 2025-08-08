@@ -1,4 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 
 class OurbitStarRating extends StatelessWidget {
   final double value;
@@ -14,10 +17,14 @@ class OurbitStarRating extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StarRating(
-      starSize: starSize,
-      value: value,
-      onChanged: onChanged,
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+        return StarRating(
+          starSize: starSize,
+          value: value,
+          onChanged: onChanged,
+        );
+      },
     );
   }
 }
