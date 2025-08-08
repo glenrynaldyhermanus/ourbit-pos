@@ -4,6 +4,7 @@ import 'package:ourbit_pos/src/data/repositories/auth_repository.dart';
 import 'package:ourbit_pos/src/core/services/supabase_service.dart';
 import 'package:ourbit_pos/src/core/services/local_storage_service.dart';
 import 'package:ourbit_pos/src/core/services/token_service.dart';
+import 'package:ourbit_pos/src/core/utils/logger.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final SupabaseClient _supabaseClient;
@@ -13,7 +14,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<AppUser?> signIn(String email, String password) async {
     try {
-      print('🔐 AUTH_REPO: Starting signIn process for $email');
+      Logger.auth('Starting signIn process for $email');
 
       final response = await _supabaseClient.auth.signInWithPassword(
         email: email,
@@ -21,21 +22,21 @@ class AuthRepositoryImpl implements AuthRepository {
       );
 
       if (response.user != null) {
-        print('✅ AUTH_REPO: User authenticated successfully');
+        Logger.auth('User authenticated successfully');
 
         // Save the session token after successful authentication
         final session = _supabaseClient.auth.currentSession;
         if (session != null && session.accessToken != null) {
-          print('💾 AUTH_REPO: Saving session token');
+          Logger.auth('Saving session token');
           await TokenService.saveToken(
             session.accessToken,
-            session.expiresAt != null 
-              ? DateTime.fromMillisecondsSinceEpoch(session.expiresAt! * 1000)
-              : DateTime.now().add(const Duration(hours: 1))
-          );
-          print('✅ AUTH_REPO: Session token saved successfully');
+            session.expiresAt != null
+                ? DateTime.fromMillisecondsSinceEpoch(
+                    session.expiresAt! * 1000)
+                : DateTime.now().add(const Duration(hours: 1)));
+          Logger.auth('Session token saved successfully');
         } else {
-          print('⚠️ AUTH_REPO: No session or access token available');
+          Logger.warning('No session or access token available');
         }
 
         // User data will be loaded by BusinessStoreService in AuthBloc
@@ -53,7 +54,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       return null;
     } catch (e) {
-      print('❌ AUTH_REPO: SignIn error: $e');
+      Logger.error('SignIn error: $e');
       // Handle specific Supabase auth errors
       if (e.toString().contains('Invalid login credentials')) {
         throw Exception(
@@ -76,18 +77,18 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> signOut() async {
     try {
-      print('DEBUG: AuthRepository - Starting signOut process');
+      Logger.auth('Starting signOut process');
       // Clear local storage first
-      print('DEBUG: AuthRepository - Clearing local storage');
+      Logger.auth('Clearing local storage');
       await LocalStorageService.clearAllData();
-      print('DEBUG: AuthRepository - Local storage cleared');
+      Logger.auth('Local storage cleared');
 
       // Then sign out from Supabase
-      print('DEBUG: AuthRepository - Signing out from Supabase');
+      Logger.auth('Signing out from Supabase');
       await _supabaseClient.auth.signOut();
-      print('DEBUG: AuthRepository - Supabase signOut completed');
+      Logger.auth('Supabase signOut completed');
     } catch (e) {
-      print('DEBUG: AuthRepository - SignOut error: $e');
+      Logger.error('SignOut error: $e');
       // TODO: gunakan logger jika perlu
       throw Exception('Failed to sign out');
     }

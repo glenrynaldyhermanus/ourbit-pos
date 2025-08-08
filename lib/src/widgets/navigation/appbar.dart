@@ -10,6 +10,7 @@ import 'package:ourbit_pos/src/core/routes/app_router.dart';
 import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/core/services/theme_service.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_theme_toggle.dart';
+import 'package:ourbit_pos/src/core/utils/logger.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:async';
 
@@ -80,57 +81,55 @@ class _OurbitAppBarState extends State<OurbitAppBar> {
   }
 
   void _startTokenValidation() {
-    print('⏰ APPBAR: Starting token validation timer (5 minutes)');
+    Logger.appbar('Starting token validation timer (5 minutes)');
     // Check token every 5 minutes for normal operation
     _tokenValidationTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
-      print('⏰ APPBAR: 5-minute timer triggered - running token validation');
+      Logger.appbar('5-minute timer triggered - running token validation');
       _validateToken();
     });
   }
 
   Future<void> _validateToken() async {
-    print('🔐 APPBAR: Starting token validation process');
+    Logger.appbar('Starting token validation process');
     try {
       // First try to refresh session if needed
-      print('🔄 APPBAR: Attempting to refresh session if needed');
+      Logger.appbar('Attempting to refresh session if needed');
       final refreshResult = await TokenService.refreshSessionIfNeeded();
-      print('📊 APPBAR: Refresh result: $refreshResult');
+      Logger.appbar('Refresh result: $refreshResult');
 
       // Then check if token is valid (now requires stored token)
-      print('🔍 APPBAR: Checking if token is valid (stored token required)');
+      Logger.appbar('Checking if token is valid (stored token required)');
       final isValid = await TokenService.isTokenValid();
-      print('📊 APPBAR: Token validation result: $isValid');
+      Logger.appbar('Token validation result: $isValid');
 
       if (!isValid) {
-        print(
-            '❌ APPBAR: Token is invalid or missing stored token - triggering logout');
+        Logger.appbar('Token is invalid or missing stored token - triggering logout');
         // Token invalid or missing stored token, force logout
         await _handleInvalidToken();
       } else {
-        print(
-            '✅ APPBAR: Token is valid with stored token - continuing session');
+        Logger.appbar('Token is valid with stored token - continuing session');
       }
     } catch (e) {
-      print('❌ APPBAR: Error during token validation: $e');
+      Logger.error('Error during token validation: $e');
       // Error during validation, assume token is invalid
       await _handleInvalidToken();
     }
   }
 
   Future<void> _handleInvalidToken() async {
-    print('🚪 APPBAR: Handling invalid token - starting logout process');
-    print('🚪 APPBAR: Reason: Missing stored token or invalid session');
+    Logger.appbar('Handling invalid token - starting logout process');
+    Logger.appbar('Reason: Missing stored token or invalid session');
     // Cancel timer to prevent multiple calls
     _tokenValidationTimer?.cancel();
-    print('⏰ APPBAR: Token validation timer cancelled');
+    Logger.appbar('Token validation timer cancelled');
 
     // Force logout
-    print('🔐 APPBAR: Calling TokenService.forceLogout()');
+    Logger.appbar('Calling TokenService.forceLogout()');
     await TokenService.forceLogout();
 
     // Navigate to login
     if (mounted) {
-      print('🔄 APPBAR: Navigating to login page');
+      Logger.appbar('Navigating to login page');
       context.go(AppRouter.loginRoute);
     }
   }

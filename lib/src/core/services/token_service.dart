@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ourbit_pos/src/core/services/supabase_service.dart';
 import 'package:ourbit_pos/src/core/services/local_storage_service.dart';
+import 'package:ourbit_pos/src/core/utils/logger.dart';
 
 // Conditional import untuk dart:html hanya di web
 import 'token_service_web.dart' if (dart.library.io) 'token_service_stub.dart';
@@ -51,11 +52,11 @@ class TokenService {
 
   /// Menyimpan token ke local storage
   static Future<void> saveToken(String token, DateTime expiry) async {
-    print('💾 TOKEN_SERVICE: Saving token to storage');
+    Logger.token('Saving token to storage');
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_tokenKey, token);
     await prefs.setString(_tokenExpiryKey, expiry.toIso8601String());
-    print('✅ TOKEN_SERVICE: Token saved successfully');
+    Logger.token('Token saved successfully');
   }
 
   /// Memuat data user berdasarkan token
@@ -96,16 +97,16 @@ class TokenService {
   /// Refresh session if needed
   static Future<bool> refreshSessionIfNeeded() async {
     try {
-      print('🔐 TOKEN_SERVICE: Starting refreshSessionIfNeeded()');
+      Logger.token('Starting refreshSessionIfNeeded()');
 
       final session = SupabaseService.client.auth.currentSession;
       if (session == null) {
-        print('❌ TOKEN_SERVICE: No current session found');
+        Logger.token('No current session found');
         return false;
       }
 
-      print('✅ TOKEN_SERVICE: Current session found');
-      print('📅 TOKEN_SERVICE: Session expires at: ${session.expiresAt}');
+      Logger.token('Current session found');
+      Logger.token('Session expires at: ${session.expiresAt}');
 
       // Check if session will expire in the next 10 minutes
       if (session.expiresAt != null) {
@@ -123,32 +124,30 @@ class TokenService {
         final now = DateTime.now();
         final timeUntilExpiry = expiryTime.difference(now);
 
-        print(
-            '⏰ TOKEN_SERVICE: Time until expiry: ${timeUntilExpiry.inMinutes} minutes');
-        print('📅 TOKEN_SERVICE: Calculated expiry time: $expiryTime');
+        Logger.token('Time until expiry: ${timeUntilExpiry.inMinutes} minutes');
+        Logger.token('Calculated expiry time: $expiryTime');
 
         // If session expires in less than 10 minutes, try to refresh
         if (timeUntilExpiry.inMinutes < 10) {
-          print(
-              '🔄 TOKEN_SERVICE: Session expires soon, attempting refresh...');
+          Logger.token('Session expires soon, attempting refresh...');
           try {
             await SupabaseService.client.auth.refreshSession();
-            print('✅ TOKEN_SERVICE: Session refreshed successfully');
+            Logger.token('Session refreshed successfully');
             return true;
           } catch (e) {
-            print('❌ TOKEN_SERVICE: Session refresh failed: $e');
+            Logger.token('Session refresh failed: $e');
             return false;
           }
         } else {
-          print('✅ TOKEN_SERVICE: Session still valid, no refresh needed');
+          Logger.token('Session still valid, no refresh needed');
         }
       } else {
-        print('⚠️ TOKEN_SERVICE: Session has no expiry time');
+        Logger.warning('Session has no expiry time');
       }
 
       return true;
     } catch (e) {
-      print('❌ TOKEN_SERVICE: Error in refreshSessionIfNeeded: $e');
+      Logger.error('Error in refreshSessionIfNeeded: $e');
       return false;
     }
   }
@@ -156,25 +155,25 @@ class TokenService {
   /// Validasi token yang tersimpan
   static Future<bool> isTokenValid() async {
     try {
-      print('🔐 TOKEN_SERVICE: Starting isTokenValid() check');
+      Logger.token('Starting isTokenValid() check');
 
       // First check if Supabase session is still valid
       final user = SupabaseService.client.auth.currentUser;
-      print('👤 TOKEN_SERVICE: Current user: ${user?.email ?? "null"}');
+      Logger.token('Current user: ${user?.email ?? "null"}');
 
       if (user == null) {
-        print('❌ TOKEN_SERVICE: No current user found - AUTHENTICATED: false');
+        Logger.token('No current user found - AUTHENTICATED: false');
         await clearToken();
         return false;
       }
 
       // Check if session is still valid by trying to get user info
       final session = SupabaseService.client.auth.currentSession;
-      print(
-          '📋 TOKEN_SERVICE: Current session: ${session != null ? "exists" : "null"}');
+      Logger.token(
+          'Current session: ${session != null ? "exists" : "null"}');
 
       if (session == null) {
-        print('❌ TOKEN_SERVICE: No valid session found - AUTHENTICATED: false');
+        Logger.token('No valid session found - AUTHENTICATED: false');
         await clearToken();
         return false;
       }
@@ -195,40 +194,37 @@ class TokenService {
         final now = DateTime.now();
         final isExpired = expiryTime.isBefore(now);
 
-        print('📅 TOKEN_SERVICE: Session expiry: $expiryTime');
-        print('⏰ TOKEN_SERVICE: Current time: $now');
-        print('🔍 TOKEN_SERVICE: Session expired: $isExpired');
+        Logger.token('Session expiry: $expiryTime');
+        Logger.token('Current time: $now');
+        Logger.token('Session expired: $isExpired');
 
         if (isExpired) {
-          print('❌ TOKEN_SERVICE: Session has expired - AUTHENTICATED: false');
+          Logger.token('Session has expired - AUTHENTICATED: false');
           await clearToken();
           return false;
         }
       } else {
-        print('⚠️ TOKEN_SERVICE: Session has no expiry time');
+        Logger.warning('Session has no expiry time');
       }
 
       // Check stored token - this is now REQUIRED
       final storedToken = await getStoredToken();
       final hasStoredToken = storedToken != null;
 
-      print('💾 TOKEN_SERVICE: Stored token exists: $hasStoredToken');
+      Logger.token('Stored token exists: $hasStoredToken');
 
       if (!hasStoredToken) {
-        print('❌ TOKEN_SERVICE: No stored token found - AUTHENTICATED: false');
-        print(
-            '🚪 TOKEN_SERVICE: User will be logged out due to missing stored token');
+        Logger.token('No stored token found - AUTHENTICATED: false');
+        Logger.token('User will be logged out due to missing stored token');
         await clearToken();
         return false;
       }
 
-      print(
-          '✅ TOKEN_SERVICE: Both session and stored token are valid - AUTHENTICATED: true');
+      Logger.token('Both session and stored token are valid - AUTHENTICATED: true');
       return true;
     } catch (e) {
-      print('❌ TOKEN_SERVICE: Error during token validation: $e');
-      print(
-          '❌ TOKEN_SERVICE: Clearing token due to error - AUTHENTICATED: false');
+      Logger.error('Error during token validation: $e');
+      Logger.error('Clearing token due to error - AUTHENTICATED: false');
       await clearToken();
       return false;
     }
@@ -236,31 +232,31 @@ class TokenService {
 
   /// Clear token dari local storage
   static Future<void> clearToken() async {
-    print('🗑️ TOKEN_SERVICE: Clearing stored token');
+    Logger.token('Clearing stored token');
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
     await prefs.remove(_tokenExpiryKey);
-    print('✅ TOKEN_SERVICE: Token cleared from storage');
+    Logger.token('Token cleared from storage');
   }
 
   /// Force logout dan clear semua data
   static Future<void> forceLogout() async {
-    print('🚪 TOKEN_SERVICE: Starting force logout process');
+    Logger.token('Starting force logout process');
 
     try {
       // Clear Supabase session
-      print('🔐 TOKEN_SERVICE: Signing out from Supabase');
+      Logger.token('Signing out from Supabase');
       await SupabaseService.client.auth.signOut();
-      print('✅ TOKEN_SERVICE: Supabase signOut completed');
+      Logger.token('Supabase signOut completed');
     } catch (e) {
-      print('⚠️ TOKEN_SERVICE: Error during Supabase signOut: $e');
+      Logger.warning('Error during Supabase signOut: $e');
     }
 
     // Clear all local data
-    print('🗑️ TOKEN_SERVICE: Clearing all local data');
+    Logger.token('Clearing all local data');
     await clearToken();
     await LocalStorageService.clearAllData();
-    print('✅ TOKEN_SERVICE: Force logout completed');
+    Logger.token('Force logout completed');
   }
 
   /// Handle hash fragment di awal untuk mencegah GoRouter confusion
