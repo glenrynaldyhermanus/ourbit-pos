@@ -1,8 +1,9 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart' as material;
 import 'package:provider/provider.dart';
 
 import 'package:ourbit_pos/src/core/services/theme_service.dart';
-import 'package:ourbit_pos/src/widgets/ui/form/ourbit_icon_button.dart';
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 
 /// Widget untuk toggle tema antara light mode dan dark mode
 ///
@@ -46,7 +47,7 @@ class OurbitThemeToggle extends StatefulWidget {
   const OurbitThemeToggle({
     super.key,
     this.size,
-    this.showTooltip = true,
+    this.showTooltip = false,
     this.showLabel = false,
     this.variant = OurbitThemeToggleVariant.ghost,
     this.lightModeLabel,
@@ -123,33 +124,12 @@ class _OurbitThemeToggleState extends State<OurbitThemeToggle>
           child: Icon(
             isDarkMode ? Icons.light_mode : Icons.dark_mode,
             size: widget.size != null ? widget.size! * 0.5 : 20,
+            color:
+                isDarkMode ? AppColors.darkPrimaryText : AppColors.primaryText,
           ),
         );
       },
     );
-  }
-
-  Widget _buildContent(ThemeService themeService) {
-    final isDarkMode = themeService.isDarkMode;
-    final icon = _buildIcon(isDarkMode);
-
-    if (widget.showLabel) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          icon,
-          const SizedBox(width: 8),
-          Text(
-            isDarkMode
-                ? (widget.darkModeLabel ?? 'Mode Gelap')
-                : (widget.lightModeLabel ?? 'Mode Terang'),
-            style: const TextStyle(fontSize: 14),
-          ),
-        ],
-      );
-    }
-
-    return icon;
   }
 
   @override
@@ -168,14 +148,7 @@ class _OurbitThemeToggleState extends State<OurbitThemeToggle>
           },
         );
 
-        if (widget.showTooltip) {
-          toggleWidget = Tooltip(
-            tooltip: (context) => Text(isDarkMode
-                ? 'Beralih ke Mode Terang'
-                : 'Beralih ke Mode Gelap'),
-            child: toggleWidget,
-          );
-        }
+        // Tooltip removed - label is already clear enough
 
         return toggleWidget;
       },
@@ -183,35 +156,42 @@ class _OurbitThemeToggleState extends State<OurbitThemeToggle>
   }
 
   Widget _buildToggleButton(ThemeService themeService, bool isDarkMode) {
-    switch (widget.variant) {
-      case OurbitThemeToggleVariant.ghost:
-        return OurbitIconButton.ghost(
-          onPressed: () => _handleToggle(themeService),
-          icon: _buildContent(themeService),
-          size: widget.size,
-        );
+    // Always show label and use outline variant with rounded stroke
+    final content = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildIcon(isDarkMode),
+        const SizedBox(width: 8),
+        Text(
+          isDarkMode ? 'Dark' : 'Light',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color:
+                isDarkMode ? AppColors.darkPrimaryText : AppColors.primaryText,
+          ),
+        ),
+      ],
+    );
 
-      case OurbitThemeToggleVariant.outline:
-        return OurbitIconButton.outline(
-          onPressed: () => _handleToggle(themeService),
-          icon: _buildContent(themeService),
-          size: widget.size,
-        );
-
-      case OurbitThemeToggleVariant.primary:
-        return OurbitIconButton.primary(
-          onPressed: () => _handleToggle(themeService),
-          icon: _buildContent(themeService),
-          size: widget.size,
-        );
-
-      case OurbitThemeToggleVariant.secondary:
-        return OurbitIconButton.secondary(
-          onPressed: () => _handleToggle(themeService),
-          icon: _buildContent(themeService),
-          size: widget.size,
-        );
-    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: isDarkMode ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+          width: 1,
+        ),
+        borderRadius: BorderRadius.circular(8),
+        color: isDarkMode
+            ? const Color(0xFF1F2937).withValues(alpha: 0.5)
+            : const Color(0xFFF9FAFB),
+      ),
+      child: material.InkWell(
+        onTap: () => _handleToggle(themeService),
+        borderRadius: BorderRadius.circular(8),
+        child: content,
+      ),
+    );
   }
 }
 
@@ -227,7 +207,7 @@ enum OurbitThemeToggleVariant {
 class OurbitThemeToggleBuilder {
   static OurbitThemeToggle basic({
     double? size,
-    bool showTooltip = true,
+    bool showTooltip = false,
   }) {
     return OurbitThemeToggle(
       size: size,
@@ -237,7 +217,7 @@ class OurbitThemeToggleBuilder {
 
   static OurbitThemeToggle withLabel({
     double? size,
-    bool showTooltip = true,
+    bool showTooltip = false,
     String? lightModeLabel,
     String? darkModeLabel,
   }) {
@@ -252,7 +232,7 @@ class OurbitThemeToggleBuilder {
 
   static OurbitThemeToggle outline({
     double? size,
-    bool showTooltip = true,
+    bool showTooltip = false,
   }) {
     return OurbitThemeToggle(
       size: size,
@@ -263,7 +243,7 @@ class OurbitThemeToggleBuilder {
 
   static OurbitThemeToggle primary({
     double? size,
-    bool showTooltip = true,
+    bool showTooltip = false,
   }) {
     return OurbitThemeToggle(
       size: size,
@@ -274,7 +254,7 @@ class OurbitThemeToggleBuilder {
 
   static OurbitThemeToggle secondary({
     double? size,
-    bool showTooltip = true,
+    bool showTooltip = false,
   }) {
     return OurbitThemeToggle(
       size: size,
@@ -284,7 +264,7 @@ class OurbitThemeToggleBuilder {
   }
 
   static OurbitThemeToggle large({
-    bool showTooltip = true,
+    bool showTooltip = false,
     bool showLabel = false,
   }) {
     return OurbitThemeToggle(
@@ -295,7 +275,7 @@ class OurbitThemeToggleBuilder {
   }
 
   static OurbitThemeToggle small({
-    bool showTooltip = true,
+    bool showTooltip = false,
   }) {
     return OurbitThemeToggle(
       size: 32,

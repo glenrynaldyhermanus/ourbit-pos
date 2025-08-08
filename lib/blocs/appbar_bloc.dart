@@ -45,11 +45,18 @@ class AppBarBloc extends Bloc<AppBarEvent, AppBarState> {
       }
 
       // Get role name from role assignment data
-      if (roleData != null && roleData['role'] != null) {
-        final role = roleData['role'] as Map<String, dynamic>;
-        final roleName = role['name'] as String?;
-        if (roleName != null && roleName.isNotEmpty) {
-          userRole = roleName;
+      if (roleData != null) {
+        // Debug: Print role data from local storage
+        print('DEBUG: Role data from local storage: $roleData');
+
+        // Try to get role from 'roles' key (new query structure)
+        if (roleData['roles'] != null) {
+          final role = roleData['roles'] as Map<String, dynamic>;
+          final roleName = role['name'] as String?;
+          print('DEBUG: Role name from roles: $roleName');
+          if (roleName != null && roleName.isNotEmpty) {
+            userRole = roleName;
+          }
         }
       }
 

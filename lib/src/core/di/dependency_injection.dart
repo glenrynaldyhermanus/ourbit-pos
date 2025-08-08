@@ -33,139 +33,104 @@ import 'package:ourbit_pos/src/core/services/theme_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DependencyInjection {
+  // Initialize Supabase client
+  static final _supabaseClient = Supabase.instance.client;
+
+  // Initialize repositories
+  static final _authRepository = AuthRepositoryImpl(_supabaseClient);
+  static final _posRepository = PosRepositoryImpl(_supabaseClient);
+  static final _managementRepository =
+      ManagementRepositoryImpl(_supabaseClient);
+
+  // Initialize services
+  static final _businessStoreService = BusinessStoreService(_supabaseClient);
+  static final _themeService = ThemeService();
+
+  // Initialize use cases
+  static final _signInUseCase = SignInUseCase(_authRepository);
+  static final _signOutUseCase = SignOutUseCase(_authRepository);
+  static final _getCurrentUserUseCase = GetCurrentUserUseCase(_authRepository);
+  static final _isAuthenticatedUseCase =
+      IsAuthenticatedUseCase(_authRepository);
+  static final _authenticateWithTokenUseCase =
+      AuthenticateWithTokenUseCase(_authRepository);
+  static final _getProductsUseCase = GetProductsUseCase(_posRepository);
+  static final _getCategoriesByStoreUseCase =
+      GetCategoriesByStoreUseCase(_posRepository);
+  static final _getCartUseCase = GetCartUseCase(_posRepository);
+  static final _addToCartUseCase = AddToCartUseCase(_posRepository);
+  static final _updateCartQuantityUseCase =
+      UpdateCartQuantityUseCase(_posRepository);
+  static final _clearCartUseCase = ClearCartUseCase(_posRepository);
+  static final _getStorePaymentMethodsUseCase =
+      GetStorePaymentMethodsUseCase(_posRepository);
+  static final _processCheckoutUseCase = ProcessCheckoutUseCase(_posRepository);
+
+  // Initialize business store use cases
+  static final _getUserBusinessStoreUseCase =
+      GetUserBusinessStoreUseCase(_businessStoreService);
+
+  // Initialize management use cases
+  static final _getAllProductsUseCase =
+      GetAllProductsUseCase(_managementRepository);
+  static final _getCategoriesUseCase =
+      GetCategoriesUseCase(_managementRepository);
+  static final _getCustomersUseCase =
+      GetCustomersUseCase(_managementRepository);
+  static final _getSuppliersUseCase =
+      GetSuppliersUseCase(_managementRepository);
+  static final _getDiscountsUseCase =
+      GetDiscountsUseCase(_managementRepository);
+  static final _getExpensesUseCase = GetExpensesUseCase(_managementRepository);
+  static final _getLoyaltyProgramsUseCase =
+      GetLoyaltyProgramsUseCase(_managementRepository);
+
   static List<ChangeNotifierProvider> getProviders() {
-    // Initialize Supabase client
-    final supabaseClient = Supabase.instance.client;
-
-    // Initialize repositories
-    final authRepository = AuthRepositoryImpl(supabaseClient);
-    final posRepository = PosRepositoryImpl(supabaseClient);
-    final managementRepository = ManagementRepositoryImpl(supabaseClient);
-
-    // Initialize services
-    final businessStoreService = BusinessStoreService(supabaseClient);
-    final themeService = ThemeService();
-
-    // Initialize use cases
-    final signInUseCase = SignInUseCase(authRepository);
-    final signOutUseCase = SignOutUseCase(authRepository);
-    final getCurrentUserUseCase = GetCurrentUserUseCase(authRepository);
-    final isAuthenticatedUseCase = IsAuthenticatedUseCase(authRepository);
-    final authenticateWithTokenUseCase =
-        AuthenticateWithTokenUseCase(authRepository);
-    final getProductsUseCase = GetProductsUseCase(posRepository);
-    final getCategoriesByStoreUseCase =
-        GetCategoriesByStoreUseCase(posRepository);
-    final getCartUseCase = GetCartUseCase(posRepository);
-    final addToCartUseCase = AddToCartUseCase(posRepository);
-    final updateCartQuantityUseCase = UpdateCartQuantityUseCase(posRepository);
-    final clearCartUseCase = ClearCartUseCase(posRepository);
-    final getStorePaymentMethodsUseCase =
-        GetStorePaymentMethodsUseCase(posRepository);
-    final processCheckoutUseCase = ProcessCheckoutUseCase(posRepository);
-
-    // Initialize business store use cases
-    final getUserBusinessStoreUseCase =
-        GetUserBusinessStoreUseCase(businessStoreService);
-
-    // Initialize management use cases
-    final getAllProductsUseCase = GetAllProductsUseCase(managementRepository);
-    final getCategoriesUseCase = GetCategoriesUseCase(managementRepository);
-    final getCustomersUseCase = GetCustomersUseCase(managementRepository);
-    final getSuppliersUseCase = GetSuppliersUseCase(managementRepository);
-    final getDiscountsUseCase = GetDiscountsUseCase(managementRepository);
-    final getExpensesUseCase = GetExpensesUseCase(managementRepository);
-    final getLoyaltyProgramsUseCase =
-        GetLoyaltyProgramsUseCase(managementRepository);
-
     return [
       ChangeNotifierProvider<ThemeService>(
-        create: (context) => themeService,
+        create: (context) => _themeService,
       ),
     ];
   }
 
   static List<BlocProvider> getBlocProviders() {
-    // Initialize Supabase client
-    final supabaseClient = Supabase.instance.client;
-
-    // Initialize repositories
-    final authRepository = AuthRepositoryImpl(supabaseClient);
-    final posRepository = PosRepositoryImpl(supabaseClient);
-    final managementRepository = ManagementRepositoryImpl(supabaseClient);
-
-    // Initialize services
-    final businessStoreService = BusinessStoreService(supabaseClient);
-
-    // Initialize use cases
-    final signInUseCase = SignInUseCase(authRepository);
-    final signOutUseCase = SignOutUseCase(authRepository);
-    final getCurrentUserUseCase = GetCurrentUserUseCase(authRepository);
-    final isAuthenticatedUseCase = IsAuthenticatedUseCase(authRepository);
-    final authenticateWithTokenUseCase =
-        AuthenticateWithTokenUseCase(authRepository);
-    final getProductsUseCase = GetProductsUseCase(posRepository);
-    final getCategoriesByStoreUseCase =
-        GetCategoriesByStoreUseCase(posRepository);
-    final getCartUseCase = GetCartUseCase(posRepository);
-    final addToCartUseCase = AddToCartUseCase(posRepository);
-    final updateCartQuantityUseCase = UpdateCartQuantityUseCase(posRepository);
-    final clearCartUseCase = ClearCartUseCase(posRepository);
-    final getStorePaymentMethodsUseCase =
-        GetStorePaymentMethodsUseCase(posRepository);
-    final processCheckoutUseCase = ProcessCheckoutUseCase(posRepository);
-
-    // Initialize business store use cases
-    final getUserBusinessStoreUseCase =
-        GetUserBusinessStoreUseCase(businessStoreService);
-
-    // Initialize management use cases
-    final getAllProductsUseCase = GetAllProductsUseCase(managementRepository);
-    final getCategoriesUseCase = GetCategoriesUseCase(managementRepository);
-    final getCustomersUseCase = GetCustomersUseCase(managementRepository);
-    final getSuppliersUseCase = GetSuppliersUseCase(managementRepository);
-    final getDiscountsUseCase = GetDiscountsUseCase(managementRepository);
-    final getExpensesUseCase = GetExpensesUseCase(managementRepository);
-    final getLoyaltyProgramsUseCase =
-        GetLoyaltyProgramsUseCase(managementRepository);
-
     return [
       BlocProvider<AuthBloc>(
         create: (context) => AuthBloc(
-          signInUseCase: signInUseCase,
-          signOutUseCase: signOutUseCase,
-          getCurrentUserUseCase: getCurrentUserUseCase,
-          isAuthenticatedUseCase: isAuthenticatedUseCase,
-          authenticateWithTokenUseCase: authenticateWithTokenUseCase,
-          getUserBusinessStoreUseCase: getUserBusinessStoreUseCase,
+          signInUseCase: _signInUseCase,
+          signOutUseCase: _signOutUseCase,
+          getCurrentUserUseCase: _getCurrentUserUseCase,
+          isAuthenticatedUseCase: _isAuthenticatedUseCase,
+          authenticateWithTokenUseCase: _authenticateWithTokenUseCase,
+          getUserBusinessStoreUseCase: _getUserBusinessStoreUseCase,
         ),
       ),
       BlocProvider<CashierBloc>(
         create: (context) => CashierBloc(
-          getProductsUseCase: getProductsUseCase,
-          getCategoriesByStoreUseCase: getCategoriesByStoreUseCase,
-          getCartUseCase: getCartUseCase,
-          addToCartUseCase: addToCartUseCase,
-          updateCartQuantityUseCase: updateCartQuantityUseCase,
-          clearCartUseCase: clearCartUseCase,
+          getProductsUseCase: _getProductsUseCase,
+          getCategoriesByStoreUseCase: _getCategoriesByStoreUseCase,
+          getCartUseCase: _getCartUseCase,
+          addToCartUseCase: _addToCartUseCase,
+          updateCartQuantityUseCase: _updateCartQuantityUseCase,
+          clearCartUseCase: _clearCartUseCase,
         ),
       ),
       BlocProvider<ManagementBloc>(
         create: (context) => ManagementBloc(
-          getAllProductsUseCase: getAllProductsUseCase,
-          getCategoriesUseCase: getCategoriesUseCase,
-          getCustomersUseCase: getCustomersUseCase,
-          getSuppliersUseCase: getSuppliersUseCase,
-          getDiscountsUseCase: getDiscountsUseCase,
-          getExpensesUseCase: getExpensesUseCase,
-          getLoyaltyProgramsUseCase: getLoyaltyProgramsUseCase,
+          getAllProductsUseCase: _getAllProductsUseCase,
+          getCategoriesUseCase: _getCategoriesUseCase,
+          getCustomersUseCase: _getCustomersUseCase,
+          getSuppliersUseCase: _getSuppliersUseCase,
+          getDiscountsUseCase: _getDiscountsUseCase,
+          getExpensesUseCase: _getExpensesUseCase,
+          getLoyaltyProgramsUseCase: _getLoyaltyProgramsUseCase,
         ),
       ),
       BlocProvider<PaymentBloc>(
         create: (context) => PaymentBloc(
-          getCartUseCase: getCartUseCase,
-          getStorePaymentMethodsUseCase: getStorePaymentMethodsUseCase,
-          processCheckoutUseCase: processCheckoutUseCase,
+          getCartUseCase: _getCartUseCase,
+          getStorePaymentMethodsUseCase: _getStorePaymentMethodsUseCase,
+          processCheckoutUseCase: _processCheckoutUseCase,
         ),
       ),
     ];

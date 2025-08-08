@@ -55,12 +55,18 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> signOut() async {
     try {
+      print('DEBUG: AuthRepository - Starting signOut process');
       // Clear local storage first
+      print('DEBUG: AuthRepository - Clearing local storage');
       await LocalStorageService.clearAllData();
+      print('DEBUG: AuthRepository - Local storage cleared');
 
       // Then sign out from Supabase
+      print('DEBUG: AuthRepository - Signing out from Supabase');
       await _supabaseClient.auth.signOut();
+      print('DEBUG: AuthRepository - Supabase signOut completed');
     } catch (e) {
+      print('DEBUG: AuthRepository - SignOut error: $e');
       // TODO: gunakan logger jika perlu
       throw Exception('Failed to sign out');
     }

@@ -64,11 +64,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     SignOutRequested event,
     Emitter<AuthState> emit,
   ) async {
+    print('DEBUG: AuthBloc - SignOutRequested event received');
     emit(const AuthLoading(isCheckingAuth: false));
     try {
+      print('DEBUG: AuthBloc - Calling signOutUseCase');
       await _signOutUseCase();
+      print('DEBUG: AuthBloc - SignOutUseCase completed, emitting Unauthenticated');
       emit(Unauthenticated());
     } catch (e) {
+      print('DEBUG: AuthBloc - SignOut error: $e');
       emit(AuthError(e.toString()));
     }
   }

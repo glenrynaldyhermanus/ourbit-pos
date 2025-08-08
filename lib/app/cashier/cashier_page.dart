@@ -142,9 +142,7 @@ class _CashierPageState extends State<CashierPage> {
                       child: Column(
                         children: [
                           // Page Header
-                          const OurbitAppBar(
-                            title: 'Cashier',
-                          ),
+                          const OurbitAppBar(),
                           // Content
                           Expanded(
                             child: SafeArea(
@@ -207,9 +205,9 @@ class _CashierPageState extends State<CashierPage> {
                                     ),
                                     const SizedBox(width: 24),
                                     // Cart Section with Skeleton
-                                    Expanded(
+                                    const Expanded(
                                       flex: 1,
-                                      child: const CartSkeleton(),
+                                      child: CartSkeleton(),
                                     ),
                                   ],
                                 ),
@@ -279,9 +277,7 @@ class _CashierPageState extends State<CashierPage> {
                       child: Column(
                         children: [
                           // Page Header
-                          const OurbitAppBar(
-                            title: 'Cashier',
-                          ),
+                          const OurbitAppBar(),
                           // Content
                           Expanded(
                             child: SafeArea(

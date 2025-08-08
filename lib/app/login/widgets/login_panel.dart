@@ -47,20 +47,21 @@ class _LoginPanelState extends State<LoginPanel> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    print('DEBUG: LoginPanel - initState called');
 
     // Initialize animation controllers
     _logoController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 500),
       vsync: this,
     );
 
     _formController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 300),
       vsync: this,
     );
 
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
 
@@ -97,19 +98,78 @@ class _LoginPanelState extends State<LoginPanel> with TickerProviderStateMixin {
       curve: Curves.easeInOut,
     ));
 
-    // Start animations
-    _startAnimations();
+    // Start animations with fallback
+    print('DEBUG: LoginPanel - Starting animations with fallback');
+    _startAnimationsWithFallback();
   }
 
   void _startAnimations() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _logoController.forward();
+    try {
+      print('DEBUG: LoginPanel - Starting logo animation');
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (mounted) {
+        _logoController.forward();
+        print('DEBUG: LoginPanel - Logo animation started');
 
-    await Future.delayed(const Duration(milliseconds: 500));
-    _formController.forward();
+        // Wait for logo animation to complete
+        await Future.delayed(const Duration(milliseconds: 500));
+        print('DEBUG: LoginPanel - Logo animation completed');
+      }
 
-    await Future.delayed(const Duration(milliseconds: 300));
-    _fadeController.forward();
+      print('DEBUG: LoginPanel - Starting form animation');
+      await Future.delayed(const Duration(milliseconds: 200));
+      if (mounted) {
+        _formController.forward();
+        print('DEBUG: LoginPanel - Form animation started');
+
+        // Wait for form animation to complete
+        await Future.delayed(const Duration(milliseconds: 300));
+        print('DEBUG: LoginPanel - Form animation completed');
+      }
+
+      print('DEBUG: LoginPanel - Starting fade animation');
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (mounted) {
+        _fadeController.forward();
+        print('DEBUG: LoginPanel - Fade animation started');
+
+        // Wait for fade animation to complete
+        await Future.delayed(const Duration(milliseconds: 200));
+        print('DEBUG: LoginPanel - Fade animation completed');
+      }
+
+      print('DEBUG: LoginPanel - All animations completed');
+    } catch (e) {
+      print('ERROR: Animation failed: $e');
+      // If animation fails, force the form to show
+      if (mounted) {
+        setState(() {
+          // Force rebuild to show form
+        });
+      }
+    }
+  }
+
+  void _startAnimationsWithFallback() async {
+    try {
+      print('DEBUG: LoginPanel - Starting animations with fallback');
+      _startAnimations();
+      print(
+          'DEBUG: LoginPanel - Animations with fallback completed successfully');
+    } catch (e) {
+      print('ERROR: Animation with fallback failed: $e');
+      // If all animations fail, force show form after a delay
+      if (mounted) {
+        print('DEBUG: LoginPanel - Using fallback, forcing form to show');
+        await Future.delayed(const Duration(milliseconds: 1000));
+        if (mounted) {
+          setState(() {
+            // Force rebuild to show form
+          });
+          print('DEBUG: LoginPanel - Fallback form display triggered');
+        }
+      }
+    }
   }
 
   @override
@@ -147,6 +207,7 @@ class _LoginPanelState extends State<LoginPanel> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    print('DEBUG: LoginPanel - build method called');
     return BlocListener<AuthBloc, AuthState>(listener: (context, state) {
       if (state is Authenticated) {
         setState(() {

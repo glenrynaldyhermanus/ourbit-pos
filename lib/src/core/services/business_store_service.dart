@@ -62,7 +62,15 @@ class BusinessStoreService {
       // Save to local storage
       await LocalStorageService.saveBusinessData(businessResponse);
       await LocalStorageService.saveStoreData(storeResponse);
-      await LocalStorageService.saveRoleAssignmentData(roleAssignment);
+
+      // Create complete role assignment data with all related data
+      final completeRoleAssignment = {
+        ...roleAssignment,
+        'businesses': businessResponse,
+        'stores': storeResponse,
+        'roles': roleResponse,
+      };
+      await LocalStorageService.saveRoleAssignmentData(completeRoleAssignment);
 
       return {
         'business': businessResponse,
@@ -132,6 +140,8 @@ class BusinessStoreService {
 
       // Save new store data
       await LocalStorageService.saveStoreData(roleAssignmentResponse['store']);
+      await LocalStorageService.saveBusinessData(
+          roleAssignmentResponse['business']);
       await LocalStorageService.saveRoleAssignmentData(roleAssignmentResponse);
     } catch (e) {
       throw Exception('Failed to switch store');

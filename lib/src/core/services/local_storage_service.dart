@@ -74,13 +74,25 @@ class LocalStorageService {
   static Future<void> saveRoleAssignmentData(
       Map<String, dynamic> roleData) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_roleAssignmentKey, jsonEncode(roleData));
+
+    // Debug: Check what keys exist in roleData
+    print('DEBUG: Role data keys: ${roleData.keys.toList()}');
+    print('DEBUG: Role data contains roles: ${roleData.containsKey('roles')}');
+    print(
+        'DEBUG: Role data contains businesses: ${roleData.containsKey('businesses')}');
+    print(
+        'DEBUG: Role data contains stores: ${roleData.containsKey('stores')}');
+
+    final jsonString = jsonEncode(roleData);
+    print('DEBUG: Saving role data to local storage: $jsonString');
+    await prefs.setString(_roleAssignmentKey, jsonString);
   }
 
   static Future<Map<String, dynamic>?> getRoleAssignmentData() async {
     final prefs = await SharedPreferences.getInstance();
     final roleString = prefs.getString(_roleAssignmentKey);
     if (roleString != null) {
+      print('DEBUG: Loading role data from local storage: $roleString');
       return jsonDecode(roleString) as Map<String, dynamic>;
     }
     return null;

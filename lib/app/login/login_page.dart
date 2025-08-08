@@ -23,7 +23,9 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    context.read<AuthBloc>().add(CheckAuthStatus());
+    print('DEBUG: LoginPage - initState called');
+    // Don't call CheckAuthStatus here to avoid infinite loop
+    // The router will handle authentication check
   }
 
   @override
@@ -43,6 +45,7 @@ class _LoginPageState extends State<LoginPage> {
       },
       child: Consumer<ThemeService>(
         builder: (context, themeService, _) {
+          print('DEBUG: LoginPage - Building scaffold');
           return Scaffold(
             backgroundColor: themeService.isDarkMode
                 ? AppColors.darkSurfaceBackground

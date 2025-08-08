@@ -55,10 +55,14 @@ class _ProductPanelState extends State<ProductPanel>
 
   void _startAnimations() async {
     await Future.delayed(const Duration(milliseconds: 300));
-    _leftPanelController.forward();
+    if (mounted) {
+      _leftPanelController.forward();
+    }
 
     await Future.delayed(const Duration(milliseconds: 300));
-    _fadeController.forward();
+    if (mounted) {
+      _fadeController.forward();
+    }
   }
 
   @override

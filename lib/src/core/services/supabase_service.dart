@@ -172,10 +172,21 @@ class SupabaseService {
       // Get role assignment data
       final roleResponse = await client
           .from('role_assignments')
-          .select('*, businesses(*), stores(*)')
+          .select('*, businesses(*), stores(*), roles(*)')
           .eq('user_id', user.id)
           .limit(1)
           .single();
+
+      // Debug: Print role response data
+      print('DEBUG: Role response data: $roleResponse');
+      print('DEBUG: Roles data: ${roleResponse['roles']}');
+
+      // Debug: Check if roles data exists before saving
+      if (roleResponse.containsKey('roles')) {
+        print('DEBUG: Roles data exists in roleResponse');
+      } else {
+        print('DEBUG: Roles data does NOT exist in roleResponse');
+      }
 
       await LocalStorageService.saveRoleAssignmentData(roleResponse);
       // Role assignment data saved to local storage

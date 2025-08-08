@@ -1,5 +1,4 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:flutter/material.dart' as material;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
@@ -26,14 +25,8 @@ import 'dart:async';
 ///
 /// Usage:
 /// ```dart
-/// // Basic usage - will show real role from database
+/// // Basic usage - will show business name and store name from database
 /// const OurbitAppBar()
-///
-/// // With custom title and subtitle
-/// const OurbitAppBar(
-///   title: 'Custom Title',
-///   subtitle: 'Custom Subtitle',
-/// )
 ///
 /// // With custom actions
 /// const OurbitAppBar(
@@ -51,19 +44,17 @@ import 'dart:async';
 /// )
 /// ```
 ///
-/// **Role Data Priority:**
-/// 1. Real role from database (stored in local storage)
-/// 2. Fallback to "User"
+/// **Data Sources:**
+/// - Business Name: `business_data.name` → Default "Allnimall Pet Shop"
+/// - Store Name: `store_data.name` → Default "Toko"
+/// - User Name: `user_data.name` → `user_data.email` prefix → Default "User"
+/// - User Role: `role_assignment_data.role.name` → Default "User"
 class OurbitAppBar extends StatefulWidget {
-  final String? title;
-  final String? subtitle;
   final List<Widget>? actions;
   final bool showUserInfo;
 
   const OurbitAppBar({
     super.key,
-    this.title,
-    this.subtitle,
     this.actions,
     this.showUserInfo = true,
   });
@@ -218,19 +209,19 @@ class _OurbitAppBarState extends State<OurbitAppBar> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Business Name (Title)
+                            // Business Name
                             Text(
-                              widget.title ?? state.businessName,
-                              style: TextStyle(
+                              state.businessName,
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.primary,
                               ),
                             ),
                             const Gap(4),
-                            // Store Name (Subtitle)
+                            // Store Name
                             Text(
-                              widget.subtitle ?? state.storeName,
+                              state.storeName,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: themeService.isDarkMode
@@ -245,9 +236,8 @@ class _OurbitAppBarState extends State<OurbitAppBar> {
                       if (widget.actions != null) ...widget.actions!,
                       // Theme Toggle
                       const Gap(16),
-                      OurbitThemeToggle(
+                      const OurbitThemeToggle(
                         size: 36,
-                        showTooltip: true,
                         variant: OurbitThemeToggleVariant.ghost,
                       ),
                       // User info section
@@ -274,19 +264,19 @@ class _OurbitAppBarState extends State<OurbitAppBar> {
                                   // User Name
                                   Text(
                                     _getFirstName(state.userName),
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: AppColors.primary,
                                       fontWeight: FontWeight.w600,
-                                      fontSize: 12,
+                                      fontSize: 14,
                                     ),
                                   ),
                                   const Gap(2),
                                   // User Role
                                   Text(
                                     state.userRole,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: AppColors.primary,
-                                      fontSize: 10,
+                                      fontSize: 12,
                                     ),
                                   ),
                                 ],
@@ -296,7 +286,7 @@ class _OurbitAppBarState extends State<OurbitAppBar> {
                               Container(
                                 width: 32,
                                 height: 32,
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   color: AppColors.primary,
                                   shape: BoxShape.circle,
                                 ),

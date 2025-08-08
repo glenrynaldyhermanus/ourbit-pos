@@ -55,6 +55,7 @@ class AppRouter {
 
         // Check if user is authenticated via Supabase
         final isAuthenticated = await SupabaseService.isUserAuthenticated();
+
         if (isAuthenticated) {
           // If authenticated and on root path, redirect to POS
           if (state.matchedLocation == '/') {
@@ -91,11 +92,24 @@ class AppRouter {
       GoRoute(
         path: loginRoute,
         name: 'login',
-        pageBuilder: (context, state) => _buildPageWithFadeTransition(
-          context,
-          state,
-          const LoginPage(),
-        ),
+        pageBuilder: (context, state) {
+          try {
+            return _buildPageWithFadeTransition(
+              context,
+              state,
+              const LoginPage(),
+            );
+          } catch (e) {
+            print('ERROR: Failed to build login page: $e');
+            return MaterialPage(
+              child: Scaffold(
+                body: Center(
+                  child: Text('Error loading login page: $e'),
+                ),
+              ),
+            );
+          }
+        },
       ),
       GoRoute(
         path: posRoute,
