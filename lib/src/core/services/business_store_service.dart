@@ -22,7 +22,7 @@ class BusinessStoreService {
       if (session != null && session.accessToken != null) {
         print('💾 BUSINESS_STORE: Ensuring token is saved');
         await TokenService.saveToken(
-          session.accessToken!,
+          session.accessToken,
           session.expiresAt != null 
             ? DateTime.fromMillisecondsSinceEpoch(session.expiresAt! * 1000)
             : DateTime.now().add(const Duration(hours: 1))

@@ -169,9 +169,10 @@ class _CashierPageState extends State<CashierPage> {
             print(
                 'DEBUG: CashierPage - State is CashierInitial, calling LoadProducts');
             // Add a small delay to ensure data is properly stored
+            final cashierBloc = context.read<CashierBloc>();
             Future.delayed(const Duration(milliseconds: 100), () {
               print('DEBUG: CashierPage - Delayed LoadProducts call');
-              context.read<CashierBloc>().add(LoadProducts());
+              cashierBloc.add(LoadProducts());
             });
             return const Center(child: OurbitCircularProgress());
           }

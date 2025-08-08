@@ -144,7 +144,7 @@ class _OurbitSelectState<T> extends State<OurbitSelect<T>>
                     onChanged: widget.enabled ? _handleChanged : null,
                     placeholder: widget.placeholder,
                     constraints: widget.constraints,
-                    itemBuilder: (context, item) => buildItem(context, item),
+                    itemBuilder: buildItem,
                     popup: SelectPopup.builder(
                       searchPlaceholder: widget.searchPlaceholder != null
                           ? Text(widget.searchPlaceholder!)

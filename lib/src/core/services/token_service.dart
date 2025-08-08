@@ -195,8 +195,8 @@ class TokenService {
         final now = DateTime.now();
         final isExpired = expiryTime.isBefore(now);
 
-        print('📅 TOKEN_SERVICE: Session expiry: ${expiryTime}');
-        print('⏰ TOKEN_SERVICE: Current time: ${now}');
+        print('📅 TOKEN_SERVICE: Session expiry: $expiryTime');
+        print('⏰ TOKEN_SERVICE: Current time: $now');
         print('🔍 TOKEN_SERVICE: Session expired: $isExpired');
 
         if (isExpired) {

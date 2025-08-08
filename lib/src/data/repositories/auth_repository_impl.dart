@@ -14,7 +14,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<AppUser?> signIn(String email, String password) async {
     try {
       print('🔐 AUTH_REPO: Starting signIn process for $email');
-      
+
       final response = await _supabaseClient.auth.signInWithPassword(
         email: email,
         password: password,
@@ -22,13 +22,13 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (response.user != null) {
         print('✅ AUTH_REPO: User authenticated successfully');
-        
+
         // Save the session token after successful authentication
         final session = _supabaseClient.auth.currentSession;
         if (session != null && session.accessToken != null) {
           print('💾 AUTH_REPO: Saving session token');
           await TokenService.saveToken(
-            session.accessToken!,
+            session.accessToken,
             session.expiresAt != null 
               ? DateTime.fromMillisecondsSinceEpoch(session.expiresAt! * 1000)
               : DateTime.now().add(const Duration(hours: 1))
