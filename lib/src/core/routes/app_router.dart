@@ -43,31 +43,41 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/',
     redirect: (context, state) async {
+      print('DEBUG: AppRouter - Redirect called for: ${state.matchedLocation}');
+
       // Check if user is authenticated
       try {
         // First, try to handle token from URL if on web
         if (kIsWeb) {
           final hasToken = await TokenService.handleTokenFromUrl();
           if (hasToken) {
+            print('DEBUG: AppRouter - Token found, redirecting to POS');
             return posRoute;
           }
         }
 
         // Check if user is authenticated via Supabase
         final isAuthenticated = await SupabaseService.isUserAuthenticated();
+        print('DEBUG: AppRouter - isAuthenticated: $isAuthenticated');
 
         if (isAuthenticated) {
           // If authenticated and on root path, redirect to POS
           if (state.matchedLocation == '/') {
+            print(
+                'DEBUG: AppRouter - Authenticated on root, redirecting to POS');
             return posRoute;
           }
 
+          print(
+              'DEBUG: AppRouter - Authenticated, allowing access to: ${state.matchedLocation}');
           return null; // Allow access to requested route
         }
       } catch (e) {
+        print('DEBUG: AppRouter - Error in redirect: $e');
         // ignore: empty_catches
       }
 
+      print('DEBUG: AppRouter - Not authenticated, redirecting to login');
       // If not authenticated, redirect to login
       return loginRoute;
     },

@@ -9,6 +9,8 @@ abstract class CashierEvent extends Equatable {
 
 class LoadProducts extends CashierEvent {}
 
+class ResetCashier extends CashierEvent {}
+
 class LoadCategories extends CashierEvent {}
 
 class LoadCart extends CashierEvent {}

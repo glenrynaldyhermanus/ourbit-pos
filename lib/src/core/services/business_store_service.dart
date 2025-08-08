@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ourbit_pos/src/core/services/local_storage_service.dart';
+import 'package:ourbit_pos/src/core/services/token_service.dart';
 
 class BusinessStoreService {
   final SupabaseClient _supabaseClient;
@@ -9,9 +10,24 @@ class BusinessStoreService {
   /// Get user's business and store data after successful login
   Future<Map<String, dynamic>> getUserBusinessAndStore() async {
     try {
+      print('🏢 BUSINESS_STORE: Starting getUserBusinessAndStore');
+      
       final user = _supabaseClient.auth.currentUser;
       if (user == null) {
         throw Exception('User not authenticated');
+      }
+
+      // Ensure token is saved during this process
+      final session = _supabaseClient.auth.currentSession;
+      if (session != null && session.accessToken != null) {
+        print('💾 BUSINESS_STORE: Ensuring token is saved');
+        await TokenService.saveToken(
+          session.accessToken!,
+          session.expiresAt != null 
+            ? DateTime.fromMillisecondsSinceEpoch(session.expiresAt! * 1000)
+            : DateTime.now().add(const Duration(hours: 1))
+        );
+        print('✅ BUSINESS_STORE: Token saved successfully');
       }
 
       // Get user's role assignments
@@ -59,8 +75,29 @@ class BusinessStoreService {
         throw Exception('Store tidak aktif atau tidak ditemukan');
       }
 
+      // Save user data
+      final currentUser = _supabaseClient.auth.currentUser;
+      if (currentUser != null) {
+        final userData = {
+          'id': currentUser.id,
+          'email': currentUser.email,
+          'name': currentUser.userMetadata?['display_name'] ??
+              currentUser.email?.split('@')[0] ??
+              'User',
+          'avatar': currentUser.userMetadata?['avatar'],
+        };
+        print(
+            'DEBUG: BusinessStoreService - Saving user data: ${userData['name']}');
+        await LocalStorageService.saveUserData(userData);
+      }
+
       // Save to local storage
+      print(
+          'DEBUG: BusinessStoreService - Saving business data: ${businessResponse['id']}');
       await LocalStorageService.saveBusinessData(businessResponse);
+
+      print(
+          'DEBUG: BusinessStoreService - Saving store data: ${storeResponse['id']}');
       await LocalStorageService.saveStoreData(storeResponse);
 
       // Create complete role assignment data with all related data
@@ -70,7 +107,14 @@ class BusinessStoreService {
         'stores': storeResponse,
         'roles': roleResponse,
       };
+      print(
+          'DEBUG: BusinessStoreService - Saving role assignment data with store_id: ${completeRoleAssignment['store_id']}');
       await LocalStorageService.saveRoleAssignmentData(completeRoleAssignment);
+
+      // Debug: Check all stored data
+      await LocalStorageService.debugStoredData();
+
+      print('✅ BUSINESS_STORE: All data loaded and saved successfully');
 
       return {
         'business': businessResponse,
@@ -79,6 +123,7 @@ class BusinessStoreService {
         'roleAssignment': roleAssignment,
       };
     } catch (e) {
+      print('❌ BUSINESS_STORE: Error: $e');
       throw Exception(e.toString());
     }
   }

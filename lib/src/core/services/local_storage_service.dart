@@ -58,7 +58,10 @@ class LocalStorageService {
   // Store data
   static Future<void> saveStoreData(Map<String, dynamic> storeData) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_storeKey, jsonEncode(storeData));
+    final jsonString = jsonEncode(storeData);
+    print('DEBUG: LocalStorageService - Saving store data: $jsonString');
+    await prefs.setString(_storeKey, jsonString);
+    print('DEBUG: LocalStorageService - Store data saved successfully');
   }
 
   static Future<Map<String, dynamic>?> getStoreData() async {
@@ -82,10 +85,13 @@ class LocalStorageService {
         'DEBUG: Role data contains businesses: ${roleData.containsKey('businesses')}');
     print(
         'DEBUG: Role data contains stores: ${roleData.containsKey('stores')}');
+    print('DEBUG: Role data contains store_id: ${roleData.containsKey('store_id')}');
+    print('DEBUG: Role data store_id value: ${roleData['store_id']}');
 
     final jsonString = jsonEncode(roleData);
     print('DEBUG: Saving role data to local storage: $jsonString');
     await prefs.setString(_roleAssignmentKey, jsonString);
+    print('DEBUG: Role assignment data saved successfully');
   }
 
   static Future<Map<String, dynamic>?> getRoleAssignmentData() async {
@@ -101,7 +107,15 @@ class LocalStorageService {
   // Get store ID from local storage
   static Future<String?> getStoreId() async {
     final roleData = await getRoleAssignmentData();
-    return roleData?['store_id'];
+    print('DEBUG: getStoreId - roleData: $roleData');
+    final storeId = roleData?['store_id'];
+    print('DEBUG: getStoreId - storeId: $storeId');
+    
+    // Also check store data directly
+    final storeData = await getStoreData();
+    print('DEBUG: getStoreId - storeData: $storeData');
+    
+    return storeId;
   }
 
   // Clear all data (for logout)
@@ -112,5 +126,27 @@ class LocalStorageService {
     await prefs.remove(_storeKey);
     await prefs.remove(_roleAssignmentKey);
     await prefs.remove(_themeKey);
+  }
+
+  // Debug method to check all stored data
+  static Future<void> debugStoredData() async {
+    print('=== DEBUG: Checking all stored data ===');
+    
+    final userData = await getUserData();
+    print('DEBUG: Stored user data: $userData');
+    
+    final businessData = await getBusinessData();
+    print('DEBUG: Stored business data: $businessData');
+    
+    final storeData = await getStoreData();
+    print('DEBUG: Stored store data: $storeData');
+    
+    final roleData = await getRoleAssignmentData();
+    print('DEBUG: Stored role assignment data: $roleData');
+    
+    final storeId = await getStoreId();
+    print('DEBUG: Retrieved store ID: $storeId');
+    
+    print('=== END DEBUG ===');
   }
 }

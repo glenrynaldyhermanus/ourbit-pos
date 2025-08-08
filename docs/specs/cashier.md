@@ -145,23 +145,24 @@ graph TB
         Q[AddToCartUseCase]
         R[UpdateCartQuantityUseCase]
         S[ClearCartUseCase]
-        T[GetStorePaymentMethodsUseCase]
-        U[ProcessCheckoutUseCase]
+        T[GetProductTypesUseCase]
+        U[GetStorePaymentMethodsUseCase]
+        V[ProcessCheckoutUseCase]
     end
 
     subgraph "Repository Layer"
-        V[PosRepositoryImpl]
-        W[AuthRepositoryImpl]
-        X[ManagementRepositoryImpl]
+        W[PosRepositoryImpl]
+        X[AuthRepositoryImpl]
+        Y[ManagementRepositoryImpl]
     end
 
     subgraph "Service Layer"
-        Y[LocalStorageService]
-        Z[SupabaseService]
+        Z[LocalStorageService]
+        AA[SupabaseService]
     end
 
     subgraph "External"
-        AA[Supabase Database]
+        BB[Supabase Database]
     end
 
     A --> H
@@ -180,37 +181,39 @@ graph TB
     H --> Q
     H --> R
     H --> S
+    H --> T
 
     K --> L
     K --> M
     K --> P
-    K --> T
     K --> U
+    K --> V
 
-    N --> V
-    O --> V
-    P --> V
-    Q --> V
-    R --> V
-    S --> V
-    T --> V
-    U --> V
+    N --> W
+    O --> W
+    P --> W
+    Q --> W
+    R --> W
+    S --> W
+    T --> W
+    U --> W
+    V --> W
 
-    V --> Y
-    V --> Z
-    W --> Y
     W --> Z
-    X --> Y
+    W --> AA
     X --> Z
-    Z --> AA
+    X --> AA
+    Y --> Z
+    Y --> AA
+    AA --> BB
 
     style A fill:#e3f2fd
     style H fill:#fff3e0
     style K fill:#fff3e0
     style N fill:#f3e5f5
-    style V fill:#e8f5e8
-    style Z fill:#fff8e1
-    style AA fill:#ffcdd2
+    style W fill:#e8f5e8
+    style AA fill:#fff8e1
+    style BB fill:#ffcdd2
 ```
 
 ## Sequence Diagram
@@ -423,6 +426,58 @@ stateDiagram-v2
 
 ## Payment Flow Architecture
 
+### CashierBloc Implementation
+
+CashierBloc menggunakan arsitektur BLoC untuk state management yang konsisten:
+
+```dart
+// Cashier Events
+abstract class CashierEvent {}
+class LoadProducts extends CashierEvent {}
+class ResetCashier extends CashierEvent {}
+class LoadCategories extends CashierEvent {}
+class LoadCart extends CashierEvent {}
+class AddToCart extends CashierEvent {
+  final String productId;
+  final int quantity;
+}
+class UpdateCartQuantity extends CashierEvent {
+  final String productId;
+  final int quantity;
+}
+class ClearCart extends CashierEvent {}
+class SearchProducts extends CashierEvent {
+  final String searchTerm;
+}
+class FilterByCategory extends CashierEvent {
+  final String category;
+}
+class FilterByType extends CashierEvent {
+  final String type;
+}
+
+// Cashier States
+abstract class CashierState {}
+class CashierInitial extends CashierState {}
+class CashierLoading extends CashierState {}
+class CashierLoaded extends CashierState {
+  final List<Product> products;
+  final List<CartItem> cartItems;
+  final List<Map<String, dynamic>> categories;
+  final List<Map<String, dynamic>> productTypes;
+  final String searchTerm;
+  final String selectedCategory;
+  final String selectedType;
+  final double total;
+  final double tax;
+  final double discount;
+  final double finalTotal;
+}
+class CashierError extends CashierState {
+  final String message;
+}
+```
+
 ### PaymentBloc Implementation
 
 PaymentBloc menggunakan arsitektur yang sama dengan CashierBloc untuk konsistensi dan maintainability:
@@ -434,6 +489,9 @@ class LoadPaymentData extends PaymentEvent {}
 class SelectPaymentMethod extends PaymentEvent {
   final Map<String, dynamic> method;
 }
+class UpdateSalesNote extends PaymentEvent {
+  final String note;
+}
 class ProcessPayment extends PaymentEvent {
   final List<Map<String, dynamic>> cartItems;
   final double subtotal;
@@ -442,6 +500,7 @@ class ProcessPayment extends PaymentEvent {
   final String paymentMethodId;
   final String? salesNotes;
 }
+class SubmitPayment extends PaymentEvent {}
 
 // Payment States
 abstract class PaymentState {}
@@ -452,6 +511,9 @@ class PaymentLoaded extends PaymentState {
   final List<Map<String, dynamic>> storePaymentMethods;
   final Map<String, dynamic>? selectedPaymentMethod;
   final String note;
+  final double subtotal;
+  final double tax;
+  final double total;
 }
 class PaymentProcessing extends PaymentLoaded {}
 class PaymentSuccess extends PaymentState {
@@ -459,6 +521,70 @@ class PaymentSuccess extends PaymentState {
 }
 class PaymentError extends PaymentState {
   final String message;
+}
+```
+
+### Cashier Use Cases
+
+#### GetProductsUseCase
+
+```dart
+Future<List<Product>> call() async {
+  final storeId = await LocalStorageService.getStoreId();
+  return await _posRepository.getProducts(storeId);
+}
+```
+
+#### GetCategoriesByStoreUseCase
+
+```dart
+Future<List<Map<String, dynamic>>> call() async {
+  final storeId = await LocalStorageService.getStoreId();
+  return await _posRepository.getCategoriesByStoreId(storeId);
+}
+```
+
+#### GetProductTypesUseCase
+
+```dart
+Future<List<Map<String, dynamic>>> call() async {
+  return await _posRepository.getProductTypes();
+}
+```
+
+#### GetCartUseCase
+
+```dart
+Future<List<CartItem>> call() async {
+  final storeId = await LocalStorageService.getStoreId();
+  return await _posRepository.getStoreCart(storeId);
+}
+```
+
+#### AddToCartUseCase
+
+```dart
+Future<void> call(String productId, int quantity) async {
+  final storeId = await LocalStorageService.getStoreId();
+  await _posRepository.addToCart(storeId, productId, quantity);
+}
+```
+
+#### UpdateCartQuantityUseCase
+
+```dart
+Future<void> call(String productId, int quantity) async {
+  final storeId = await LocalStorageService.getStoreId();
+  await _posRepository.updateCartQuantity(storeId, productId, quantity);
+}
+```
+
+#### ClearCartUseCase
+
+```dart
+Future<void> call() async {
+  final storeId = await LocalStorageService.getStoreId();
+  await _posRepository.clearCart(storeId);
 }
 ```
 
@@ -505,6 +631,88 @@ Future<String?> call({
 - Setiap method menampilkan nama, type, dan description
 - Radio button selection dengan visual feedback
 - Tombol "Bayar" dengan total amount
+
+### Payment Page Implementation
+
+Payment page menggunakan layout dua panel dengan responsive design:
+
+```dart
+Row(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    // Left Panel: Order Summary (3/5 width)
+    Expanded(
+      flex: 3,
+      child: OurbitCard(
+        child: OrderSummarySection(),
+      ),
+    ),
+    const SizedBox(width: 20),
+    // Right Panel: Payment Methods (2/5 width)
+    Expanded(
+      flex: 2,
+      child: Column(
+        children: [
+          OurbitCard(
+            child: PaymentMethodsSection(),
+          ),
+          const SizedBox(height: 16),
+          OurbitButton.primary(
+            onPressed: () => _processPayment(),
+            label: 'Bayar ${_formatCurrency(total)}',
+          ),
+        ],
+      ),
+    ),
+  ],
+)
+```
+
+### Sales Draft Dialog Implementation
+
+Dialog input catatan menggunakan OurbitTextArea:
+
+```dart
+Future<bool?> _promptSalesDraft() async {
+  final controller = TextEditingController(text: salesDraftNote);
+  return showDialog<bool>(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              const Text('Catatan Penjualan (Draft)'),
+              OurbitTextArea(
+                controller: controller,
+                placeholder: 'Tulis catatan penjualan (opsional)',
+                expandableHeight: true,
+                initialHeight: 120,
+              ),
+              Row(
+                children: [
+                  OurbitButton.outline(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    label: 'Batal',
+                  ),
+                  OurbitButton.primary(
+                    onPressed: () {
+                      salesDraftNote = controller.text.trim();
+                      Navigator.of(context).pop(true);
+                    },
+                    label: 'Lanjutkan',
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+```
 
 ### Sales Draft Dialog
 
@@ -644,6 +852,25 @@ OurbitSkeleton(
 )
 ```
 
+### Success Page Animation
+
+```dart
+// Multiple animations for success page
+_scaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+  CurvedAnimation(
+    parent: _animationController,
+    curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
+  ),
+);
+
+_fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+  CurvedAnimation(
+    parent: _animationController,
+    curve: const Interval(0.3, 1.0, curve: Curves.easeInOut),
+  ),
+);
+```
+
 ## Error Handling Flow
 
 ```mermaid
@@ -699,6 +926,9 @@ flowchart TD
 4. **OurbitCard**: Untuk product cards
 5. **OurbitTextInput**: Untuk search functionality
 6. **OurbitTextArea**: Untuk input catatan penjualan (sales draft)
+7. **OurbitSelect**: Untuk filter kategori dan tipe produk
+8. **OurbitCircularProgress**: Untuk loading indicator
+9. **OurbitToast**: Untuk error notifications
 
 ### Custom Styling
 
@@ -895,22 +1125,60 @@ Cashier Page Ourbit POS telah diimplementasi dengan arsitektur yang solid, mengg
 
 ## Implementation Details
 
+### Cashier Page Layout
+
+Cashier Page menggunakan layout responsive dengan sidebar dan main content:
+
+```dart
+// Layout Structure
+Row(
+  children: [
+    // Sidebar - hanya tampil jika bukan web
+    if (!Responsive.isWeb()) const Sidebar(),
+    // Main Content
+    Expanded(
+      child: Column(
+        children: [
+          // Page Header
+          const OurbitAppBar(),
+          // Content
+          Expanded(
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Row(
+                  children: [
+                    // Products Section (2/3 width)
+                    Expanded(flex: 2, child: ProductsSection()),
+                    const SizedBox(width: 24),
+                    // Cart Section (1/3 width)
+                    Expanded(flex: 1, child: CartSection()),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  ],
+)
+```
+
 ### OurbitAppBar Integration
 
 Cashier Page menggunakan `OurbitAppBar` untuk header yang konsisten dengan aplikasi. OurbitAppBar secara otomatis:
 
 - Memuat data business, store, dan user dari local storage
 - Menampilkan role user dari database (Owner, Admin, Cashier, dll)
-- Melakukan validasi token otomatis setiap 30 detik
+- Melakukan validasi token otomatis setiap 5 menit
 - Force logout jika token tidak valid
 - Mendukung custom title dan actions
 - **Full Dark Mode Support**: Otomatis menyesuaikan dengan theme aplikasi
 
 ```dart
 // Penggunaan OurbitAppBar di Cashier Page
-const OurbitAppBar(
-  title: 'Cashier',
-)
+const OurbitAppBar()
 ```
 
 **Dark Mode Features:**
@@ -920,3 +1188,67 @@ const OurbitAppBar(
 - Text: `AppColors.darkPrimaryText` / `AppColors.primaryText`
 - Secondary Text: `AppColors.darkSecondaryText` / `AppColors.secondaryText`
 - User Info Container: `AppColors.darkSecondaryBackground` / `AppColors.secondaryBackground`
+
+### Product Grid Implementation
+
+Product grid menggunakan GridView.builder dengan 4 kolom:
+
+```dart
+GridView.builder(
+  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+    crossAxisCount: 4,
+    childAspectRatio: 1.1,
+    crossAxisSpacing: 16,
+    mainAxisSpacing: 16,
+  ),
+  itemCount: filteredProducts.length,
+  itemBuilder: (context, index) {
+    final product = filteredProducts[index];
+    return ProductCard(
+      product: product,
+      onTap: () => _addToCart(product),
+    );
+  },
+)
+```
+
+### Cart Implementation
+
+Cart menggunakan PosCart widget dengan layout yang terstruktur:
+
+```dart
+PosCart(
+  state: state,
+  onClearCart: _clearCart,
+  onUpdateQuantity: _updateQuantity,
+  onProcessPayment: _processPayment,
+)
+```
+
+### Filter Implementation
+
+Filter menggunakan OurbitSelect untuk kategori dan tipe produk:
+
+```dart
+// Category Filter
+OurbitSelect<String>(
+  value: state.selectedCategory == 'all' ? 'Semua Kategori' : state.selectedCategory,
+  items: _getCategories(state),
+  onChanged: (category) {
+    if (category != null) {
+      context.read<CashierBloc>().add(FilterByCategory(category));
+    }
+  },
+)
+
+// Type Filter
+OurbitSelect<String>(
+  value: state.selectedType == 'all' ? 'Semua Tipe' : state.selectedType,
+  items: _getProductTypes(state),
+  onChanged: (type) {
+    if (type != null) {
+      context.read<CashierBloc>().add(FilterByType(type));
+    }
+  },
+)
+```

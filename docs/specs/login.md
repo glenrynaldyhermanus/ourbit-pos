@@ -239,6 +239,60 @@ graph TB
     style Q fill:#ffcdd2
 ```
 
+## Updated Implementation Details
+
+### AuthBloc Integration
+
+```dart
+class AuthBloc extends Bloc<AuthEvent, AuthState> {
+  // After successful login, automatically load business/store data
+  Future<void> _onSignInRequested(SignInRequested event, Emitter<AuthState> emit) async {
+    emit(const AuthLoading(isCheckingAuth: false));
+    try {
+      final user = await _signInUseCase(event.email, event.password);
+      if (user != null) {
+        // Get business and store data after successful login
+        await _getUserBusinessStoreUseCase.execute();
+        emit(Authenticated(user));
+      } else {
+        emit(const AuthError('Email atau password salah'));
+      }
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+}
+```
+
+### BusinessStoreService Integration
+
+```dart
+class BusinessStoreService {
+  Future<Map<String, dynamic>> getUserBusinessAndStore() async {
+    // Get user's role assignments with business, store, and role data
+    final roleAssignmentsResponse = await _supabaseClient
+        .from('role_assignments')
+        .select('*, businesses(*), stores(*), roles(*)')
+        .eq('user_id', user.id);
+
+    // Validate business and store status
+    if (businessResponse['deleted_at'] != null) {
+      throw Exception('Bisnis tidak aktif atau tidak ditemukan');
+    }
+
+    if (storeResponse['deleted_at'] != null) {
+      throw Exception('Store tidak aktif atau tidak ditemukan');
+    }
+
+    // Save all data to local storage
+    await LocalStorageService.saveUserData(userData);
+    await LocalStorageService.saveBusinessData(businessResponse);
+    await LocalStorageService.saveStoreData(storeResponse);
+    await LocalStorageService.saveRoleAssignmentData(completeRoleAssignment);
+  }
+}
+```
+
 ## Sequence Diagram
 
 ```mermaid
@@ -384,7 +438,7 @@ stateDiagram-v2
 
 ### 3. Cek Role Assignments
 
-- **Proses**: Ambil data `role_assignments` berdasarkan user_id
+- **Proses**: Ambil data `role_assignments` dengan join ke business, store, dan role
 - **Query**:
   ```sql
   SELECT *, businesses(*), stores(*), roles(*)
@@ -523,7 +577,27 @@ static Future<bool> isTokenValid() async {
 	"user_id": "user_id",
 	"business_id": "business_id",
 	"store_id": "store_id",
-	"role_id": "role_id"
+	"role_id": "role_id",
+	"businesses": {
+		"id": "business_id",
+		"name": "Business Name",
+		"created_at": "timestamp",
+		"deleted_at": null
+	},
+	"stores": {
+		"id": "store_id",
+		"name": "Store Name",
+		"business_id": "business_id",
+		"created_at": "timestamp",
+		"deleted_at": null
+	},
+	"roles": {
+		"id": "role_id",
+		"name": "Role Name",
+		"description": "Role Description",
+		"permissions": {},
+		"created_at": "timestamp"
+	}
 }
 ```
 

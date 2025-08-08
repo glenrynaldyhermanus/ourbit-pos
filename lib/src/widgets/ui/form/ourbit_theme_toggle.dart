@@ -178,8 +178,8 @@ class _OurbitThemeToggleState extends State<OurbitThemeToggle>
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         border: Border.all(
-          color: isDarkMode ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
-          width: 1,
+          color: isDarkMode ? const Color(0xff292524) : const Color(0xFFE5E7EB),
+          width: 0.5,
         ),
         borderRadius: BorderRadius.circular(8),
         color: isDarkMode

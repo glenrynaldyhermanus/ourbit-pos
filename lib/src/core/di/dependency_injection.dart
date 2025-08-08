@@ -109,15 +109,19 @@ class DependencyInjection {
         ),
       ),
       BlocProvider<CashierBloc>(
-        create: (context) => CashierBloc(
-          getProductsUseCase: _getProductsUseCase,
-          getCategoriesByStoreUseCase: _getCategoriesByStoreUseCase,
-          getProductTypesUseCase: _getProductTypesUseCase,
-          getCartUseCase: _getCartUseCase,
-          addToCartUseCase: _addToCartUseCase,
-          updateCartQuantityUseCase: _updateCartQuantityUseCase,
-          clearCartUseCase: _clearCartUseCase,
-        ),
+        create: (context) {
+          print(
+              'DEBUG: DependencyInjection - Creating new CashierBloc instance');
+          return CashierBloc(
+            getProductsUseCase: _getProductsUseCase,
+            getCategoriesByStoreUseCase: _getCategoriesByStoreUseCase,
+            getProductTypesUseCase: _getProductTypesUseCase,
+            getCartUseCase: _getCartUseCase,
+            addToCartUseCase: _addToCartUseCase,
+            updateCartQuantityUseCase: _updateCartQuantityUseCase,
+            clearCartUseCase: _clearCartUseCase,
+          );
+        },
       ),
       BlocProvider<ManagementBloc>(
         create: (context) => ManagementBloc(

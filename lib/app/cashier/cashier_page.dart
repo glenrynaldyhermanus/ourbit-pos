@@ -19,6 +19,7 @@ import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_select.dart';
 import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_circular_progress.dart';
 import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_toast.dart';
+import 'package:ourbit_pos/src/core/services/local_storage_service.dart';
 
 class CashierPage extends StatefulWidget {
   const CashierPage({super.key});
@@ -44,6 +45,22 @@ class _CashierPageState extends State<CashierPage> {
   @override
   void initState() {
     super.initState();
+    print('DEBUG: CashierPage - initState called');
+    // Debug: Check stored data when cashier page loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      print('DEBUG: CashierPage - Post frame callback executed');
+      LocalStorageService.debugStoredData();
+
+      // Reset CashierBloc to ensure fresh data for new user
+      print('DEBUG: CashierPage - Resetting CashierBloc');
+
+      // Check if store ID is correct for current user
+      LocalStorageService.getStoreId().then((storeId) {
+        print('DEBUG: CashierPage - Current store ID: $storeId');
+      });
+
+      context.read<CashierBloc>().add(ResetCashier());
+    });
   }
 
   void _addToCart(Product product) {
@@ -146,8 +163,16 @@ class _CashierPageState extends State<CashierPage> {
       },
       child: BlocBuilder<CashierBloc, CashierState>(
         builder: (context, state) {
+          print('DEBUG: CashierPage - Current state: ${state.runtimeType}');
+
           if (state is CashierInitial) {
-            context.read<CashierBloc>().add(LoadProducts());
+            print(
+                'DEBUG: CashierPage - State is CashierInitial, calling LoadProducts');
+            // Add a small delay to ensure data is properly stored
+            Future.delayed(const Duration(milliseconds: 100), () {
+              print('DEBUG: CashierPage - Delayed LoadProducts call');
+              context.read<CashierBloc>().add(LoadProducts());
+            });
             return const Center(child: OurbitCircularProgress());
           }
 

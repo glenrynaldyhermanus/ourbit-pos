@@ -80,38 +80,57 @@ class _OurbitAppBarState extends State<OurbitAppBar> {
   }
 
   void _startTokenValidation() {
-    // Check token every 5 minutes instead of 30 seconds to reduce unnecessary validations
+    print('⏰ APPBAR: Starting token validation timer (5 minutes)');
+    // Check token every 5 minutes for normal operation
     _tokenValidationTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
+      print('⏰ APPBAR: 5-minute timer triggered - running token validation');
       _validateToken();
     });
   }
 
   Future<void> _validateToken() async {
+    print('🔐 APPBAR: Starting token validation process');
     try {
       // First try to refresh session if needed
-      await TokenService.refreshSessionIfNeeded();
+      print('🔄 APPBAR: Attempting to refresh session if needed');
+      final refreshResult = await TokenService.refreshSessionIfNeeded();
+      print('📊 APPBAR: Refresh result: $refreshResult');
 
-      // Then check if token is still valid
+      // Then check if token is valid (now requires stored token)
+      print('🔍 APPBAR: Checking if token is valid (stored token required)');
       final isValid = await TokenService.isTokenValid();
+      print('📊 APPBAR: Token validation result: $isValid');
+
       if (!isValid) {
-        // Token invalid, force logout
+        print(
+            '❌ APPBAR: Token is invalid or missing stored token - triggering logout');
+        // Token invalid or missing stored token, force logout
         await _handleInvalidToken();
+      } else {
+        print(
+            '✅ APPBAR: Token is valid with stored token - continuing session');
       }
     } catch (e) {
+      print('❌ APPBAR: Error during token validation: $e');
       // Error during validation, assume token is invalid
       await _handleInvalidToken();
     }
   }
 
   Future<void> _handleInvalidToken() async {
+    print('🚪 APPBAR: Handling invalid token - starting logout process');
+    print('🚪 APPBAR: Reason: Missing stored token or invalid session');
     // Cancel timer to prevent multiple calls
     _tokenValidationTimer?.cancel();
+    print('⏰ APPBAR: Token validation timer cancelled');
 
     // Force logout
+    print('🔐 APPBAR: Calling TokenService.forceLogout()');
     await TokenService.forceLogout();
 
     // Navigate to login
     if (mounted) {
+      print('🔄 APPBAR: Navigating to login page');
       context.go(AppRouter.loginRoute);
     }
   }
@@ -148,9 +167,9 @@ class _OurbitAppBarState extends State<OurbitAppBar> {
                     border: Border(
                       bottom: BorderSide(
                           color: themeService.isDarkMode
-                              ? AppColors.darkBorder
-                              : AppColors.border,
-                          width: 1),
+                              ? const Color(0xff292524)
+                              : const Color(0xFFE5E7EB),
+                          width: 0.5),
                     ),
                   ),
                   child: Row(
@@ -198,9 +217,9 @@ class _OurbitAppBarState extends State<OurbitAppBar> {
                     border: Border(
                       bottom: BorderSide(
                           color: themeService.isDarkMode
-                              ? AppColors.darkBorder
-                              : AppColors.border,
-                          width: 1),
+                              ? const Color(0xff292524)
+                              : const Color(0xFFE5E7EB),
+                          width: 0.5),
                     ),
                   ),
                   child: Row(
@@ -320,9 +339,9 @@ class _OurbitAppBarState extends State<OurbitAppBar> {
                     border: Border(
                       bottom: BorderSide(
                           color: themeService.isDarkMode
-                              ? AppColors.darkBorder
-                              : AppColors.border,
-                          width: 1),
+                              ? const Color(0xff292524)
+                              : const Color(0xFFE5E7EB),
+                          width: 0.5),
                     ),
                   ),
                   child: Row(
@@ -373,9 +392,9 @@ class _OurbitAppBarState extends State<OurbitAppBar> {
                   border: Border(
                     bottom: BorderSide(
                         color: themeService.isDarkMode
-                            ? AppColors.darkBorder
-                            : AppColors.border,
-                        width: 1),
+                            ? const Color(0xff292524)
+                            : const Color(0xFFE5E7EB),
+                        width: 0.5),
                   ),
                 ),
                 child: Row(

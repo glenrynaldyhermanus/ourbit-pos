@@ -91,14 +91,16 @@ Dokumen ini berisi test script untuk menguji keseluruhan flow cashier aplikasi O
 **Expected Results**:
 
 - [ ] CashierInitial state awal
-- [ ] CashierLoading state ditampilkan
+- [ ] CashierLoading state ditampilkan dengan skeleton
 - [ ] LoadProducts event dispatch
 - [ ] GetCategoriesByStoreUseCase execute
 - [ ] GetProductsUseCase execute
+- [ ] GetProductTypesUseCase execute
 - [ ] GetCartUseCase execute
 - [ ] CashierLoaded state dengan data:
   - [ ] categories: List dengan 2 categories
   - [ ] products: List dengan 3 products
+  - [ ] productTypes: List dengan product types
   - [ ] cartItems: List kosong (initial)
 - [ ] ProductSkeleton diganti dengan ProductCard
 - [ ] CartSkeleton diganti dengan PosCart
@@ -124,9 +126,10 @@ Dokumen ini berisi test script untuk menguji keseluruhan flow cashier aplikasi O
 - [ ] Cart UI update dengan animasi
 - [ ] Item pertama muncul di cart: "Test Product 1" qty 1
 - [ ] Item kedua ditambahkan: "Test Product 2" qty 1
-- [ ] Total calculation otomatis
+- [ ] Total calculation otomatis dengan tax (11%)
 - [ ] Cart counter update
 - [ ] Smooth animation pada cart items
+- [ ] Micro animation pada ProductCard (scale & opacity)
 
 ---
 
@@ -186,14 +189,16 @@ Dokumen ini berisi test script untuk menguji keseluruhan flow cashier aplikasi O
 3. Verifikasi filter results
 4. Clear search
 5. Test category filter
+6. Test type filter
 
 **Expected Results**:
 
-- [ ] Search functionality bekerja
+- [ ] Search functionality bekerja dengan OurbitTextInput
 - [ ] Products filtered real-time
-- [ ] Category filter berfungsi
+- [ ] Category filter berfungsi dengan OurbitSelect
+- [ ] Type filter berfungsi dengan OurbitSelect
 - [ ] Clear search restore semua products
-- [ ] No products found state (jika applicable)
+- [ ] No products found state dengan icon dan message yang sesuai
 
 ---
 
@@ -278,8 +283,9 @@ Dokumen ini berisi test script untuk menguji keseluruhan flow cashier aplikasi O
 **Expected Results**:
 
 - [ ] CashierLoaded state dengan products kosong
-- [ ] Empty state UI ditampilkan
-- [ ] Message "Tidak ada produk tersedia"
+- [ ] Empty state UI ditampilkan dengan icon inventory_2_outlined
+- [ ] Message "No products found"
+- [ ] Subtitle "Try adjusting your search or filter"
 - [ ] Cart tetap bisa diakses (kosong)
 - [ ] No crash atau error
 
@@ -299,8 +305,8 @@ Dokumen ini berisi test script untuk menguji keseluruhan flow cashier aplikasi O
 
 - [ ] CashierLoading state ditampilkan
 - [ ] CashierError state dengan network error
-- [ ] Error message user-friendly
-- [ ] Retry functionality tersedia
+- [ ] OurbitToast error ditampilkan dengan title "Error" dan content error message
+- [ ] Error page dengan retry button tersedia
 - [ ] No crash aplikasi
 
 ---

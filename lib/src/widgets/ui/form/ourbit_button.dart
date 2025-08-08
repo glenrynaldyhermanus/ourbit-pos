@@ -310,7 +310,7 @@ class _OurbitButtonState extends State<OurbitButton>
 
   Widget _buildContent(ThemeService themeService) {
     if (widget.isLoading) {
-      return SizedBox(
+      return const SizedBox(
         width: 20,
         height: 20,
         child: CircularProgressIndicator(

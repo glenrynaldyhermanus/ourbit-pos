@@ -257,10 +257,20 @@ class SupabaseService {
   // Check if user is authenticated
   static Future<bool> isUserAuthenticated() async {
     try {
+      print('🔐 SUPABASE: Checking if user is authenticated');
       final user = client.auth.currentUser;
+      print('👤 SUPABASE: Current user: ${user?.email ?? "null"}');
+      print('📊 SUPABASE: Authentication result: ${user != null}');
+
+      if (user != null) {
+        print('✅ SUPABASE: User is authenticated - ${user.email}');
+      } else {
+        print('❌ SUPABASE: No authenticated user found');
+      }
+
       return user != null;
     } catch (e) {
-      // Error checking user authentication: $e
+      print('❌ SUPABASE: Error in isUserAuthenticated: $e');
       return false;
     }
   }

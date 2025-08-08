@@ -144,7 +144,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 
 **Expected Results**:
 
-- [ ] Toast error ditampilkan dengan pesan "Email tidak boleh kosong"
+- [ ] OurbitToast error ditampilkan dengan title "Data Tidak Lengkap" dan content "Masukkan username dan password"
 - [ ] Form tidak submit
 - [ ] Tidak ada request ke server
 - [ ] User tetap di halaman login
@@ -164,7 +164,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 
 **Expected Results**:
 
-- [ ] Toast error ditampilkan dengan pesan "Password tidak boleh kosong"
+- [ ] OurbitToast error ditampilkan dengan title "Data Tidak Lengkap" dan content "Masukkan username dan password"
 - [ ] Form tidak submit
 - [ ] Tidak ada request ke server
 - [ ] User tetap di halaman login
@@ -184,9 +184,9 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 
 **Expected Results**:
 
-- [ ] Toast error ditampilkan dengan pesan "Format email tidak valid"
+- [ ] OurbitToast error ditampilkan dengan title "Login Gagal" dan content dari AuthBloc error message
 - [ ] Form tidak submit
-- [ ] Tidak ada request ke server
+- [ ] Request ke server untuk validasi
 - [ ] User tetap di halaman login
 
 ---
@@ -205,7 +205,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 **Expected Results**:
 
 - [ ] Loading state ditampilkan
-- [ ] Toast error ditampilkan dengan pesan "Email atau password salah"
+- [ ] OurbitToast error ditampilkan dengan title "Login Gagal" dan content "Email atau password salah"
 - [ ] Tidak ada data yang tersimpan di SharedPreferences
 - [ ] User tetap di halaman login
 - [ ] Form fields dikosongkan atau tetap terisi (sesuai UX)
@@ -226,7 +226,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 **Expected Results**:
 
 - [ ] Loading state ditampilkan
-- [ ] Toast error ditampilkan dengan pesan "Email atau password salah"
+- [ ] OurbitToast error ditampilkan dengan title "Login Gagal" dan content "Email atau password salah"
 - [ ] Tidak ada data yang tersimpan di SharedPreferences
 - [ ] User tetap di halaman login
 
@@ -331,7 +331,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 **Expected Results**:
 
 - [ ] Loading state ditampilkan
-- [ ] Toast error ditampilkan dengan pesan "Tidak dapat terhubung ke server. Periksa koneksi internet Anda."
+- [ ] OurbitToast error ditampilkan dengan title "Login Gagal" dan content network error message dari AuthBloc
 - [ ] Tidak ada data yang tersimpan di SharedPreferences
 - [ ] User tetap di halaman login
 
@@ -355,7 +355,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 **Expected Results**:
 
 - [ ] Loading state ditampilkan
-- [ ] Toast error ditampilkan dengan pesan "Terjadi kesalahan pada server. Silakan coba lagi nanti."
+- [ ] OurbitToast error ditampilkan dengan title "Login Gagal" dan content server error message dari AuthBloc
 - [ ] Tidak ada data yang tersimpan di SharedPreferences
 - [ ] User tetap di halaman login
 

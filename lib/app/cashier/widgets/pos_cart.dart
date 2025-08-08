@@ -3,6 +3,7 @@ import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:ourbit_pos/blocs/cashier_state.dart';
 import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_icon_button.dart';
 
 class PosCart extends StatelessWidget {
   final CashierLoaded state;
@@ -42,8 +43,8 @@ class PosCart extends StatelessWidget {
             : AppColors.surfaceBackground,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.border,
-          width: 1,
+          color: isDark ? const Color(0xff292524) : const Color(0xFFE5E7EB),
+          width: 0.5,
         ),
       ),
       child: Column(
@@ -147,6 +148,7 @@ class PosCart extends StatelessWidget {
                     leadingIcon: const Icon(
                       Icons.payment,
                       size: 20,
+                      color: AppColors.secondaryBackground,
                     ),
                   ),
                 ),
@@ -273,8 +275,18 @@ class PosCart extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 // Quantity controls
-                Column(
+                Row(
                   children: [
+                    OurbitIconButton.destructive(
+                      onPressed: () =>
+                          onUpdateQuantity(index, item.quantity - 1),
+                      icon: const Icon(
+                        Icons.remove,
+                        size: 16,
+                      ),
+                      size: 24,
+                    ),
+                    const SizedBox(width: 8),
                     // Quantity display
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -287,8 +299,10 @@ class PosCart extends StatelessWidget {
                             : AppColors.surfaceBackground,
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(
-                          color: AppColors.border,
-                          width: 1,
+                          color: isDark
+                              ? const Color(0xff292524)
+                              : const Color(0xFFE5E7EB),
+                          width: 0.5,
                         ),
                       ),
                       child: Text(
@@ -299,46 +313,15 @@ class PosCart extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    // +/- buttons
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () =>
-                              onUpdateQuantity(index, item.quantity - 1),
-                          child: Container(
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              color: AppColors.error,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Icon(
-                              Icons.remove,
-                              size: 16,
-                              color: AppColors.secondaryBackground,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        GestureDetector(
-                          onTap: () =>
-                              onUpdateQuantity(index, item.quantity + 1),
-                          child: Container(
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Icon(
-                              Icons.add,
-                              size: 16,
-                              color: AppColors.secondaryBackground,
-                            ),
-                          ),
-                        ),
-                      ],
+                    const SizedBox(width: 8),
+                    OurbitIconButton.primary(
+                      onPressed: () =>
+                          onUpdateQuantity(index, item.quantity + 1),
+                      icon: const Icon(
+                        Icons.add,
+                        size: 16,
+                      ),
+                      size: 24,
                     ),
                   ],
                 ),

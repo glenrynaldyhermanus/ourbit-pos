@@ -37,7 +37,9 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
         _updateCartQuantityUseCase = updateCartQuantityUseCase,
         _clearCartUseCase = clearCartUseCase,
         super(CashierInitial()) {
+    print('DEBUG: CashierBloc - Initializing with CashierInitial state');
     on<LoadProducts>(_onLoadProducts);
+    on<ResetCashier>(_onResetCashier);
     on<LoadCategories>(_onLoadCategories);
     on<LoadCart>(_onLoadCart);
     on<AddToCart>(_onAddToCart);
@@ -48,10 +50,22 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
     on<FilterByType>(_onFilterByType);
   }
 
+  Future<void> _onResetCashier(
+    ResetCashier event,
+    Emitter<CashierState> emit,
+  ) async {
+    print('DEBUG: CashierBloc - _onResetCashier called');
+    print(
+        'DEBUG: CashierBloc - Current state before reset: ${state.runtimeType}');
+    emit(CashierInitial());
+    print('DEBUG: CashierBloc - State reset to CashierInitial');
+  }
+
   Future<void> _onLoadProducts(
     LoadProducts event,
     Emitter<CashierState> emit,
   ) async {
+    print('DEBUG: CashierBloc - _onLoadProducts called');
     // Loading products...
     emit(CashierLoading());
     try {
@@ -66,6 +80,8 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
       final sortedCartItems = _sortCartItems(cartItems);
       final totals = _calculateTotals(sortedCartItems);
 
+      print(
+          'DEBUG: CashierBloc - Emitting CashierLoaded with ${products.length} products');
       emit(CashierLoaded(
         products: products,
         categories: categories,
@@ -78,7 +94,7 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
       ));
       // CashierLoaded state emitted with ${products.length} products
     } catch (e) {
-      // Error in _onLoadProducts: $e
+      print('DEBUG: CashierBloc - Error in _onLoadProducts: $e');
       emit(CashierError(e.toString()));
     }
   }

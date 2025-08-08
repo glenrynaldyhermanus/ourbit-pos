@@ -175,17 +175,27 @@ graph TB
         G[AppRouter]
     end
 
+    subgraph "BLoC Layer"
+        H[AuthBloc]
+        I[AuthEvent]
+        J[AuthState]
+    end
+
     A --> B
     B --> C
     A --> D
     D --> E
     D --> F
     A --> G
+    A --> H
+    H --> I
+    H --> J
 
     style A fill:#e3f2fd
     style B fill:#fff3e0
     style D fill:#e8f5e8
     style G fill:#f3e5f5
+    style H fill:#fff3e0
 ```
 
 ## Token Management
@@ -405,10 +415,27 @@ class OurbitAppBar extends StatefulWidget {
 ```dart
 class AppBarBloc extends Bloc<AppBarEvent, AppBarState> {
   // Load data from local storage
-  Future<void> _onLoadAppBarData()
+  Future<void> _onLoadAppBarData() async {
+    // Load data from local storage
+    final businessData = await LocalStorageService.getBusinessData();
+    final storeData = await LocalStorageService.getStoreData();
+    final roleData = await LocalStorageService.getRoleAssignmentData();
+    final userData = await LocalStorageService.getUserData();
+
+    // Get role name from role assignment data
+    if (roleData != null && roleData['roles'] != null) {
+      final role = roleData['roles'] as Map<String, dynamic>;
+      final roleName = role['name'] as String?;
+      if (roleName != null && roleName.isNotEmpty) {
+        userRole = roleName;
+      }
+    }
+  }
 
   // Refresh data
-  Future<void> _onRefreshAppBarData()
+  Future<void> _onRefreshAppBarData() async {
+    add(LoadAppBarData());
+  }
 }
 ```
 

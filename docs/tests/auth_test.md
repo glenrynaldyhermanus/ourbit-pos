@@ -186,7 +186,7 @@ Dokumen ini berisi test script untuk menguji sistem autentikasi aplikasi Ourbit 
 
 ### TC-004: OurbitAppBar - Token Validation Timer
 
-**Objective**: Memverifikasi token validation timer berjalan setiap 30 detik
+**Objective**: Memverifikasi token validation timer berjalan setiap 5 menit
 
 **Precondition**:
 
@@ -197,12 +197,12 @@ Dokumen ini berisi test script untuk menguji sistem autentikasi aplikasi Ourbit 
 
 1. Login dengan kredensial valid
 2. Navigasi ke halaman dengan OurbitAppBar
-3. Tunggu 30 detik
+3. Tunggu 5 menit
 4. Amati token validation
 
 **Expected Results**:
 
-- [ ] Timer berjalan setiap 30 detik
+- [ ] Timer berjalan setiap 5 menit
 - [ ] Token validation dipanggil
 - [ ] Session tetap aktif
 - [ ] Tidak ada logout otomatis
@@ -216,7 +216,7 @@ Dokumen ini berisi test script untuk menguji sistem autentikasi aplikasi Ourbit 
 **Precondition**:
 
 - User sudah login
-- Token akan expired dalam 30 detik
+- Token akan expired dalam 10 menit
 
 **Test Steps**:
 
@@ -227,7 +227,8 @@ Dokumen ini berisi test script untuk menguji sistem autentikasi aplikasi Ourbit 
 **Expected Results**:
 
 - [ ] Token validation mendeteksi expired token
-- [ ] Force logout dijalankan
+- [ ] Auto refresh session sebelum expired
+- [ ] Force logout dijalankan jika refresh gagal
 - [ ] Semua data dihapus dari SharedPreferences
 - [ ] Navigasi ke `/login`
 - [ ] Timer di-cancel
@@ -349,7 +350,7 @@ Dokumen ini berisi test script untuk menguji sistem autentikasi aplikasi Ourbit 
 
 1. Login dengan kredensial valid
 2. Matikan network connection
-3. Tunggu token validation timer (30 detik)
+3. Tunggu token validation timer (5 menit)
 4. Amati behavior
 
 **Expected Results**:
@@ -499,7 +500,7 @@ Dokumen ini berisi test script untuk menguji sistem autentikasi aplikasi Ourbit 
 
 **Expected Results**:
 
-- [ ] Token validation setiap 30 detik
+- [ ] Token validation setiap 5 menit
 - [ ] Tidak ada excessive API calls
 - [ ] Performance tidak terpengaruh
 - [ ] Battery usage normal
@@ -676,6 +677,7 @@ VALUES ('incomplete-role', 'incomplete-user', 'complete-business', 'complete-sto
 - AppBar data loading: < 500ms
 - Force logout: < 1s
 - Timer accuracy: ±1 second
+- Auto refresh session: < 2s
 
 ### Memory Testing
 

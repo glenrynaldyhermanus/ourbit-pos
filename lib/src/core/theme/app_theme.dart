@@ -55,7 +55,7 @@ class AppColors {
   static const Color darkSecondaryText = Color(0xFFCBD5E1);
   static const Color darkMutedForeground = Color(0xFF64748B);
   static const Color darkMuted = Color(0xFF111827);
-  static const Color darkBorder = Color(0xFF334155);
+  static const Color darkBorder = Color(0xff292524);
   static const Color darkInput = Color(0xFF1E293B);
   static const Color darkRing = Color(0xFFFF5701);
   static const Color darkError = Color(0xFFF87171);

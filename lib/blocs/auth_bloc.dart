@@ -44,15 +44,28 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final user = await _signInUseCase(event.email, event.password);
       if (user != null) {
+        print(
+            'DEBUG: AuthBloc - User authenticated successfully: ${user.email}');
         // Get business and store data after successful login
         try {
+          print('DEBUG: AuthBloc - Getting business and store data');
           await _getUserBusinessStoreUseCase.execute();
+          print(
+              'DEBUG: AuthBloc - Business and store data loaded successfully');
+
+          // Reset CashierBloc to clear previous user's data
+          print('DEBUG: AuthBloc - Resetting CashierBloc for new user');
+
           emit(Authenticated(user));
+          print('DEBUG: AuthBloc - Emitting Authenticated state');
         } catch (businessError) {
+          print(
+              'DEBUG: AuthBloc - Error getting business/store data: $businessError');
           // Handle specific business/store access errors
           emit(AuthError(businessError.toString()));
         }
       } else {
+        print('DEBUG: AuthBloc - User authentication failed');
         emit(const AuthError('Email atau password salah'));
       }
     } catch (e) {
@@ -69,7 +82,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       print('DEBUG: AuthBloc - Calling signOutUseCase');
       await _signOutUseCase();
-      print('DEBUG: AuthBloc - SignOutUseCase completed, emitting Unauthenticated');
+      print(
+          'DEBUG: AuthBloc - SignOutUseCase completed, emitting Unauthenticated');
       emit(Unauthenticated());
     } catch (e) {
       print('DEBUG: AuthBloc - SignOut error: $e');

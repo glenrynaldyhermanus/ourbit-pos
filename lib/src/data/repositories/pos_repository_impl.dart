@@ -14,10 +14,14 @@ class PosRepositoryImpl implements PosRepository {
   Future<List<Product>> getProducts() async {
     try {
       final storeId = await LocalStorageService.getStoreId();
+      print('DEBUG: getProducts - storeId: $storeId');
+
       if (storeId == null) {
+        print('DEBUG: getProducts - storeId is null, returning empty list');
         return [];
       }
 
+      print('DEBUG: getProducts - querying products for storeId: $storeId');
       final response = await _supabaseClient
           .from('products')
           .select('*, categories(name)')
@@ -25,10 +29,13 @@ class PosRepositoryImpl implements PosRepository {
           .eq('is_active', true)
           .order('created_at', ascending: false);
 
+      print('DEBUG: getProducts - raw response length: ${response.length}');
       final products =
           (response as List).map((json) => Product.fromJson(json)).toList();
+      print('DEBUG: getProducts - parsed products length: ${products.length}');
       return products;
     } catch (e) {
+      print('DEBUG: getProducts - error: $e');
       // TODO: gunakan logger jika perlu
       return [];
     }

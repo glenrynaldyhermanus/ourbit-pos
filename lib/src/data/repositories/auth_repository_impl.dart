@@ -3,6 +3,7 @@ import 'package:ourbit_pos/src/data/objects/user.dart';
 import 'package:ourbit_pos/src/data/repositories/auth_repository.dart';
 import 'package:ourbit_pos/src/core/services/supabase_service.dart';
 import 'package:ourbit_pos/src/core/services/local_storage_service.dart';
+import 'package:ourbit_pos/src/core/services/token_service.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final SupabaseClient _supabaseClient;
@@ -12,14 +13,33 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<AppUser?> signIn(String email, String password) async {
     try {
+      print('🔐 AUTH_REPO: Starting signIn process for $email');
+      
       final response = await _supabaseClient.auth.signInWithPassword(
         email: email,
         password: password,
       );
 
       if (response.user != null) {
-        // Load and cache user data after successful login
-        await SupabaseService.loadUserDataAfterLogin();
+        print('✅ AUTH_REPO: User authenticated successfully');
+        
+        // Save the session token after successful authentication
+        final session = _supabaseClient.auth.currentSession;
+        if (session != null && session.accessToken != null) {
+          print('💾 AUTH_REPO: Saving session token');
+          await TokenService.saveToken(
+            session.accessToken!,
+            session.expiresAt != null 
+              ? DateTime.fromMillisecondsSinceEpoch(session.expiresAt! * 1000)
+              : DateTime.now().add(const Duration(hours: 1))
+          );
+          print('✅ AUTH_REPO: Session token saved successfully');
+        } else {
+          print('⚠️ AUTH_REPO: No session or access token available');
+        }
+
+        // User data will be loaded by BusinessStoreService in AuthBloc
+        // Don't call loadUserDataAfterLogin here to avoid duplication
 
         return AppUser(
           id: response.user!.id,
@@ -33,6 +53,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       return null;
     } catch (e) {
+      print('❌ AUTH_REPO: SignIn error: $e');
       // Handle specific Supabase auth errors
       if (e.toString().contains('Invalid login credentials')) {
         throw Exception(

@@ -2,7 +2,6 @@ import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:provider/provider.dart';
 
 import 'package:ourbit_pos/src/core/services/theme_service.dart';
-import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 
 /// Custom Select Widget dengan efek bounce animation saat focus
 ///
@@ -125,7 +124,8 @@ class _OurbitSelectState<T> extends State<OurbitSelect<T>>
         }
 
         final isDark = themeService.isDarkMode;
-        final borderColor = isDark ? AppColors.darkBorder : AppColors.border;
+        final borderColor =
+            isDark ? const Color(0xff292524) : const Color(0xFFE5E7EB);
 
         return AnimatedBuilder(
           animation: _bounceController,
@@ -136,7 +136,7 @@ class _OurbitSelectState<T> extends State<OurbitSelect<T>>
                 onPointerDown: (_) => _triggerBounceAnimation(),
                 child: Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: borderColor),
+                    border: Border.all(color: borderColor, width: 0.5),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Select<T>(

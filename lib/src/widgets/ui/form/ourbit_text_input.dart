@@ -2,6 +2,7 @@ import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:provider/provider.dart';
 
 import 'package:ourbit_pos/src/core/services/theme_service.dart';
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 
 /// Custom Text Input Widget dengan efek shrink animation saat focus
 ///
@@ -284,25 +285,38 @@ class OurbitFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FormField(
-      key: fieldKey,
-      label: label != null ? Text(label!) : const Text(''),
-      showErrors: showErrors,
-      validator: validator,
-      child: OurbitTextInput(
-        placeholder: placeholder,
-        obscureText: obscureText,
-        features: features,
-        leading: leading,
-        onChanged: onChanged,
-        onSubmitted: onSubmitted,
-        controller: controller,
-        focusNode: focusNode,
-        width: width,
-        height: height,
-        padding: padding,
-        borderRadius: borderRadius,
-      ),
+    return Consumer<ThemeService>(
+      builder: (context, themeService, _) {
+                  return FormField(
+            key: fieldKey,
+            label: label != null 
+                ? Text(
+                    label!,
+                    style: TextStyle(
+                      color: themeService.isDarkMode 
+                          ? Colors.white
+                          : AppColors.primaryText,
+                    ),
+                  ) 
+                : const Text(''),
+          showErrors: showErrors,
+          validator: validator,
+          child: OurbitTextInput(
+            placeholder: placeholder,
+            obscureText: obscureText,
+            features: features,
+            leading: leading,
+            onChanged: onChanged,
+            onSubmitted: onSubmitted,
+            controller: controller,
+            focusNode: focusNode,
+            width: width,
+            height: height,
+            padding: padding,
+            borderRadius: borderRadius,
+          ),
+        );
+      },
     );
   }
 }
