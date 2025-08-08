@@ -123,6 +123,95 @@ CREATE TABLE public.options (
     value TEXT NOT NULL
 );
 
+-- ========================================
+-- DATA TABEL OPTIONS (MASTER DATA)
+-- ========================================
+
+-- Business Age Options
+-- INSERT INTO options (type, name, key, value) VALUES
+-- ('business_age', 'Business Age', '1', 'Kurang dari 1 tahun'),
+-- ('business_age', 'Business Age', '2', '1 – 3 tahun'),
+-- ('business_age', 'Business Age', '3', '3 – 5 tahun'),
+-- ('business_age', 'Business Age', '4', '5 – 10 tahun'),
+-- ('business_age', 'Business Age', '5', 'Lebih dari 10 tahun');
+
+-- Business Field Options
+-- INSERT INTO options (type, name, key, value) VALUES
+-- ('business_field', 'Business Field', '1', 'Kelontong / Grocery'),
+-- ('business_field', 'Business Field', '2', 'Elektronik'),
+-- ('business_field', 'Business Field', '3', 'Fashion / Pakaian & Aksesoris'),
+-- ('business_field', 'Business Field', '4', 'Makanan & Minuman'),
+-- ('business_field', 'Business Field', '5', 'Kecantikan & Perawatan'),
+-- ('business_field', 'Business Field', '6', 'Pet Shop'),
+-- ('business_field', 'Business Field', '7', 'Kesehatan & Farmasi'),
+-- ('business_field', 'Business Field', '8', 'Otomotif & Bengkel'),
+-- ('business_field', 'Business Field', '9', 'Perlengkapan Rumah Tangga'),
+-- ('business_field', 'Business Field', '10', 'Buku & Alat Tulis'),
+-- ('business_field', 'Business Field', '11', 'Souvenir & Gift'),
+-- ('business_field', 'Business Field', '12', 'Olahraga & Outdoor'),
+-- ('business_field', 'Business Field', '13', 'Jasa (laundry, cleaning...)'),
+-- ('business_field', 'Business Field', '14', 'Optik'),
+-- ('business_field', 'Business Field', '9999', 'Lain-lain');
+
+-- Currency Options
+-- INSERT INTO options (type, name, key, value) VALUES
+-- ('currency', 'Kurs Mata Uang', '1', 'Indonesian Rupiah (Rp)'),
+-- ('currency', 'Kurs Mata Uang', '2', 'US Dollar ($)'),
+-- ('currency', 'Kurs Mata Uang', '3', 'Euro (€)'),
+-- ('currency', 'Kurs Mata Uang', '4', 'Singapore Dollar (S$)'),
+-- ('currency', 'Kurs Mata Uang', '5', 'Malaysian Ringgit (RM)'),
+-- ('currency', 'Kurs Mata Uang', '6', 'Japanese Yen (¥)'),
+-- ('currency', 'Kurs Mata Uang', '7', 'British Pound Sterling (£)');
+
+-- Inventory Transaction Type Options
+-- INSERT INTO options (type, name, key, value) VALUES
+-- ('inventory_transaction_type', 'Inventory Transaction Type', '1', 'Pembelian'),
+-- ('inventory_transaction_type', 'Inventory Transaction Type', '2', 'Penjualan'),
+-- ('inventory_transaction_type', 'Inventory Transaction Type', '3', 'Penyesuaian'),
+-- ('inventory_transaction_type', 'Inventory Transaction Type', '4', 'Transfer'),
+-- ('inventory_transaction_type', 'Inventory Transaction Type', '5', 'Produksi'),
+-- ('inventory_transaction_type', 'Inventory Transaction Type', '6', 'Kerusakan'),
+-- ('inventory_transaction_type', 'Inventory Transaction Type', '7', 'Retur'),
+-- ('inventory_transaction_type', 'Inventory Transaction Type', '8', 'Stock Opname');
+
+-- Inventory Valuation Method Options
+-- INSERT INTO options (type, name, key, value) VALUES
+-- ('inventory_valuation_method', 'Inventory Valuation Method', '1', 'Default'),
+-- ('inventory_valuation_method', 'Inventory Valuation Method', '2', 'FIFO'),
+-- ('inventory_valuation_method', 'Inventory Valuation Method', '3', 'LIFO'),
+-- ('inventory_valuation_method', 'Inventory Valuation Method', '4', 'Average');
+
+-- Online Store Mode Options
+-- INSERT INTO options (type, name, key, value) VALUES
+-- ('online_store_mode', 'Online Store Mode', '1', 'Catalog'),
+-- ('online_store_mode', 'Online Store Mode', '2', 'Catalog & Order'),
+-- ('online_store_mode', 'Online Store Mode', '3', 'Disabled');
+
+-- Product Type Options
+-- INSERT INTO options (type, name, key, value) VALUES
+-- ('product_type', 'Product Type', '1', 'Barang'),
+-- ('product_type', 'Product Type', '2', 'Jasa'),
+-- ('product_type', 'Product Type', '3', 'Kelas/Jadwal');
+
+-- Stock Opname Session Status Options
+-- INSERT INTO options (type, name, key, value) VALUES
+-- ('stock_opname_session_status', 'Stock Opname Session Status', '1', 'Open'),
+-- ('stock_opname_session_status', 'Stock Opname Session Status', '2', 'Counted'),
+-- ('stock_opname_session_status', 'Stock Opname Session Status', '3', 'Adjusted'),
+-- ('stock_opname_session_status', 'Stock Opname Session Status', '4', 'Closed');
+
+-- Stock Opname Status Options
+-- INSERT INTO options (type, name, key, value) VALUES
+-- ('stock_opname_status', 'Stock Opname Status', '1', 'Draft'),
+-- ('stock_opname_status', 'Stock Opname Status', '2', 'Sedang Berlangsung'),
+-- ('stock_opname_status', 'Stock Opname Status', '3', 'Selesai'),
+-- ('stock_opname_status', 'Stock Opname Status', '4', 'Dibatalkan');
+
+-- Stock Tracking Mode Options
+-- INSERT INTO options (type, name, key, value) VALUES
+-- ('stock_tracking_mode', 'Stock Tracking Mode', '1', 'Physical'),
+-- ('stock_tracking_mode', 'Stock Tracking Mode', '2', 'Booking');
+
 -- products
 CREATE TABLE public.products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

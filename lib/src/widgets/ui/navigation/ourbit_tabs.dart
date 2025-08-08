@@ -56,8 +56,8 @@ class OurbitTabsBuilder {
   }) {
     return OurbitTabs(
       index: index,
-      onChanged: onChanged,
       children: labels.map((label) => TabItem(child: Text(label))).toList(),
+      onChanged: onChanged,
     );
   }
 
@@ -68,8 +68,8 @@ class OurbitTabsBuilder {
   }) {
     return OurbitTabs(
       index: index,
-      onChanged: onChanged,
       children: items,
+      onChanged: onChanged,
     );
   }
 

@@ -160,6 +160,22 @@ class ManagementRepositoryImpl implements ManagementRepository {
     }
   }
 
+  // Product Types
+  @override
+  Future<List<Map<String, dynamic>>> getProductTypes() async {
+    try {
+      final response = await _supabaseClient
+          .from('options')
+          .select('*')
+          .eq('type', 'product_type')
+          .order('key', ascending: true);
+
+      return List<Map<String, dynamic>>.from(response);
+    } catch (e) {
+      throw Exception('Failed to fetch product types');
+    }
+  }
+
   // Customers
   @override
   Future<List<Map<String, dynamic>>> getCustomers() async {

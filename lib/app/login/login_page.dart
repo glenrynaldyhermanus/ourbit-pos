@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import 'package:ourbit_pos/blocs/auth_bloc.dart';
-import 'package:ourbit_pos/blocs/auth_event.dart';
 import 'package:ourbit_pos/blocs/auth_state.dart';
 import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/core/services/theme_service.dart';

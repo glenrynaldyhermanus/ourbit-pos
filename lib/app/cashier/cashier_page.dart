@@ -16,6 +16,7 @@ import 'package:ourbit_pos/src/widgets/navigation/sidebar.dart';
 import 'package:ourbit_pos/src/widgets/navigation/appbar.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_select.dart';
 import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_circular_progress.dart';
 import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_toast.dart';
 
@@ -91,18 +92,41 @@ class _CashierPageState extends State<CashierPage> {
   List<String> _getCategories(CashierLoaded state) {
     final categories =
         state.categories.map((c) => c['name'] as String).toList();
-    categories.insert(0, 'All');
+    categories.insert(0, 'Semua Kategori');
     return categories;
   }
 
+  List<String> _getProductTypes(CashierLoaded state) {
+    final types = state.productTypes.map((t) => t['value'] as String).toList();
+    types.insert(0, 'Semua Tipe');
+    return types;
+  }
+
+  String _getProductTypeKey(CashierLoaded state, String typeValue) {
+    final type = state.productTypes.firstWhere(
+      (t) => t['value'] == typeValue,
+      orElse: () => {'key': '', 'value': ''},
+    );
+    return type['key'] as String;
+  }
+
   List<Product> _getFilteredProducts(CashierLoaded state) {
-    if (state.selectedCategory == 'all' || state.selectedCategory == 'All') {
-      return state.products;
+    var filtered = state.products;
+
+    // Filter by category
+    if (state.selectedCategory != 'all' &&
+        state.selectedCategory != 'Semua Kategori') {
+      filtered = filtered
+          .where((p) => p.categoryName == state.selectedCategory)
+          .toList();
     }
 
-    final filtered = state.products
-        .where((p) => p.categoryName == state.selectedCategory)
-        .toList();
+    // Filter by type
+    if (state.selectedType != 'all' && state.selectedType != 'Semua Tipe') {
+      final typeKey = _getProductTypeKey(state, state.selectedType);
+      filtered = filtered.where((p) => p.type == typeKey).toList();
+    }
+
     return filtered;
   }
 
@@ -292,7 +316,7 @@ class _CashierPageState extends State<CashierPage> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          // Search and Category Row
+                                          // Search and Filters Row
                                           Row(
                                             children: [
                                               // Search Field
@@ -300,7 +324,7 @@ class _CashierPageState extends State<CashierPage> {
                                                 flex: 2,
                                                 child: OurbitTextInput(
                                                   placeholder:
-                                                      'Type product name...',
+                                                      'Cari nama produk...',
                                                   label: 'Search Products',
                                                   leading:
                                                       const Icon(Icons.search),
@@ -316,95 +340,53 @@ class _CashierPageState extends State<CashierPage> {
                                               // Category Filter
                                               Expanded(
                                                 flex: 1,
-                                                child: Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 8),
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color:
-                                                            AppColors.border),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                  ),
-                                                  child: GestureDetector(
-                                                    onTap: () {
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (context) =>
-                                                            AlertDialog(
-                                                          title: const Text(
-                                                              'Select Category'),
-                                                          content: SizedBox(
-                                                            width: double
-                                                                .maxFinite,
-                                                            child: ListView
-                                                                .builder(
-                                                              shrinkWrap: true,
-                                                              itemCount:
-                                                                  _getCategories(
-                                                                          state)
-                                                                      .length,
-                                                              itemBuilder:
-                                                                  (context,
-                                                                      index) {
-                                                                final category =
-                                                                    _getCategories(
-                                                                            state)[
-                                                                        index];
-                                                                return GestureDetector(
-                                                                  onTap: () {
-                                                                    context
-                                                                        .read<
-                                                                            CashierBloc>()
-                                                                        .add(FilterByCategory(
-                                                                            category));
-                                                                    Navigator.pop(
-                                                                        context);
-                                                                  },
-                                                                  child:
-                                                                      Container(
-                                                                    padding: const EdgeInsets
-                                                                        .symmetric(
-                                                                        vertical:
-                                                                            12,
-                                                                        horizontal:
-                                                                            16),
-                                                                    child: Text(
-                                                                        category),
-                                                                  ),
-                                                                );
-                                                              },
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          state.selectedCategory ==
-                                                                  'all'
-                                                              ? 'All'
-                                                              : state
-                                                                  .selectedCategory,
-                                                          style: _getSystemFont(
-                                                            fontSize: 14,
-                                                            fontWeight: material
-                                                                .FontWeight
-                                                                .w500,
-                                                          ),
-                                                        ),
-                                                        const Icon(Icons
-                                                            .arrow_drop_down),
-                                                      ],
-                                                    ),
-                                                  ),
+                                                child: OurbitSelect<String>(
+                                                  value:
+                                                      state.selectedCategory ==
+                                                              'all'
+                                                          ? 'Semua Kategori'
+                                                          : state
+                                                              .selectedCategory,
+                                                  items: _getCategories(state),
+                                                  itemBuilder:
+                                                      (context, category) =>
+                                                          Text(category),
+                                                  onChanged: (category) {
+                                                    if (category != null) {
+                                                      context
+                                                          .read<CashierBloc>()
+                                                          .add(FilterByCategory(
+                                                              category));
+                                                    }
+                                                  },
+                                                  placeholder: const Text(
+                                                      'Pilih Kategori'),
+                                                ),
+                                              ),
+                                              const Gap(16),
+                                              // Type Filter
+                                              Expanded(
+                                                flex: 1,
+                                                child: OurbitSelect<String>(
+                                                  value: state.selectedType ==
+                                                          'all'
+                                                      ? 'Semua Tipe'
+                                                      : state.selectedType,
+                                                  items:
+                                                      _getProductTypes(state),
+                                                  itemBuilder:
+                                                      (context, type) =>
+                                                          Text(type),
+                                                  onChanged: (type) {
+                                                    if (type != null) {
+                                                      context
+                                                          .read<CashierBloc>()
+                                                          .add(FilterByType(
+                                                              type));
+                                                    }
+                                                  },
+                                                  placeholder: const Text(
+                                                      'Pilih Tipe Produk'),
                                                 ),
                                               ),
                                             ],

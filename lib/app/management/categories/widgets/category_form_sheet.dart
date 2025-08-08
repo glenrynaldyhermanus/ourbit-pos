@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:ourbit_pos/blocs/management_bloc.dart';
 import 'package:ourbit_pos/blocs/management_event.dart';
-import 'package:ourbit_pos/blocs/management_state.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_select.dart';
 

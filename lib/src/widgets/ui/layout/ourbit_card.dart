@@ -20,8 +20,8 @@ class OurbitCard extends StatelessWidget {
     return Consumer<ThemeService>(
       builder: (context, themeService, _) {
         Widget card = Card(
-          padding: padding,
           child: child,
+          padding: padding,
         );
 
         if (intrinsic) {
@@ -41,8 +41,8 @@ class OurbitCardBuilder {
     EdgeInsetsGeometry? padding,
   }) {
     return OurbitCard(
-      child: child,
       padding: padding,
+      child: child,
     );
   }
 
@@ -51,8 +51,8 @@ class OurbitCardBuilder {
     EdgeInsetsGeometry padding = const EdgeInsets.all(24),
   }) {
     return OurbitCard(
-      child: child,
       padding: padding,
+      child: child,
     );
   }
 
@@ -61,9 +61,9 @@ class OurbitCardBuilder {
     EdgeInsetsGeometry? padding,
   }) {
     return OurbitCard(
-      child: child,
       padding: padding,
       intrinsic: true,
+      child: child,
     );
   }
 
@@ -74,7 +74,6 @@ class OurbitCardBuilder {
     required List<Widget> actions,
   }) {
     return OurbitCard(
-      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -93,6 +92,7 @@ class OurbitCardBuilder {
           ),
         ],
       ),
+      padding: const EdgeInsets.all(24),
     );
   }
 }

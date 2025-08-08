@@ -119,7 +119,7 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
     try {
       // TODO: Implement actual API call
       await Future.delayed(const Duration(seconds: 1));
-      emit(InventoryLoaded([]));
+      emit(const InventoryLoaded([]));
     } catch (e) {
       emit(ManagementError(e.toString()));
     }

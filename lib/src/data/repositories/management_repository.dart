@@ -14,6 +14,9 @@ abstract class ManagementRepository {
   Future<void> updateCategory(String id, Map<String, dynamic> categoryData);
   Future<void> deleteCategory(String id);
 
+  // Product Types
+  Future<List<Map<String, dynamic>>> getProductTypes();
+
   // Customers
   Future<List<Map<String, dynamic>>> getCustomers();
   Future<void> createCustomer(Map<String, dynamic> customerData);

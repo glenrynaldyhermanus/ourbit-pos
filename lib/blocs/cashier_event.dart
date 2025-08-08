@@ -58,3 +58,12 @@ class FilterByCategory extends CashierEvent {
   @override
   List<Object?> get props => [category];
 }
+
+class FilterByType extends CashierEvent {
+  final String type;
+
+  const FilterByType(this.type);
+
+  @override
+  List<Object?> get props => [type];
+}

@@ -17,8 +17,10 @@ class CashierLoaded extends CashierState {
   final List<Product> products;
   final List<CartItem> cartItems;
   final List<Map<String, dynamic>> categories;
+  final List<Map<String, dynamic>> productTypes;
   final String searchTerm;
   final String selectedCategory;
+  final String selectedType;
   final double total;
   final double tax;
   final double discount;
@@ -28,8 +30,10 @@ class CashierLoaded extends CashierState {
     required this.products,
     required this.cartItems,
     this.categories = const [],
+    this.productTypes = const [],
     this.searchTerm = '',
     this.selectedCategory = 'all',
+    this.selectedType = 'all',
     required this.total,
     required this.tax,
     required this.discount,
@@ -40,8 +44,10 @@ class CashierLoaded extends CashierState {
     List<Product>? products,
     List<CartItem>? cartItems,
     List<Map<String, dynamic>>? categories,
+    List<Map<String, dynamic>>? productTypes,
     String? searchTerm,
     String? selectedCategory,
+    String? selectedType,
     double? total,
     double? tax,
     double? discount,
@@ -51,8 +57,10 @@ class CashierLoaded extends CashierState {
       products: products ?? this.products,
       cartItems: cartItems ?? this.cartItems,
       categories: categories ?? this.categories,
+      productTypes: productTypes ?? this.productTypes,
       searchTerm: searchTerm ?? this.searchTerm,
       selectedCategory: selectedCategory ?? this.selectedCategory,
+      selectedType: selectedType ?? this.selectedType,
       total: total ?? this.total,
       tax: tax ?? this.tax,
       discount: discount ?? this.discount,
@@ -65,8 +73,10 @@ class CashierLoaded extends CashierState {
         products,
         cartItems,
         categories,
+        productTypes,
         searchTerm,
         selectedCategory,
+        selectedType,
         total,
         tax,
         discount,

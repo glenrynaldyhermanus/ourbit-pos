@@ -33,8 +33,8 @@ class OurbitBreadcrumbBuilder {
     Widget? separator,
   }) {
     return OurbitBreadcrumb(
-      children: children,
       separator: separator,
+      children: children,
     );
   }
 
@@ -59,8 +59,8 @@ class OurbitBreadcrumbBuilder {
     }
 
     return OurbitBreadcrumb(
-      children: children,
       separator: separator,
+      children: children,
     );
   }
 
@@ -77,8 +77,8 @@ class OurbitBreadcrumbBuilder {
     }
 
     return OurbitBreadcrumb(
-      children: items,
       separator: separator,
+      children: items,
     );
   }
 }

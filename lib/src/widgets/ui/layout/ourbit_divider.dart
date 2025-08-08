@@ -32,8 +32,8 @@ class OurbitDividerBuilder {
     Widget? child,
   }) {
     return OurbitDivider(
-      child: child,
       isVertical: false,
+      child: child,
     );
   }
 
@@ -41,8 +41,8 @@ class OurbitDividerBuilder {
     Widget? child,
   }) {
     return OurbitDivider(
-      child: child,
       isVertical: true,
+      child: child,
     );
   }
 
@@ -51,8 +51,8 @@ class OurbitDividerBuilder {
     bool isVertical = false,
   }) {
     return OurbitDivider(
-      child: Text(text),
       isVertical: isVertical,
+      child: Text(text),
     );
   }
 

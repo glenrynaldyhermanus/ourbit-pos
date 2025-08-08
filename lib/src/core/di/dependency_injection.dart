@@ -25,6 +25,7 @@ import 'package:ourbit_pos/src/data/usecases/get_suppliers_usecase.dart';
 import 'package:ourbit_pos/src/data/usecases/get_discounts_usecase.dart';
 import 'package:ourbit_pos/src/data/usecases/get_expenses_usecase.dart';
 import 'package:ourbit_pos/src/data/usecases/get_loyalty_programs_usecase.dart';
+import 'package:ourbit_pos/src/data/usecases/get_product_types_usecase.dart';
 import 'package:ourbit_pos/src/data/usecases/get_store_payment_methods_usecase.dart';
 import 'package:ourbit_pos/src/data/usecases/process_checkout_usecase.dart';
 import 'package:ourbit_pos/blocs/payment_bloc.dart';
@@ -84,6 +85,8 @@ class DependencyInjection {
   static final _getExpensesUseCase = GetExpensesUseCase(_managementRepository);
   static final _getLoyaltyProgramsUseCase =
       GetLoyaltyProgramsUseCase(_managementRepository);
+  static final _getProductTypesUseCase =
+      GetProductTypesUseCase(_managementRepository);
 
   static List<ChangeNotifierProvider> getProviders() {
     return [
@@ -109,6 +112,7 @@ class DependencyInjection {
         create: (context) => CashierBloc(
           getProductsUseCase: _getProductsUseCase,
           getCategoriesByStoreUseCase: _getCategoriesByStoreUseCase,
+          getProductTypesUseCase: _getProductTypesUseCase,
           getCartUseCase: _getCartUseCase,
           addToCartUseCase: _addToCartUseCase,
           updateCartQuantityUseCase: _updateCartQuantityUseCase,
