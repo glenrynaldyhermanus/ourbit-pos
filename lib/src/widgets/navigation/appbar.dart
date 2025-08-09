@@ -103,7 +103,8 @@ class _OurbitAppBarState extends State<OurbitAppBar> {
       Logger.appbar('Token validation result: $isValid');
 
       if (!isValid) {
-        Logger.appbar('Token is invalid or missing stored token - triggering logout');
+        Logger.appbar(
+            'Token is invalid or missing stored token - triggering logout');
         // Token invalid or missing stored token, force logout
         await _handleInvalidToken();
       } else {

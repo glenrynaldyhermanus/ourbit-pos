@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ourbit_pos/src/core/services/local_storage_service.dart';
+import 'package:ourbit_pos/src/core/utils/logger.dart';
 import 'appbar_event.dart';
 import 'appbar_state.dart';
 
@@ -47,13 +48,13 @@ class AppBarBloc extends Bloc<AppBarEvent, AppBarState> {
       // Get role name from role assignment data
       if (roleData != null) {
         // Debug: Print role data from local storage
-        print('DEBUG: Role data from local storage: $roleData');
+        Logger.appbar('Role data from local storage: $roleData');
 
         // Try to get role from 'roles' key (new query structure)
         if (roleData['roles'] != null) {
           final role = roleData['roles'] as Map<String, dynamic>;
           final roleName = role['name'] as String?;
-          print('DEBUG: Role name from roles: $roleName');
+          Logger.appbar('Role name from roles: $roleName');
           if (roleName != null && roleName.isNotEmpty) {
             userRole = roleName;
           }

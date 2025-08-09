@@ -21,8 +21,8 @@ class OurbitTabList extends StatelessWidget {
       builder: (context, themeService, _) {
         return TabList(
           index: index,
-          children: children,
           onChanged: onChanged,
+          children: children,
         );
       },
     );
@@ -38,8 +38,8 @@ class OurbitTabListBuilder {
   }) {
     return OurbitTabList(
       index: index,
-      children: labels.map((label) => TabItem(child: Text(label))).toList(),
       onChanged: onChanged,
+      children: labels.map((label) => TabItem(child: Text(label))).toList(),
     );
   }
 
@@ -50,8 +50,8 @@ class OurbitTabListBuilder {
   }) {
     return OurbitTabList(
       index: index,
-      children: items,
       onChanged: onChanged,
+      children: items,
     );
   }
 }

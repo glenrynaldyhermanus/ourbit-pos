@@ -52,23 +52,24 @@ class _CustomerFormSheetState extends State<CustomerFormSheet> {
       _isLoading = true;
     });
 
+    // Store context and bloc before async gap
+    final currentContext = context;
+    final managementBloc = context.read<ManagementBloc>();
+
     try {
-      // TODO: Implement actual API call
       // For now, just simulate success
       await Future.delayed(const Duration(seconds: 1));
 
       // Reload customers using BLoC
-      context.read<ManagementBloc>().add(LoadCustomers());
+      managementBloc.add(LoadCustomers());
 
-      // Close sheet
-      if (mounted) {
-        closeSheet(context);
-      }
+      if (mounted && currentContext.mounted) {
+        // Close sheet
+        closeSheet(currentContext);
 
-      // Show success toast
-      if (mounted) {
+        // Show success toast
         showToast(
-          context: context,
+          context: currentContext,
           builder: (context, overlay) => SurfaceCard(
             child: Basic(
               title: const Text('Berhasil'),
@@ -86,9 +87,9 @@ class _CustomerFormSheetState extends State<CustomerFormSheet> {
       }
     } catch (e) {
       // Show error toast
-      if (mounted) {
+      if (mounted && currentContext.mounted) {
         showToast(
-          context: context,
+          context: currentContext,
           builder: (context, overlay) => SurfaceCard(
             child: Basic(
               title: const Text('Error'),

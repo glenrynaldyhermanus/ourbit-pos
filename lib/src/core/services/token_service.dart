@@ -169,8 +169,7 @@ class TokenService {
 
       // Check if session is still valid by trying to get user info
       final session = SupabaseService.client.auth.currentSession;
-      Logger.token(
-          'Current session: ${session != null ? "exists" : "null"}');
+      Logger.token('Current session: ${session != null ? "exists" : "null"}');
 
       if (session == null) {
         Logger.token('No valid session found - AUTHENTICATED: false');
@@ -220,7 +219,8 @@ class TokenService {
         return false;
       }
 
-      Logger.token('Both session and stored token are valid - AUTHENTICATED: true');
+      Logger.token(
+          'Both session and stored token are valid - AUTHENTICATED: true');
       return true;
     } catch (e) {
       Logger.error('Error during token validation: $e');

@@ -26,14 +26,14 @@ class AuthRepositoryImpl implements AuthRepository {
 
         // Save the session token after successful authentication
         final session = _supabaseClient.auth.currentSession;
-        if (session != null && session.accessToken != null) {
+        if (session != null && session.accessToken.isNotEmpty) {
           Logger.auth('Saving session token');
           await TokenService.saveToken(
-            session.accessToken,
-            session.expiresAt != null
-                ? DateTime.fromMillisecondsSinceEpoch(
-                    session.expiresAt! * 1000)
-                : DateTime.now().add(const Duration(hours: 1)));
+              session.accessToken,
+              session.expiresAt != null
+                  ? DateTime.fromMillisecondsSinceEpoch(
+                      session.expiresAt! * 1000)
+                  : DateTime.now().add(const Duration(hours: 1)));
           Logger.auth('Session token saved successfully');
         } else {
           Logger.warning('No session or access token available');

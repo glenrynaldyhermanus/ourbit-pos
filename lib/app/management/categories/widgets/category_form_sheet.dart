@@ -42,18 +42,21 @@ class _CategoryFormSheetState extends State<CategoryFormSheet> {
       _isLoading = true;
     });
 
+    // Store context and bloc before async gap
+    final currentContext = context;
+    final managementBloc = context.read<ManagementBloc>();
+
     try {
-      // TODO: Implement actual API call
       // For now, just simulate success
       await Future.delayed(const Duration(seconds: 1));
 
       // Reload categories using BLoC
-      context.read<ManagementBloc>().add(LoadCategories());
+      managementBloc.add(LoadCategories());
 
-      // Show success toast first
-      if (mounted) {
+      if (mounted && currentContext.mounted) {
+        // Show success toast first
         showToast(
-          context: context,
+          context: currentContext,
           builder: (context, overlay) => SurfaceCard(
             child: Basic(
               title: const Text('Berhasil'),
@@ -70,17 +73,15 @@ class _CategoryFormSheetState extends State<CategoryFormSheet> {
           ),
           location: ToastLocation.topCenter,
         );
+        closeSheet(currentContext);
       }
 
       // Close sheet after showing toast
-      if (mounted) {
-        closeSheet(context);
-      }
     } catch (e) {
       // Show error toast
-      if (mounted) {
+      if (mounted && currentContext.mounted) {
         showToast(
-          context: context,
+          context: currentContext,
           builder: (context, overlay) => SurfaceCard(
             child: Basic(
               title: const Text('Error'),

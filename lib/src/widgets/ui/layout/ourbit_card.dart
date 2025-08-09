@@ -20,8 +20,8 @@ class OurbitCard extends StatelessWidget {
     return Consumer<ThemeService>(
       builder: (context, themeService, _) {
         Widget card = Card(
-          child: child,
           padding: padding,
+          child: child,
         );
 
         if (intrinsic) {
@@ -74,6 +74,7 @@ class OurbitCardBuilder {
     required List<Widget> actions,
   }) {
     return OurbitCard(
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -92,7 +93,6 @@ class OurbitCardBuilder {
           ),
         ],
       ),
-      padding: const EdgeInsets.all(24),
     );
   }
 }

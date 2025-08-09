@@ -12,6 +12,7 @@ import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_theme_toggle.dart';
 import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_toast.dart';
 import 'package:ourbit_pos/src/core/services/theme_service.dart';
+import 'package:ourbit_pos/src/core/utils/logger.dart';
 import 'package:provider/provider.dart';
 
 class LoginPanel extends StatefulWidget {
@@ -47,7 +48,7 @@ class _LoginPanelState extends State<LoginPanel> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    print('DEBUG: LoginPanel - initState called');
+    Logger.login('LoginPanel - initState called');
 
     // Initialize animation controllers
     _logoController = AnimationController(
@@ -99,48 +100,48 @@ class _LoginPanelState extends State<LoginPanel> with TickerProviderStateMixin {
     ));
 
     // Start animations with fallback
-    print('DEBUG: LoginPanel - Starting animations with fallback');
+    Logger.login('LoginPanel - Starting animations with fallback');
     _startAnimationsWithFallback();
   }
 
   void _startAnimations() async {
     try {
-      print('DEBUG: LoginPanel - Starting logo animation');
+      Logger.login('LoginPanel - Starting logo animation');
       await Future.delayed(const Duration(milliseconds: 100));
       if (mounted) {
         _logoController.forward();
-        print('DEBUG: LoginPanel - Logo animation started');
+        Logger.login('LoginPanel - Logo animation started');
 
         // Wait for logo animation to complete
         await Future.delayed(const Duration(milliseconds: 500));
-        print('DEBUG: LoginPanel - Logo animation completed');
+        Logger.login('LoginPanel - Logo animation completed');
       }
 
-      print('DEBUG: LoginPanel - Starting form animation');
+      Logger.login('LoginPanel - Starting form animation');
       await Future.delayed(const Duration(milliseconds: 200));
       if (mounted) {
         _formController.forward();
-        print('DEBUG: LoginPanel - Form animation started');
+        Logger.login('LoginPanel - Form animation started');
 
         // Wait for form animation to complete
         await Future.delayed(const Duration(milliseconds: 300));
-        print('DEBUG: LoginPanel - Form animation completed');
+        Logger.login('LoginPanel - Form animation completed');
       }
 
-      print('DEBUG: LoginPanel - Starting fade animation');
+      Logger.login('LoginPanel - Starting fade animation');
       await Future.delayed(const Duration(milliseconds: 100));
       if (mounted) {
         _fadeController.forward();
-        print('DEBUG: LoginPanel - Fade animation started');
+        Logger.login('LoginPanel - Fade animation started');
 
         // Wait for fade animation to complete
         await Future.delayed(const Duration(milliseconds: 200));
-        print('DEBUG: LoginPanel - Fade animation completed');
+        Logger.login('LoginPanel - Fade animation completed');
       }
 
-      print('DEBUG: LoginPanel - All animations completed');
+      Logger.login('LoginPanel - All animations completed');
     } catch (e) {
-      print('ERROR: Animation failed: $e');
+      Logger.error(' Animation failed: $e');
       // If animation fails, force the form to show
       if (mounted) {
         setState(() {
@@ -152,21 +153,21 @@ class _LoginPanelState extends State<LoginPanel> with TickerProviderStateMixin {
 
   void _startAnimationsWithFallback() async {
     try {
-      print('DEBUG: LoginPanel - Starting animations with fallback');
+      Logger.login('LoginPanel - Starting animations with fallback');
       _startAnimations();
-      print(
-          'DEBUG: LoginPanel - Animations with fallback completed successfully');
+      Logger.login(
+          'LoginPanel - Animations with fallback completed successfully');
     } catch (e) {
-      print('ERROR: Animation with fallback failed: $e');
+      Logger.error(' Animation with fallback failed: $e');
       // If all animations fail, force show form after a delay
       if (mounted) {
-        print('DEBUG: LoginPanel - Using fallback, forcing form to show');
+        Logger.login('LoginPanel - Using fallback, forcing form to show');
         await Future.delayed(const Duration(milliseconds: 1000));
         if (mounted) {
           setState(() {
             // Force rebuild to show form
           });
-          print('DEBUG: LoginPanel - Fallback form display triggered');
+          Logger.login('LoginPanel - Fallback form display triggered');
         }
       }
     }
@@ -207,7 +208,7 @@ class _LoginPanelState extends State<LoginPanel> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    print('DEBUG: LoginPanel - build method called');
+    Logger.login('LoginPanel - build method called');
     return BlocListener<AuthBloc, AuthState>(listener: (context, state) {
       if (state is Authenticated) {
         setState(() {

@@ -20,14 +20,13 @@ class BusinessStoreService {
 
       // Ensure token is saved during this process
       final session = _supabaseClient.auth.currentSession;
-      if (session != null && session.accessToken != null) {
+      if (session != null && session.accessToken.isNotEmpty) {
         Logger.business('Ensuring token is saved');
         await TokenService.saveToken(
-          session.accessToken,
-          session.expiresAt != null
-              ? DateTime.fromMillisecondsSinceEpoch(session.expiresAt! * 1000)
-              : DateTime.now().add(const Duration(hours: 1))
-        );
+            session.accessToken,
+            session.expiresAt != null
+                ? DateTime.fromMillisecondsSinceEpoch(session.expiresAt! * 1000)
+                : DateTime.now().add(const Duration(hours: 1)));
         Logger.business('Token saved successfully');
       }
 
@@ -105,7 +104,8 @@ class BusinessStoreService {
         'stores': storeResponse,
         'roles': roleResponse,
       };
-      Logger.business('Saving role assignment data with store_id: ${completeRoleAssignment['store_id']}');
+      Logger.business(
+          'Saving role assignment data with store_id: ${completeRoleAssignment['store_id']}');
       await LocalStorageService.saveRoleAssignmentData(completeRoleAssignment);
 
       // Debug: Check all stored data

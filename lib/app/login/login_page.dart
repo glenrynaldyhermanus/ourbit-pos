@@ -8,6 +8,7 @@ import 'package:ourbit_pos/blocs/auth_state.dart';
 import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/core/services/theme_service.dart';
 import 'package:ourbit_pos/src/core/utils/responsive.dart';
+import 'package:ourbit_pos/src/core/utils/logger.dart';
 import 'package:ourbit_pos/app/login/widgets/product_panel.dart';
 import 'package:ourbit_pos/app/login/widgets/login_panel.dart';
 
@@ -22,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    print('DEBUG: LoginPage - initState called');
+    Logger.login('LoginPage - initState called');
     // Don't call CheckAuthStatus here to avoid infinite loop
     // The router will handle authentication check
   }
@@ -44,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
       },
       child: Consumer<ThemeService>(
         builder: (context, themeService, _) {
-          print('DEBUG: LoginPage - Building scaffold');
+          Logger.login('LoginPage - Building scaffold');
           return Scaffold(
             backgroundColor: themeService.isDarkMode
                 ? AppColors.darkSurfaceBackground

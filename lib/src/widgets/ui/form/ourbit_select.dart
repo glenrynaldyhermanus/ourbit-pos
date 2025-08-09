@@ -170,7 +170,7 @@ class _OurbitSelectState<T> extends State<OurbitSelect<T>>
                           ],
                         );
                       },
-                    ),
+                    ).call,
                   ),
                 ),
               ),

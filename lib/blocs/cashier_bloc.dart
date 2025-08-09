@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ourbit_pos/src/core/config/app_config.dart';
+import 'package:ourbit_pos/src/core/utils/logger.dart';
 import 'package:ourbit_pos/src/data/objects/cart_item.dart';
 import 'package:ourbit_pos/src/data/usecases/add_to_cart_usecase.dart';
 import 'package:ourbit_pos/src/data/usecases/clear_cart_usecase.dart';
@@ -37,7 +38,7 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
         _updateCartQuantityUseCase = updateCartQuantityUseCase,
         _clearCartUseCase = clearCartUseCase,
         super(CashierInitial()) {
-    print('DEBUG: CashierBloc - Initializing with CashierInitial state');
+    Logger.cashier('Initializing with CashierInitial state');
     on<LoadProducts>(_onLoadProducts);
     on<ResetCashier>(_onResetCashier);
     on<LoadCategories>(_onLoadCategories);
@@ -54,18 +55,17 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
     ResetCashier event,
     Emitter<CashierState> emit,
   ) async {
-    print('DEBUG: CashierBloc - _onResetCashier called');
-    print(
-        'DEBUG: CashierBloc - Current state before reset: ${state.runtimeType}');
+    Logger.cashier('_onResetCashier called');
+    Logger.cashier('Current state before reset: ${state.runtimeType}');
     emit(CashierInitial());
-    print('DEBUG: CashierBloc - State reset to CashierInitial');
+    Logger.cashier('State reset to CashierInitial');
   }
 
   Future<void> _onLoadProducts(
     LoadProducts event,
     Emitter<CashierState> emit,
   ) async {
-    print('DEBUG: CashierBloc - _onLoadProducts called');
+    Logger.cashier('_onLoadProducts called');
     // Loading products...
     emit(CashierLoading());
     try {
@@ -80,8 +80,7 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
       final sortedCartItems = _sortCartItems(cartItems);
       final totals = _calculateTotals(sortedCartItems);
 
-      print(
-          'DEBUG: CashierBloc - Emitting CashierLoaded with ${products.length} products');
+      Logger.cashier('Emitting CashierLoaded with ${products.length} products');
       emit(CashierLoaded(
         products: products,
         categories: categories,
@@ -94,7 +93,7 @@ class CashierBloc extends Bloc<CashierEvent, CashierState> {
       ));
       // CashierLoaded state emitted with ${products.length} products
     } catch (e) {
-      print('DEBUG: CashierBloc - Error in _onLoadProducts: $e');
+      Logger.cashier('Error in _onLoadProducts: $e');
       emit(CashierError(e.toString()));
     }
   }

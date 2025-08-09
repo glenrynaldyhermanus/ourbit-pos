@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ourbit_pos/src/core/utils/logger.dart';
 
 class LocalStorageService {
   static const String _userKey = 'user_data';
@@ -59,9 +60,9 @@ class LocalStorageService {
   static Future<void> saveStoreData(Map<String, dynamic> storeData) async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = jsonEncode(storeData);
-    print('DEBUG: LocalStorageService - Saving store data: $jsonString');
+    Logger.debug('LocalStorageService - Saving store data: $jsonString');
     await prefs.setString(_storeKey, jsonString);
-    print('DEBUG: LocalStorageService - Store data saved successfully');
+    Logger.debug('LocalStorageService - Store data saved successfully');
   }
 
   static Future<Map<String, dynamic>?> getStoreData() async {
@@ -79,26 +80,27 @@ class LocalStorageService {
     final prefs = await SharedPreferences.getInstance();
 
     // Debug: Check what keys exist in roleData
-    print('DEBUG: Role data keys: ${roleData.keys.toList()}');
-    print('DEBUG: Role data contains roles: ${roleData.containsKey('roles')}');
-    print(
-        'DEBUG: Role data contains businesses: ${roleData.containsKey('businesses')}');
-    print(
-        'DEBUG: Role data contains stores: ${roleData.containsKey('stores')}');
-    print('DEBUG: Role data contains store_id: ${roleData.containsKey('store_id')}');
-    print('DEBUG: Role data store_id value: ${roleData['store_id']}');
+    Logger.debug('Role data keys: ${roleData.keys.toList()}');
+    Logger.debug('Role data contains roles: ${roleData.containsKey('roles')}');
+    Logger.debug(
+        'Role data contains businesses: ${roleData.containsKey('businesses')}');
+    Logger.debug(
+        'Role data contains stores: ${roleData.containsKey('stores')}');
+    Logger.debug(
+        'Role data contains store_id: ${roleData.containsKey('store_id')}');
+    Logger.debug('Role data store_id value: ${roleData['store_id']}');
 
     final jsonString = jsonEncode(roleData);
-    print('DEBUG: Saving role data to local storage: $jsonString');
+    Logger.debug('Saving role data to local storage: $jsonString');
     await prefs.setString(_roleAssignmentKey, jsonString);
-    print('DEBUG: Role assignment data saved successfully');
+    Logger.debug('Role assignment data saved successfully');
   }
 
   static Future<Map<String, dynamic>?> getRoleAssignmentData() async {
     final prefs = await SharedPreferences.getInstance();
     final roleString = prefs.getString(_roleAssignmentKey);
     if (roleString != null) {
-      print('DEBUG: Loading role data from local storage: $roleString');
+      Logger.debug('Loading role data from local storage: $roleString');
       return jsonDecode(roleString) as Map<String, dynamic>;
     }
     return null;
@@ -107,14 +109,14 @@ class LocalStorageService {
   // Get store ID from local storage
   static Future<String?> getStoreId() async {
     final roleData = await getRoleAssignmentData();
-    print('DEBUG: getStoreId - roleData: $roleData');
+    Logger.debug('getStoreId - roleData: $roleData');
     final storeId = roleData?['store_id'];
-    print('DEBUG: getStoreId - storeId: $storeId');
-    
+    Logger.debug('getStoreId - storeId: $storeId');
+
     // Also check store data directly
     final storeData = await getStoreData();
-    print('DEBUG: getStoreId - storeData: $storeData');
-    
+    Logger.debug('getStoreId - storeData: $storeData');
+
     return storeId;
   }
 
@@ -130,23 +132,23 @@ class LocalStorageService {
 
   // Debug method to check all stored data
   static Future<void> debugStoredData() async {
-    print('=== DEBUG: Checking all stored data ===');
-    
+    Logger.debug('=== DEBUG: Checking all stored data ===');
+
     final userData = await getUserData();
-    print('DEBUG: Stored user data: $userData');
-    
+    Logger.debug('Stored user data: $userData');
+
     final businessData = await getBusinessData();
-    print('DEBUG: Stored business data: $businessData');
-    
+    Logger.debug('Stored business data: $businessData');
+
     final storeData = await getStoreData();
-    print('DEBUG: Stored store data: $storeData');
-    
+    Logger.debug('Stored store data: $storeData');
+
     final roleData = await getRoleAssignmentData();
-    print('DEBUG: Stored role assignment data: $roleData');
-    
+    Logger.debug('Stored role assignment data: $roleData');
+
     final storeId = await getStoreId();
-    print('DEBUG: Retrieved store ID: $storeId');
-    
-    print('=== END DEBUG ===');
+    Logger.debug('Retrieved store ID: $storeId');
+
+    Logger.debug('=== END DEBUG ===');
   }
 }

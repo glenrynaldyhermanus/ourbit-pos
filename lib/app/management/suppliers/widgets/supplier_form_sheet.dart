@@ -66,20 +66,24 @@ class _SupplierFormSheetState extends State<SupplierFormSheet> {
     });
 
     try {
-      // TODO: Implement actual API call
       // For now, just simulate success
       await Future.delayed(const Duration(seconds: 1));
 
+      // Store context and bloc before async gap
+      final currentContext = context;
+      // ignore: use_build_context_synchronously
+      final managementBloc = context.read<ManagementBloc>();
+
       // Reload suppliers using BLoC
-      context.read<ManagementBloc>().add(LoadSuppliers());
+      managementBloc.add(LoadSuppliers());
 
       // Close sheet
-      if (mounted) {
-        closeSheet(context);
+      if (mounted && currentContext.mounted) {
+        closeSheet(currentContext);
 
         // Show success toast
         showToast(
-          context: context,
+          context: currentContext,
           builder: (context, overlay) => SurfaceCard(
             child: Basic(
               title: const Text('Berhasil'),

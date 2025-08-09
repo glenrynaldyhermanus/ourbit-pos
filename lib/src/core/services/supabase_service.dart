@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'local_storage_service.dart';
+import 'package:ourbit_pos/src/core/utils/logger.dart';
 
 class SupabaseService {
   static SupabaseClient get client => Supabase.instance.client;
@@ -178,14 +179,14 @@ class SupabaseService {
           .single();
 
       // Debug: Print role response data
-      print('DEBUG: Role response data: $roleResponse');
-      print('DEBUG: Roles data: ${roleResponse['roles']}');
+      Logger.supabase('Role response data: $roleResponse');
+      Logger.supabase(' Roles data: ${roleResponse['roles']}');
 
       // Debug: Check if roles data exists before saving
       if (roleResponse.containsKey('roles')) {
-        print('DEBUG: Roles data exists in roleResponse');
+        Logger.supabase(' Roles data exists in roleResponse');
       } else {
-        print('DEBUG: Roles data does NOT exist in roleResponse');
+        Logger.supabase(' Roles data does NOT exist in roleResponse');
       }
 
       await LocalStorageService.saveRoleAssignmentData(roleResponse);
@@ -257,20 +258,20 @@ class SupabaseService {
   // Check if user is authenticated
   static Future<bool> isUserAuthenticated() async {
     try {
-      print('🔐 SUPABASE: Checking if user is authenticated');
+      Logger.supabase(' Checking if user is authenticated');
       final user = client.auth.currentUser;
-      print('👤 SUPABASE: Current user: ${user?.email ?? "null"}');
-      print('📊 SUPABASE: Authentication result: ${user != null}');
+      Logger.supabase(' Current user: ${user?.email ?? "null"}');
+      Logger.supabase(' Authentication result: ${user != null}');
 
       if (user != null) {
-        print('✅ SUPABASE: User is authenticated - ${user.email}');
+        Logger.supabase(' User is authenticated - ${user.email}');
       } else {
-        print('❌ SUPABASE: No authenticated user found');
+        Logger.supabase(' No authenticated user found');
       }
 
       return user != null;
     } catch (e) {
-      print('❌ SUPABASE: Error in isUserAuthenticated: $e');
+      Logger.supabase(' Error in isUserAuthenticated: $e');
       return false;
     }
   }

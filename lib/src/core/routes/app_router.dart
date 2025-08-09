@@ -11,6 +11,7 @@ import 'package:ourbit_pos/app/reports/reports_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:ourbit_pos/src/core/services/token_service.dart';
 import 'package:ourbit_pos/src/core/services/supabase_service.dart';
+import 'package:ourbit_pos/src/core/utils/logger.dart';
 
 class AppRouter {
   static const String loginRoute = '/login';
@@ -43,7 +44,7 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/',
     redirect: (context, state) async {
-      print('DEBUG: AppRouter - Redirect called for: ${state.matchedLocation}');
+      Logger.debug('AppRouter - Redirect called for: ${state.matchedLocation}');
 
       // Check if user is authenticated
       try {
@@ -51,33 +52,33 @@ class AppRouter {
         if (kIsWeb) {
           final hasToken = await TokenService.handleTokenFromUrl();
           if (hasToken) {
-            print('DEBUG: AppRouter - Token found, redirecting to POS');
+            Logger.debug('AppRouter - Token found, redirecting to POS');
             return posRoute;
           }
         }
 
         // Check if user is authenticated via Supabase
         final isAuthenticated = await SupabaseService.isUserAuthenticated();
-        print('DEBUG: AppRouter - isAuthenticated: $isAuthenticated');
+        Logger.debug('AppRouter - isAuthenticated: $isAuthenticated');
 
         if (isAuthenticated) {
           // If authenticated and on root path, redirect to POS
           if (state.matchedLocation == '/') {
-            print(
-                'DEBUG: AppRouter - Authenticated on root, redirecting to POS');
+            Logger.debug(
+                'AppRouter - Authenticated on root, redirecting to POS');
             return posRoute;
           }
 
-          print(
-              'DEBUG: AppRouter - Authenticated, allowing access to: ${state.matchedLocation}');
+          Logger.debug(
+              'AppRouter - Authenticated, allowing access to: ${state.matchedLocation}');
           return null; // Allow access to requested route
         }
       } catch (e) {
-        print('DEBUG: AppRouter - Error in redirect: $e');
+        Logger.debug('AppRouter - Error in redirect: $e');
         // ignore: empty_catches
       }
 
-      print('DEBUG: AppRouter - Not authenticated, redirecting to login');
+      Logger.debug('AppRouter - Not authenticated, redirecting to login');
       // If not authenticated, redirect to login
       return loginRoute;
     },
@@ -110,7 +111,7 @@ class AppRouter {
               const LoginPage(),
             );
           } catch (e) {
-            print('ERROR: Failed to build login page: $e');
+            Logger.error('Failed to build login page: $e');
             return MaterialPage(
               child: Scaffold(
                 body: Center(

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ourbit_pos/blocs/auth_bloc.dart';
 import 'package:ourbit_pos/blocs/auth_event.dart';
 import 'package:ourbit_pos/blocs/auth_state.dart';
+import 'package:ourbit_pos/src/core/utils/logger.dart';
 
 class Sidebar extends StatefulWidget {
   const Sidebar({super.key});
@@ -95,7 +96,7 @@ class _SidebarState extends State<Sidebar> {
                 break;
               case 6:
                 // Logout functionality
-                print('DEBUG: Sidebar - Logout button clicked');
+                Logger.debug('Sidebar - Logout button clicked');
                 context.read<AuthBloc>().add(SignOutRequested());
                 break;
             }

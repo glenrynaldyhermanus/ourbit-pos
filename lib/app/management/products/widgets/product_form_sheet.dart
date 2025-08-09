@@ -88,21 +88,25 @@ class _ProductFormSheetState extends State<ProductFormSheet> {
       _isSubmitting = true;
     });
 
+    // Store context and bloc before async gap
+    final currentContext = context;
+    final managementBloc = context.read<ManagementBloc>();
+
     try {
-      // TODO: Implement actual API call
       // For now, just simulate success
       await Future.delayed(const Duration(seconds: 1));
 
       // Reload products using BLoC
-      context.read<ManagementBloc>().add(LoadProducts());
+      managementBloc.add(LoadProducts());
 
-      // Close sheet
-      closeSheet(context);
+      if (currentContext.mounted) {
+        // Close sheet
+        closeSheet(currentContext);
 
-      // Show success toast
-      if (mounted) {
+        // Show success toast
+
         showToast(
-          context: context,
+          context: currentContext,
           builder: (context, overlay) => SurfaceCard(
             child: Basic(
               title: const Text('Berhasil'),
@@ -120,9 +124,9 @@ class _ProductFormSheetState extends State<ProductFormSheet> {
       }
     } catch (e) {
       // Show error toast
-      if (mounted) {
+      if (currentContext.mounted) {
         showToast(
-          context: context,
+          context: currentContext,
           builder: (context, overlay) => SurfaceCard(
             child: Basic(
               title: const Text('Error'),
