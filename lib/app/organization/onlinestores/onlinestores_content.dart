@@ -9,6 +9,8 @@ import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_area.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_switch.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_radio_group.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_radio_card.dart';
 
 class OnlineStoresContent extends StatefulWidget {
   const OnlineStoresContent({super.key});
@@ -282,336 +284,360 @@ class _OnlineStoresContentState extends State<OnlineStoresContent> {
         final Color borderColor = themeService.isDarkMode
             ? const Color(0xff292524)
             : const Color(0xFFE5E7EB);
-        return SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                const Text(
-                  'Toko Online',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 4),
-                const Text('Kelola pengaturan toko online Anda'),
-                const SizedBox(height: 16),
-
-                // Online settings card
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: borderColor, width: 0.5),
-                    borderRadius: Theme.of(context).borderRadiusLg,
+        return Align(
+          alignment: Alignment.topLeft,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  const Text(
+                    'Toko Online',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Pengaturan Toko Online',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w600),
-                          ),
-                          OurbitSwitchBuilder.withLabel(
-                            value: _isOnlineActive,
-                            onChanged: (v) =>
-                                setState(() => _isOnlineActive = v),
-                            label: 'Aktifkan',
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      if (_isOnlineActive) ...[
-                        // Subdomain
-                        const Text('Subdomain'),
-                        const SizedBox(height: 8),
+                  const SizedBox(height: 4),
+                  const Text('Kelola pengaturan toko online Anda'),
+                  const SizedBox(height: 16),
+
+                  // Online settings card
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: borderColor, width: 0.5),
+                      borderRadius: Theme.of(context).borderRadiusLg,
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 12),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: Theme.of(context).colorScheme.border,
-                                    width: 1),
-                                borderRadius: Theme.of(context).borderRadiusSm,
-                              ),
-                              child: const Text('ourbit.web.app/@'),
+                            const Text(
+                              'Pengaturan Toko Online',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w600),
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: OurbitTextInput(
-                                controller: _subdomainController,
-                                placeholder: 'namabisnis',
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Contact email
-                        const Text('Email Kontak'),
-                        const SizedBox(height: 8),
-                        OurbitTextInput(
-                          controller: _contactEmailController,
-                          placeholder: 'contact@example.com',
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Description
-                        const Text('Deskripsi Toko'),
-                        const SizedBox(height: 8),
-                        OurbitTextArea(
-                          controller: _descriptionController,
-                          placeholder: 'Deskripsi toko Anda...',
-                          initialHeight: 100,
-                          expandableHeight: true,
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Socials
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text('Facebook URL'),
-                                  const SizedBox(height: 8),
-                                  OurbitTextInput(
-                                    controller: _facebookController,
-                                    placeholder: 'https://facebook.com/...',
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text('Instagram URL'),
-                                  const SizedBox(height: 8),
-                                  OurbitTextInput(
-                                    controller: _instagramController,
-                                    placeholder: 'https://instagram.com/...',
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text('Twitter URL'),
-                                  const SizedBox(height: 8),
-                                  OurbitTextInput(
-                                    controller: _twitterController,
-                                    placeholder: 'https://twitter.com/...',
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Stock Tracking
-                        const Text('Tracking Stok'),
-                        const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 8,
-                          children: [
-                            OurbitButton.outline(
-                              onPressed: () =>
-                                  setState(() => _stockTracking = 1),
-                              label: 'Real-time',
-                              // OurbitButton.outline tidak punya isActive; gunakan style default
-                            ),
-                            OurbitButton.outline(
-                              onPressed: () =>
-                                  setState(() => _stockTracking = 2),
-                              label: 'Manual',
-                              // style default
-                            ),
-                            OurbitButton.outline(
-                              onPressed: () =>
-                                  setState(() => _stockTracking = 3),
-                              label: 'Tidak Ada',
-                              // style default
+                            OurbitSwitchBuilder.withLabel(
+                              value: _isOnlineActive,
+                              onChanged: (v) =>
+                                  setState(() => _isOnlineActive = v),
+                              label: 'Aktifkan',
                             ),
                           ],
                         ),
                         const SizedBox(height: 16),
+                        if (_isOnlineActive) ...[
+                          // Subdomain
+                          const Text('Subdomain'),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 12),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color:
+                                          Theme.of(context).colorScheme.border,
+                                      width: 1),
+                                  borderRadius:
+                                      Theme.of(context).borderRadiusSm,
+                                ),
+                                child: const Text('ourbit.web.app/@'),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: OurbitTextInput(
+                                  controller: _subdomainController,
+                                  placeholder: 'namabisnis',
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
 
-                        OurbitButton.primary(
-                          onPressed: _saving ? null : _saveSettings,
-                          isLoading: _saving,
-                          label: 'Simpan Pengaturan',
+                          // Contact email
+                          const Text('Email Kontak'),
+                          const SizedBox(height: 8),
+                          OurbitTextInput(
+                            controller: _contactEmailController,
+                            placeholder: 'contact@example.com',
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Description
+                          const Text('Deskripsi Toko'),
+                          const SizedBox(height: 8),
+                          OurbitTextArea(
+                            controller: _descriptionController,
+                            placeholder: 'Deskripsi toko Anda...',
+                            initialHeight: 100,
+                            expandableHeight: true,
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Socials
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Facebook URL'),
+                                    const SizedBox(height: 8),
+                                    OurbitTextInput(
+                                      controller: _facebookController,
+                                      placeholder: 'https://facebook.com/...',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Instagram URL'),
+                                    const SizedBox(height: 8),
+                                    OurbitTextInput(
+                                      controller: _instagramController,
+                                      placeholder: 'https://instagram.com/...',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Twitter URL'),
+                                    const SizedBox(height: 8),
+                                    OurbitTextInput(
+                                      controller: _twitterController,
+                                      placeholder: 'https://twitter.com/...',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Stock Tracking
+                          const Text('Tracking Stok'),
+                          const SizedBox(height: 8),
+                          OurbitRadioGroup<int>(
+                            value: _stockTracking,
+                            onChanged: (val) =>
+                                setState(() => _stockTracking = val),
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: const [
+                                  OurbitRadioCard<int>(
+                                    value: 1,
+                                    child: Basic(
+                                      title: Text('Real-time'),
+                                      content: Text(
+                                          'Kurangi stok otomatis saat pesanan masuk'),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  OurbitRadioCard<int>(
+                                    value: 2,
+                                    child: Basic(
+                                      title: Text('Manual'),
+                                      content: Text(
+                                          'Update stok dilakukan secara manual'),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  OurbitRadioCard<int>(
+                                    value: 3,
+                                    child: Basic(
+                                      title: Text('Tidak Ada'),
+                                      content:
+                                          Text('Tidak melakukan tracking stok'),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          OurbitButton.primary(
+                            onPressed: _saving ? null : _saveSettings,
+                            isLoading: _saving,
+                            label: 'Simpan Pengaturan',
+                          ),
+                        ] else ...[
+                          OurbitButton.primary(
+                            onPressed: _saving ? null : _saveSettings,
+                            isLoading: _saving,
+                            label: 'Simpan',
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Delivery Locations card
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: borderColor, width: 0.5),
+                      borderRadius: Theme.of(context).borderRadiusLg,
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Lokasi Pengiriman',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600),
                         ),
-                      ] else ...[
-                        OurbitButton.primary(
-                          onPressed: _saving ? null : _saveSettings,
-                          isLoading: _saving,
-                          label: 'Simpan',
+                        const SizedBox(height: 12),
+
+                        // Stores
+                        const Text('Toko'),
+                        const SizedBox(height: 8),
+                        Column(
+                          children: [
+                            for (final s in _stores)
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                margin: const EdgeInsets.only(bottom: 8),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: borderColor, width: 0.5),
+                                  borderRadius:
+                                      Theme.of(context).borderRadiusMd,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text((s['name'] ?? '-') as String,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w600)),
+                                        Text(
+                                          s['is_online_delivery_active'] == true
+                                              ? 'Aktif untuk pengiriman online'
+                                              : 'Tidak aktif',
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .mutedForeground,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    OurbitSwitchBuilder.withLabel(
+                                      value: s['is_online_delivery_active'] ==
+                                          true,
+                                      onChanged: (checked) {
+                                        if (_togglingStores.contains(
+                                            (s['id'] ?? '').toString())) {
+                                          return;
+                                        }
+                                        _toggleStoreDelivery(
+                                            (s['id'] ?? '').toString(),
+                                            checked);
+                                      },
+                                      label: '',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            if (_stores.isEmpty)
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                                child: Center(child: Text('Belum ada toko')),
+                              ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Warehouses
+                        const Text('Gudang'),
+                        const SizedBox(height: 8),
+                        Column(
+                          children: [
+                            for (final w in _warehouses)
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                margin: const EdgeInsets.only(bottom: 8),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: borderColor, width: 0.5),
+                                  borderRadius:
+                                      Theme.of(context).borderRadiusMd,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text((w['name'] ?? '-') as String,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w600)),
+                                        Text(
+                                          w['is_online_delivery_active'] == true
+                                              ? 'Aktif untuk pengiriman online'
+                                              : 'Tidak aktif',
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .mutedForeground,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    OurbitSwitchBuilder.withLabel(
+                                      value: w['is_online_delivery_active'] ==
+                                          true,
+                                      onChanged: (checked) {
+                                        if (_togglingWarehouses.contains(
+                                            (w['id'] ?? '').toString())) {
+                                          return;
+                                        }
+                                        _toggleWarehouseDelivery(
+                                            (w['id'] ?? '').toString(),
+                                            checked);
+                                      },
+                                      label: '',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            if (_warehouses.isEmpty)
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                                child: Center(child: Text('Belum ada gudang')),
+                              ),
+                          ],
                         ),
                       ],
-                    ],
+                    ),
                   ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Delivery Locations card
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: borderColor, width: 0.5),
-                    borderRadius: Theme.of(context).borderRadiusLg,
-                  ),
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Lokasi Pengiriman',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Stores
-                      const Text('Toko'),
-                      const SizedBox(height: 8),
-                      Column(
-                        children: [
-                          for (final s in _stores)
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              margin: const EdgeInsets.only(bottom: 8),
-                              decoration: BoxDecoration(
-                                border:
-                                    Border.all(color: borderColor, width: 0.5),
-                                borderRadius: Theme.of(context).borderRadiusMd,
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text((s['name'] ?? '-') as String,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.w600)),
-                                      Text(
-                                        s['is_online_delivery_active'] == true
-                                            ? 'Aktif untuk pengiriman online'
-                                            : 'Tidak aktif',
-                                        style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .mutedForeground,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  OurbitSwitchBuilder.withLabel(
-                                    value:
-                                        s['is_online_delivery_active'] == true,
-                                    onChanged: (checked) {
-                                      if (_togglingStores.contains(
-                                          (s['id'] ?? '').toString())) {
-                                        return;
-                                      }
-                                      _toggleStoreDelivery(
-                                          (s['id'] ?? '').toString(), checked);
-                                    },
-                                    label: '',
-                                  ),
-                                ],
-                              ),
-                            ),
-                          if (_stores.isEmpty)
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 12),
-                              child: Center(child: Text('Belum ada toko')),
-                            ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Warehouses
-                      const Text('Gudang'),
-                      const SizedBox(height: 8),
-                      Column(
-                        children: [
-                          for (final w in _warehouses)
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              margin: const EdgeInsets.only(bottom: 8),
-                              decoration: BoxDecoration(
-                                border:
-                                    Border.all(color: borderColor, width: 0.5),
-                                borderRadius: Theme.of(context).borderRadiusMd,
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text((w['name'] ?? '-') as String,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.w600)),
-                                      Text(
-                                        w['is_online_delivery_active'] == true
-                                            ? 'Aktif untuk pengiriman online'
-                                            : 'Tidak aktif',
-                                        style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .mutedForeground,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  OurbitSwitchBuilder.withLabel(
-                                    value:
-                                        w['is_online_delivery_active'] == true,
-                                    onChanged: (checked) {
-                                      if (_togglingWarehouses.contains(
-                                          (w['id'] ?? '').toString())) {
-                                        return;
-                                      }
-                                      _toggleWarehouseDelivery(
-                                          (w['id'] ?? '').toString(), checked);
-                                    },
-                                    label: '',
-                                  ),
-                                ],
-                              ),
-                            ),
-                          if (_warehouses.isEmpty)
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 12),
-                              child: Center(child: Text('Belum ada gudang')),
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
