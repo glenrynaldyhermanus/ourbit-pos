@@ -1,4 +1,4 @@
-# Ourbit POS
+# Ourbit Kasir
 
 Aplikasi Point of Sale (POS) yang dibangun dengan Flutter untuk desktop, tablet, dan web. Terintegrasi dengan aplikasi Next.js CMS untuk autentikasi seamless.
 

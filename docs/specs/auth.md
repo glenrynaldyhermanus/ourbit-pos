@@ -1,8 +1,8 @@
-# Sistem Autentikasi Ourbit POS
+# Sistem Autentikasi Ourbit Kasir
 
 ## Overview
 
-Dokumen ini menjelaskan sistem autentikasi Ourbit POS yang mencakup validasi token otomatis, pengecekan status autentikasi di AppBar, dan support untuk aplikasi offline. Sistem telah diperbaiki untuk mengatasi masalah logout otomatis dengan menambahkan refresh session otomatis dan validasi yang lebih akurat.
+Dokumen ini menjelaskan sistem autentikasi Ourbit Kasir yang mencakup validasi token otomatis, pengecekan status autentikasi di AppBar, dan support untuk aplikasi offline. Sistem telah diperbaiki untuk mengatasi masalah logout otomatis dengan menambahkan refresh session otomatis dan validasi yang lebih akurat.
 
 ## Flow Diagram
 

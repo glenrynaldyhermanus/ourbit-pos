@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeService>(
         builder: (context, themeService, child) {
           return ShadcnApp.router(
-            title: 'Ourbit POS',
+            title: 'Ourbit Kasir',
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
               colorScheme: ColorSchemes.lightOrange()

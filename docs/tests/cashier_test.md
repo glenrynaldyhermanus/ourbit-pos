@@ -1,8 +1,8 @@
-# Test Script Cashier Flow Ourbit POS
+# Test Script Cashier Flow Ourbit Kasir
 
 ## Overview
 
-Dokumen ini berisi test script untuk menguji keseluruhan flow cashier aplikasi Ourbit POS berdasarkan spesifikasi di `docs/specs/cashier.md`. Test script ini mencakup semua skenario dari cart management hingga payment processing, termasuk happy path, error cases, dan integrasi BLoC architecture.
+Dokumen ini berisi test script untuk menguji keseluruhan flow cashier aplikasi Ourbit Kasir berdasarkan spesifikasi di `docs/specs/cashier.md`. Test script ini mencakup semua skenario dari cart management hingga payment processing, termasuk happy path, error cases, dan integrasi BLoC architecture.
 
 ## Test Environment Setup
 

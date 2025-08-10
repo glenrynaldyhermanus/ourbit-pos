@@ -123,7 +123,7 @@ class _ProductPanelState extends State<ProductPanel>
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 const Text(
-                                  'Ourbit POS',
+                                  'Ourbit Kasir',
                                   style: TextStyle(
                                     fontSize: 48,
                                     fontWeight: FontWeight.bold,

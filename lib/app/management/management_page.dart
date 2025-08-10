@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
 import 'package:ourbit_pos/src/widgets/navigation/sidebar.dart';
 import 'package:ourbit_pos/blocs/management_bloc.dart';
 import 'package:ourbit_pos/blocs/management_event.dart';
@@ -119,26 +121,33 @@ class _ManagementPageState extends State<ManagementPage> {
                       return Row(
                         children: [
                           // Menu Panel
-                          Container(
-                            width: 300,
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              border: Border(
-                                right: BorderSide(
-                                  color: Colors.gray.shade300,
-                                  width: 1,
+                          Consumer<ThemeService>(
+                            builder: (context, themeService, _) {
+                              final bool isDark = themeService.isDarkMode;
+                              return Container(
+                                width: 300,
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  border: Border(
+                                    right: BorderSide(
+                                      color: isDark
+                                          ? const Color(0xff292524)
+                                          : const Color(0xFFE5E7EB),
+                                      width: 0.5,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            child: ManagementMenuWidget(
-                              menuItems: _menuItems,
-                              initialSelectedMenu: _selectedMenu,
-                              onMenuSelected: (menuId) {
-                                context.read<ManagementBloc>().add(
-                                      SelectManagementMenu(menuId: menuId),
-                                    );
-                              },
-                            ),
+                                child: ManagementMenuWidget(
+                                  menuItems: _menuItems,
+                                  initialSelectedMenu: _selectedMenu,
+                                  onMenuSelected: (menuId) {
+                                    context.read<ManagementBloc>().add(
+                                          SelectManagementMenu(menuId: menuId),
+                                        );
+                                  },
+                                ),
+                              );
+                            },
                           ),
 
                           // Content Panel

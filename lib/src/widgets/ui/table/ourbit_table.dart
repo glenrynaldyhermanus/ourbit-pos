@@ -54,7 +54,7 @@ class OurbitTable extends StatelessWidget {
             borderRadius: borderRadius ?? theme.borderRadiusLg,
             border: Border.all(
               color: borderColor ?? theme.colorScheme.border,
-              width: 1,
+              width: 0.5,
             ),
           ),
           child: scrollable ? _buildScrollableTable() : _buildBasicTable(),

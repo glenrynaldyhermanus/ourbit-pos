@@ -1,8 +1,8 @@
-# Flow Login Ourbit POS
+# Flow Login Ourbit Kasir
 
 ## Overview
 
-Dokumen ini menjelaskan alur login aplikasi Ourbit POS yang mengikuti validasi bertingkat untuk memastikan user memiliki akses yang tepat ke sistem. Sistem telah diperbaiki untuk mengatasi masalah logout otomatis dengan menambahkan refresh session otomatis dan validasi yang lebih akurat.
+Dokumen ini menjelaskan alur login aplikasi Ourbit Kasir yang mengikuti validasi bertingkat untuk memastikan user memiliki akses yang tepat ke sistem. Sistem telah diperbaiki untuk mengatasi masalah logout otomatis dengan menambahkan refresh session otomatis dan validasi yang lebih akurat.
 
 ## Flow Diagram
 

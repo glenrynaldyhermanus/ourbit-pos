@@ -29,3 +29,5 @@ alwaysApply: true
 **Gunakan Built In Flutter Widget Last** - Terakhir sekali jika widget di kedua source diatas tidak ada baru gunakan widget Flutter.
 **Cara Menggunakan shadcn** - Cek shadcn-rule.mdc untuk penggunaan widget Ourbit dan Shadcn.
 **Default UI Import** - Kalau sudah pakai import 'package:shadcn_flutter/shadcn_flutter.dart', tidak perlu import 'package:flutter/material.dart' lagi, kalau masih perlu import material, dibuat seperti ini import 'package:flutter/material.dart' as material
+
+Jangan gunakan showSnackBar, instead gunakan OurbitToast

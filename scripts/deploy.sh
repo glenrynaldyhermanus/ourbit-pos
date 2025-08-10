@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Ourbit POS Deploy Script
+# Ourbit Kasir Deploy Script
 # Script untuk deploy aplikasi Flutter web ke Firebase Hosting
 
 set -e  # Exit on any error

@@ -313,7 +313,7 @@ class _LoginPanelState extends State<LoginPanel> with TickerProviderStateMixin {
                                 ),
                                 const Gap(8),
                                 Text(
-                                  'Masuk ke akun Ourbit POS Anda',
+                                  'Masuk ke akun Ourbit Kasir Anda',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: themeService.isDarkMode

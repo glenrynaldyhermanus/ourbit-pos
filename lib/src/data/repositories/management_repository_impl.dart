@@ -1,7 +1,9 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ourbit_pos/src/data/objects/product.dart';
 import 'package:ourbit_pos/src/core/services/local_storage_service.dart';
+import 'package:ourbit_pos/src/core/utils/logger.dart';
 import 'management_repository.dart';
+import 'package:ourbit_pos/src/core/services/supabase_service.dart';
 
 class ManagementRepositoryImpl implements ManagementRepository {
   final SupabaseClient _supabaseClient;
@@ -47,7 +49,8 @@ class ManagementRepositoryImpl implements ManagementRepository {
   @override
   Future<void> createProduct(Map<String, dynamic> productData) async {
     try {
-      final storeId = await LocalStorageService.getStoreId();
+      String? storeId = await LocalStorageService.getStoreId();
+      storeId ??= await SupabaseService.getStoreId();
       if (storeId == null) {
         throw Exception('Store ID not found');
       }
@@ -58,9 +61,15 @@ class ManagementRepositoryImpl implements ManagementRepository {
         'store_id': storeId,
       };
 
-      await _supabaseClient.from('products').insert(productDataWithStore);
+      Logger.supabase(
+          'REPO: createProduct payload=${productDataWithStore.toString()}');
+
+      final res =
+          await _supabaseClient.from('products').insert(productDataWithStore);
+      Logger.supabase('REPO: createProduct response=$res');
     } catch (e) {
-      throw Exception('Failed to create product');
+      Logger.error('REPO: createProduct error=${e.toString()}');
+      throw Exception('Failed to create product: ${e.toString()}');
     }
   }
 
@@ -68,18 +77,28 @@ class ManagementRepositoryImpl implements ManagementRepository {
   Future<void> updateProduct(
       String id, Map<String, dynamic> productData) async {
     try {
-      await _supabaseClient.from('products').update(productData).eq('id', id);
+      Logger.supabase(
+          'REPO: updateProduct id=$id payload=${productData.toString()}');
+      final res = await _supabaseClient
+          .from('products')
+          .update(productData)
+          .eq('id', id);
+      Logger.supabase('REPO: updateProduct response=$res');
     } catch (e) {
-      throw Exception('Failed to update product');
+      Logger.error('REPO: updateProduct error=${e.toString()}');
+      throw Exception('Failed to update product: ${e.toString()}');
     }
   }
 
   @override
   Future<void> deleteProduct(String id) async {
     try {
-      await _supabaseClient.from('products').delete().eq('id', id);
+      Logger.supabase('REPO: deleteProduct id=$id');
+      final res = await _supabaseClient.from('products').delete().eq('id', id);
+      Logger.supabase('REPO: deleteProduct response=$res');
     } catch (e) {
-      throw Exception('Failed to delete product');
+      Logger.error('REPO: deleteProduct error=${e.toString()}');
+      throw Exception('Failed to delete product: ${e.toString()}');
     }
   }
 

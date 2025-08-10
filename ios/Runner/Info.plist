@@ -4,8 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
-	<key>CFBundleDisplayName</key>
-	<string>Ourbit Pos</string>
+    <key>CFBundleDisplayName</key>
+    <string>Ourbit Kasir</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+  <key>NSBluetoothAlwaysUsageDescription</key>
+  <string>Aplikasi membutuhkan akses Bluetooth untuk menghubungkan ke printer thermal.</string>
+  <key>NSBluetoothPeripheralUsageDescription</key>
+  <string>Aplikasi membutuhkan akses Bluetooth untuk menghubungkan ke printer thermal.</string>
 </dict>
 </plist>

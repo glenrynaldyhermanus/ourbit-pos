@@ -1,8 +1,8 @@
-# Test Script Login Ourbit POS
+# Test Script Login Ourbit Kasir
 
 ## Overview
 
-Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berdasarkan spesifikasi di `docs/specs/login.md`. Test script ini mencakup semua skenario termasuk happy path dan error cases.
+Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit Kasir berdasarkan spesifikasi di `docs/specs/login.md`. Test script ini mencakup semua skenario termasuk happy path dan error cases.
 
 ## Test Environment Setup
 
@@ -98,7 +98,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 
 **Test Steps**:
 
-1. Buka aplikasi Ourbit POS
+1. Buka aplikasi Ourbit Kasir
 2. Masukkan email: `test@ourbit.com`
 3. Masukkan password: `testpassword123`
 4. Klik tombol "Login"
@@ -137,7 +137,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 
 **Test Steps**:
 
-1. Buka aplikasi Ourbit POS
+1. Buka aplikasi Ourbit Kasir
 2. Biarkan field email kosong
 3. Masukkan password: `testpassword123`
 4. Klik tombol "Login"
@@ -157,7 +157,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 
 **Test Steps**:
 
-1. Buka aplikasi Ourbit POS
+1. Buka aplikasi Ourbit Kasir
 2. Masukkan email: `test@ourbit.com`
 3. Biarkan field password kosong
 4. Klik tombol "Login"
@@ -177,7 +177,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 
 **Test Steps**:
 
-1. Buka aplikasi Ourbit POS
+1. Buka aplikasi Ourbit Kasir
 2. Masukkan email: `invalid-email`
 3. Masukkan password: `testpassword123`
 4. Klik tombol "Login"
@@ -197,7 +197,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 
 **Test Steps**:
 
-1. Buka aplikasi Ourbit POS
+1. Buka aplikasi Ourbit Kasir
 2. Masukkan email: `nonexistent@ourbit.com`
 3. Masukkan password: `wrongpassword`
 4. Klik tombol "Login"
@@ -218,7 +218,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 
 **Test Steps**:
 
-1. Buka aplikasi Ourbit POS
+1. Buka aplikasi Ourbit Kasir
 2. Masukkan email: `test@ourbit.com`
 3. Masukkan password: `wrongpassword`
 4. Klik tombol "Login"
@@ -243,7 +243,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 
 **Test Steps**:
 
-1. Buka aplikasi Ourbit POS
+1. Buka aplikasi Ourbit Kasir
 2. Masukkan email: `user-without-role@ourbit.com`
 3. Masukkan password: `testpassword123`
 4. Klik tombol "Login"
@@ -270,7 +270,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 
 **Test Steps**:
 
-1. Buka aplikasi Ourbit POS
+1. Buka aplikasi Ourbit Kasir
 2. Masukkan email: `user-inactive-business@ourbit.com`
 3. Masukkan password: `testpassword123`
 4. Klik tombol "Login"
@@ -299,7 +299,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 
 **Test Steps**:
 
-1. Buka aplikasi Ourbit POS
+1. Buka aplikasi Ourbit Kasir
 2. Masukkan email: `user-inactive-store@ourbit.com`
 3. Masukkan password: `testpassword123`
 4. Klik tombol "Login"
@@ -323,7 +323,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 **Test Steps**:
 
 1. Matikan koneksi internet
-2. Buka aplikasi Ourbit POS
+2. Buka aplikasi Ourbit Kasir
 3. Masukkan email: `test@ourbit.com`
 4. Masukkan password: `testpassword123`
 5. Klik tombol "Login"
@@ -347,7 +347,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 
 **Test Steps**:
 
-1. Buka aplikasi Ourbit POS
+1. Buka aplikasi Ourbit Kasir
 2. Masukkan email: `test@ourbit.com`
 3. Masukkan password: `testpassword123`
 4. Klik tombol "Login"
@@ -367,7 +367,7 @@ Dokumen ini berisi test script untuk menguji flow login aplikasi Ourbit POS berd
 
 **Test Steps**:
 
-1. Buka aplikasi Ourbit POS
+1. Buka aplikasi Ourbit Kasir
 2. Masukkan kredensial valid
 3. Klik tombol "Login"
 4. Amati loading state

@@ -67,6 +67,9 @@ dependencies:
   #UI
   shadcn_flutter: ^0.0.37
   gap: ^3.0.1
+  bluetooth_print: ^4.3.0
+  printing: ^5.14.2
+  pdf: ^3.11.3
 
 dev_dependencies:
   flutter_test:

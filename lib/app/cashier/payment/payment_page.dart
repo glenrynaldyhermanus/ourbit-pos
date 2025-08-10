@@ -5,6 +5,9 @@ import 'package:ourbit_pos/blocs/payment_bloc.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_area.dart';
 import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
+import 'package:ourbit_pos/src/core/services/printer_service.dart';
+import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_toast.dart';
+import 'package:ourbit_pos/src/core/services/receipt_pdf_service.dart';
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -19,6 +22,11 @@ class _PaymentPageState extends State<PaymentPage>
   late Animation<double> _fadeAnimation;
   String salesDraftNote = '';
   Map<String, dynamic>? selectedPaymentMethod;
+  // Snapshot for printing after success
+  List<Map<String, dynamic>> _lastCartItems = const [];
+  double _lastSubtotal = 0.0;
+  double _lastTax = 0.0;
+  double _lastTotal = 0.0;
 
   @override
   void initState() {
@@ -110,9 +118,10 @@ class _PaymentPageState extends State<PaymentPage>
   void _processPayment(List<Map<String, dynamic>> cartItems, double subtotal,
       double tax, double total) {
     if (selectedPaymentMethod == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Pilih metode pembayaran terlebih dahulu')),
+      OurbitToast.warning(
+        context: context,
+        title: 'Perhatian',
+        content: 'Pilih metode pembayaran terlebih dahulu',
       );
       return;
     }
@@ -145,10 +154,47 @@ class _PaymentPageState extends State<PaymentPage>
           if (state is PaymentLoaded) {
             _animationController.forward();
           } else if (state is PaymentSuccess) {
+            // Fire and forget printing using last snapshot
+            if (_lastCartItems.isNotEmpty && _lastTotal > 0) {
+              // On mobile use Bluetooth; else use system print (PDF)
+              (() async {
+                try {
+                  // ignore: avoid_print
+                  if (Theme.of(context).platform == TargetPlatform.android ||
+                      Theme.of(context).platform == TargetPlatform.iOS) {
+                    await PrinterService.instance.printReceipt(
+                      title: 'Struk Pembelian',
+                      items: _lastCartItems,
+                      subtotal: _lastSubtotal,
+                      tax: _lastTax,
+                      total: _lastTotal,
+                      footerNote: 'ID Transaksi: ${state.saleId}',
+                    );
+                  } else {
+                    await ReceiptPdfService.instance.printReceipt(
+                      title: 'Struk Pembelian',
+                      items: _lastCartItems,
+                      subtotal: _lastSubtotal,
+                      tax: _lastTax,
+                      total: _lastTotal,
+                      footerNote: 'ID Transaksi: ${state.saleId}',
+                    );
+                  }
+                } catch (e) {
+                  OurbitToast.error(
+                    context: context,
+                    title: 'Gagal',
+                    content: 'Cetak gagal: $e',
+                  );
+                }
+              })();
+            }
             context.go('/success');
           } else if (state is PaymentError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error: ${state.message}')),
+            OurbitToast.error(
+              context: context,
+              title: 'Gagal',
+              content: 'Error: ${state.message}',
             );
           }
         },
@@ -513,6 +559,13 @@ class _PaymentPageState extends State<PaymentPage>
                                 : () async {
                                     final confirmed = await _promptSalesDraft();
                                     if (confirmed == true) {
+                                      // snapshot values for printing after success
+                                      _lastCartItems =
+                                          List<Map<String, dynamic>>.from(
+                                              cartItems);
+                                      _lastSubtotal = subtotal;
+                                      _lastTax = tax;
+                                      _lastTotal = total;
                                       _processPayment(
                                           cartItems, subtotal, tax, total);
                                     }

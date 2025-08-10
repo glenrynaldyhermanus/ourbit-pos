@@ -8,6 +8,8 @@ import '../src/data/usecases/get_suppliers_usecase.dart';
 import '../src/data/usecases/get_discounts_usecase.dart';
 import '../src/data/usecases/get_expenses_usecase.dart';
 import '../src/data/usecases/get_loyalty_programs_usecase.dart';
+import '../src/data/repositories/management_repository.dart';
+import 'package:ourbit_pos/src/core/utils/logger.dart';
 
 class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   final GetAllProductsUseCase _getAllProductsUseCase;
@@ -17,6 +19,7 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   final GetDiscountsUseCase _getDiscountsUseCase;
   final GetExpensesUseCase _getExpensesUseCase;
   final GetLoyaltyProgramsUseCase _getLoyaltyProgramsUseCase;
+  final ManagementRepository _managementRepository;
 
   ManagementBloc({
     required GetAllProductsUseCase getAllProductsUseCase,
@@ -26,6 +29,7 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
     required GetDiscountsUseCase getDiscountsUseCase,
     required GetExpensesUseCase getExpensesUseCase,
     required GetLoyaltyProgramsUseCase getLoyaltyProgramsUseCase,
+    required ManagementRepository managementRepository,
   })  : _getAllProductsUseCase = getAllProductsUseCase,
         _getCategoriesUseCase = getCategoriesUseCase,
         _getCustomersUseCase = getCustomersUseCase,
@@ -33,6 +37,7 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
         _getDiscountsUseCase = getDiscountsUseCase,
         _getExpensesUseCase = getExpensesUseCase,
         _getLoyaltyProgramsUseCase = getLoyaltyProgramsUseCase,
+        _managementRepository = managementRepository,
         super(ManagementInitial()) {
     on<LoadProducts>(_onLoadProducts);
     on<LoadCategories>(_onLoadCategories);
@@ -71,11 +76,14 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
 
   Future<void> _onLoadProducts(
       LoadProducts event, Emitter<ManagementState> emit) async {
+    Logger.debug('BLOC: LoadProducts start');
     emit(ManagementLoading());
     try {
       final products = await _getAllProductsUseCase.execute();
+      Logger.debug('BLOC: LoadProducts success count=${products.length}');
       emit(ProductsLoaded(products));
     } catch (e) {
+      Logger.error('BLOC: LoadProducts error ${e.toString()}');
       emit(ManagementError(e.toString()));
     }
   }
@@ -161,10 +169,13 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onUpdateProduct(
       UpdateProduct event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 1));
+      Logger.debug('BLOC: UpdateProduct id=${event.productId}');
+      await _managementRepository.updateProduct(
+          event.productId, event.productData);
+      Logger.debug('BLOC: UpdateProduct success');
       add(LoadProducts());
     } catch (e) {
+      Logger.error('BLOC: UpdateProduct error ${e.toString()}');
       emit(ManagementError(e.toString()));
     }
   }
@@ -172,10 +183,12 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onCreateProduct(
       CreateProduct event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 1));
+      Logger.debug('BLOC: CreateProduct payload=${event.productData}');
+      await _managementRepository.createProduct(event.productData);
+      Logger.debug('BLOC: CreateProduct success');
       add(LoadProducts());
     } catch (e) {
+      Logger.error('BLOC: CreateProduct error ${e.toString()}');
       emit(ManagementError(e.toString()));
     }
   }
@@ -183,10 +196,12 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onDeleteProduct(
       DeleteProduct event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 1));
+      Logger.debug('BLOC: DeleteProduct id=${event.productId}');
+      await _managementRepository.deleteProduct(event.productId);
+      Logger.debug('BLOC: DeleteProduct success');
       add(LoadProducts());
     } catch (e) {
+      Logger.error('BLOC: DeleteProduct error ${e.toString()}');
       emit(ManagementError(e.toString()));
     }
   }
@@ -194,10 +209,12 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onCreateCategory(
       CreateCategory event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 1));
+      Logger.debug('BLOC: CreateCategory payload=${event.categoryData}');
+      await _managementRepository.createCategory(event.categoryData);
+      Logger.debug('BLOC: CreateCategory success');
       add(LoadCategories());
     } catch (e) {
+      Logger.error('BLOC: CreateCategory error ${e.toString()}');
       emit(ManagementError(e.toString()));
     }
   }
@@ -205,10 +222,13 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onUpdateCategory(
       UpdateCategory event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 1));
+      Logger.debug('BLOC: UpdateCategory id=${event.categoryId}');
+      await _managementRepository.updateCategory(
+          event.categoryId, event.categoryData);
+      Logger.debug('BLOC: UpdateCategory success');
       add(LoadCategories());
     } catch (e) {
+      Logger.error('BLOC: UpdateCategory error ${e.toString()}');
       emit(ManagementError(e.toString()));
     }
   }
@@ -216,10 +236,12 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onDeleteCategory(
       DeleteCategory event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 1));
+      Logger.debug('BLOC: DeleteCategory id=${event.categoryId}');
+      await _managementRepository.deleteCategory(event.categoryId);
+      Logger.debug('BLOC: DeleteCategory success');
       add(LoadCategories());
     } catch (e) {
+      Logger.error('BLOC: DeleteCategory error ${e.toString()}');
       emit(ManagementError(e.toString()));
     }
   }
@@ -227,10 +249,12 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onCreateCustomer(
       CreateCustomer event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 1));
+      Logger.debug('BLOC: CreateCustomer payload=${event.customerData}');
+      await _managementRepository.createCustomer(event.customerData);
+      Logger.debug('BLOC: CreateCustomer success');
       add(LoadCustomers());
     } catch (e) {
+      Logger.error('BLOC: CreateCustomer error ${e.toString()}');
       emit(ManagementError(e.toString()));
     }
   }
@@ -238,10 +262,13 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onUpdateCustomer(
       UpdateCustomer event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 1));
+      Logger.debug('BLOC: UpdateCustomer id=${event.customerId}');
+      await _managementRepository.updateCustomer(
+          event.customerId, event.customerData);
+      Logger.debug('BLOC: UpdateCustomer success');
       add(LoadCustomers());
     } catch (e) {
+      Logger.error('BLOC: UpdateCustomer error ${e.toString()}');
       emit(ManagementError(e.toString()));
     }
   }
@@ -249,10 +276,12 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onDeleteCustomer(
       DeleteCustomer event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 1));
+      Logger.debug('BLOC: DeleteCustomer id=${event.customerId}');
+      await _managementRepository.deleteCustomer(event.customerId);
+      Logger.debug('BLOC: DeleteCustomer success');
       add(LoadCustomers());
     } catch (e) {
+      Logger.error('BLOC: DeleteCustomer error ${e.toString()}');
       emit(ManagementError(e.toString()));
     }
   }
@@ -260,10 +289,12 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onCreateSupplier(
       CreateSupplier event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 1));
+      Logger.debug('BLOC: CreateSupplier payload=${event.supplierData}');
+      await _managementRepository.createSupplier(event.supplierData);
+      Logger.debug('BLOC: CreateSupplier success');
       add(LoadSuppliers());
     } catch (e) {
+      Logger.error('BLOC: CreateSupplier error ${e.toString()}');
       emit(ManagementError(e.toString()));
     }
   }
@@ -271,10 +302,13 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onUpdateSupplier(
       UpdateSupplier event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 1));
+      Logger.debug('BLOC: UpdateSupplier id=${event.supplierId}');
+      await _managementRepository.updateSupplier(
+          event.supplierId, event.supplierData);
+      Logger.debug('BLOC: UpdateSupplier success');
       add(LoadSuppliers());
     } catch (e) {
+      Logger.error('BLOC: UpdateSupplier error ${e.toString()}');
       emit(ManagementError(e.toString()));
     }
   }
@@ -282,10 +316,12 @@ class ManagementBloc extends Bloc<ManagementEvent, ManagementState> {
   Future<void> _onDeleteSupplier(
       DeleteSupplier event, Emitter<ManagementState> emit) async {
     try {
-      // TODO: Implement actual API call
-      await Future.delayed(const Duration(seconds: 1));
+      Logger.debug('BLOC: DeleteSupplier id=${event.supplierId}');
+      await _managementRepository.deleteSupplier(event.supplierId);
+      Logger.debug('BLOC: DeleteSupplier success');
       add(LoadSuppliers());
     } catch (e) {
+      Logger.error('BLOC: DeleteSupplier error ${e.toString()}');
       emit(ManagementError(e.toString()));
     }
   }

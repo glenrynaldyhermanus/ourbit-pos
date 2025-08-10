@@ -14,7 +14,7 @@ import 'package:ourbit_pos/src/core/utils/logger.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:async';
 
-/// Global custom appbar widget for Ourbit POS application
+/// Global custom appbar widget for Ourbit Kasir application
 ///
 /// This widget provides a consistent header across the application with:
 /// - Business name and store name display

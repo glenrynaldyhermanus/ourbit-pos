@@ -1,8 +1,8 @@
-# Test Script Autentikasi Ourbit POS
+# Test Script Autentikasi Ourbit Kasir
 
 ## Overview
 
-Dokumen ini berisi test script untuk menguji sistem autentikasi aplikasi Ourbit POS berdasarkan spesifikasi di `docs/specs/auth.md`. Test script ini mencakup token validation, AppBar integration, offline support, dan force logout functionality.
+Dokumen ini berisi test script untuk menguji sistem autentikasi aplikasi Ourbit Kasir berdasarkan spesifikasi di `docs/specs/auth.md`. Test script ini mencakup token validation, AppBar integration, offline support, dan force logout functionality.
 
 ## Test Environment Setup
 
@@ -98,7 +98,7 @@ Dokumen ini berisi test script untuk menguji sistem autentikasi aplikasi Ourbit 
 
 **Test Steps**:
 
-1. Buka aplikasi Ourbit POS
+1. Buka aplikasi Ourbit Kasir
 2. Amati proses startup
 3. Verifikasi routing
 
@@ -148,7 +148,7 @@ Dokumen ini berisi test script untuk menguji sistem autentikasi aplikasi Ourbit 
 
 **Test Steps**:
 
-1. Buka aplikasi Ourbit POS
+1. Buka aplikasi Ourbit Kasir
 2. Amati proses startup
 3. Verifikasi routing
 
@@ -172,7 +172,7 @@ Dokumen ini berisi test script untuk menguji sistem autentikasi aplikasi Ourbit 
 
 **Test Steps**:
 
-1. Buka aplikasi Ourbit POS
+1. Buka aplikasi Ourbit Kasir
 2. Amati proses startup
 3. Verifikasi routing
 

@@ -133,6 +133,7 @@ class DependencyInjection {
           getDiscountsUseCase: _getDiscountsUseCase,
           getExpensesUseCase: _getExpensesUseCase,
           getLoyaltyProgramsUseCase: _getLoyaltyProgramsUseCase,
+          managementRepository: _managementRepository,
         ),
       ),
       BlocProvider<PaymentBloc>(

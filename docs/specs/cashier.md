@@ -1,8 +1,8 @@
-# Flow Cashier Page Ourbit POS
+# Flow Cashier Page Ourbit Kasir
 
 ## Overview
 
-Dokumen ini menjelaskan alur dan implementasi halaman Cashier (POS) aplikasi Ourbit POS yang mencakup loading data, interaksi user, dan operasi cart dengan micro animation dan widget custom.
+Dokumen ini menjelaskan alur dan implementasi halaman Cashier (POS) aplikasi Ourbit Kasir yang mencakup loading data, interaksi user, dan operasi cart dengan micro animation dan widget custom.
 
 ## Flow Diagram
 
@@ -1121,7 +1121,7 @@ Payment flow sekarang 100% mengikuti standar arsitektur yang sama dengan Cashier
 
 ## Conclusion
 
-Cashier Page Ourbit POS telah diimplementasi dengan arsitektur yang solid, menggunakan widget custom Ourbit, micro animations, dan mengikuti best practices Flutter. Payment flow telah di-refactor untuk menggunakan BLoC architecture secara konsisten. Implementasi mencakup semua fitur yang diminta dengan performance yang optimal dan user experience yang baik.
+Cashier Page Ourbit Kasir telah diimplementasi dengan arsitektur yang solid, menggunakan widget custom Ourbit, micro animations, dan mengikuti best practices Flutter. Payment flow telah di-refactor untuk menggunakan BLoC architecture secara konsisten. Implementasi mencakup semua fitur yang diminta dengan performance yang optimal dan user experience yang baik.
 
 ## Implementation Details
 
