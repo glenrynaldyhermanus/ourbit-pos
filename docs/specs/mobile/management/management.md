@@ -26,7 +26,7 @@ flowchart TD
   B --> I[Discounts Tab]
   B --> J[Loyalty Tab]
   B --> K[Taxes Tab]
-  
+
   C --> L[Products List]
   D --> M[Inventory List]
   E --> N[Categories List]
@@ -36,7 +36,7 @@ flowchart TD
   I --> R[Discounts List]
   J --> S[Loyalty List]
   K --> T[Taxes Placeholder]
-  
+
   L --> U[Product Detail Sheet]
   M --> V[Inventory Detail Sheet]
   N --> W[Category Detail Sheet]
@@ -52,11 +52,13 @@ flowchart TD
 ### Main Management Page
 
 #### Header
+
 - **AppBar**: Title "Data" + menu drawer icon
 - **TabBar**: Scrollable tabs untuk sub-modul navigation
 - **Leading**: Drawer menu button
 
 #### TabBar Navigation
+
 ```dart
 const List<Tab> tabs = [
   Tab(text: 'Produk'),
@@ -72,6 +74,7 @@ const List<Tab> tabs = [
 ```
 
 #### TabBarView Content
+
 - **Products**: `ProductsContentMobile()`
 - **Inventory**: `InventoryContentMobile()`
 - **Categories**: `CategoriesContentMobile()`
@@ -85,13 +88,16 @@ const List<Tab> tabs = [
 ## Content Page Patterns
 
 ### Common Structure
+
 Setiap content page mengikuti pattern yang sama:
 
 #### Header Section
+
 - **Search Bar**: Full width search input
 - **Filter Options**: Dropdown atau chip filters (jika ada)
 
 #### List Section
+
 - **List-Card Layout**: Menggantikan desktop table
 - **Card Components**:
   - Main content (name, description, etc.)
@@ -99,6 +105,7 @@ Setiap content page mengikuti pattern yang sama:
   - Action buttons (view, edit, delete)
 
 #### Detail Bottom Sheet
+
 - **Trigger**: Tap pada card item
 - **Content**: Detailed information dengan actions
 - **Actions**: Edit, Delete, atau specific actions
@@ -106,6 +113,7 @@ Setiap content page mengikuti pattern yang sama:
 ### Products Content
 
 #### List Layout
+
 ```dart
 // Product card structure
 OurbitCard(
@@ -125,10 +133,12 @@ OurbitCard(
 ```
 
 #### Search & Filter
+
 - **Search**: By name, code, description
 - **Category Filter**: Dropdown dengan "Semua Kategori"
 
 #### Detail Sheet
+
 - **Product Info**: Name, code, category, description
 - **Pricing**: Selling price, purchase price
 - **Stock Info**: Current stock, min stock
@@ -137,12 +147,14 @@ OurbitCard(
 ### Inventory Content
 
 #### Special Features
+
 - **Stock Status**: Visual indicators (Normal, Menipis, Habis)
 - **Stock Update**: Quick update dialog
 - **Category Filter**: Filter by product category
 - **Search**: By product name or code
 
 #### Status Indicators
+
 ```dart
 // Status color coding
 Color statusColor = _getStatusColor(status);
@@ -159,17 +171,20 @@ Container(
 ### Customers Content
 
 #### List Features
+
 - **Customer Info**: Name, email, phone
 - **Status Badge**: Active/Inactive indicator
 - **Contact Info**: Email dan phone display
 
 #### Search
+
 - **Multi-field**: Search by name, email, phone
 - **Real-time**: Filter as you type
 
 ### Categories Content
 
 #### Simple Layout
+
 - **Category Name**: Primary display
 - **Description**: Secondary text
 - **Product Count**: Number of products in category
@@ -177,6 +192,7 @@ Container(
 ## Data Integration
 
 ### BLoC Integration
+
 ```dart
 // ManagementBloc integration
 BlocBuilder<ManagementBloc, ManagementState>(
@@ -190,6 +206,7 @@ BlocBuilder<ManagementBloc, ManagementState>(
 ```
 
 ### Supabase Integration
+
 ```dart
 // Direct Supabase calls untuk organization content
 final stores = await Supabase.instance.client
@@ -201,16 +218,19 @@ final stores = await Supabase.instance.client
 ## Mobile-Specific Features
 
 ### Touch Optimization
+
 - **Card Taps**: Large touch targets untuk navigation
 - **Swipe Actions**: Future enhancement untuk quick actions
 - **Pull to Refresh**: Refresh data dengan pull gesture
 
 ### Responsive Design
+
 - **List Adaptation**: Optimal untuk mobile scrolling
 - **Card Sizing**: Consistent card heights
 - **Text Scaling**: Responsive text sizes
 
 ### Performance
+
 - **Lazy Loading**: Content loaded per tab
 - **Image Optimization**: Efficient image loading
 - **State Management**: Efficient BLoC usage
@@ -218,12 +238,14 @@ final stores = await Supabase.instance.client
 ## Navigation Integration
 
 ### Drawer Navigation
+
 ```dart
 // SidebarDrawer integration
 drawer: const SidebarDrawer(),
 ```
 
 ### Tab Navigation
+
 ```dart
 // TabBar integration
 DefaultTabController(
@@ -244,11 +266,13 @@ DefaultTabController(
 ## Error Handling
 
 ### Network Errors
+
 - **Loading States**: Proper loading indicators
 - **Error Messages**: User-friendly error display
 - **Retry Mechanism**: Retry buttons untuk failed operations
 
 ### Data Validation
+
 - **Empty States**: Proper empty state handling
 - **Search Results**: "No results found" messages
 - **Form Validation**: Input validation untuk forms
@@ -256,12 +280,14 @@ DefaultTabController(
 ## Testing Scenarios
 
 ### Functional Testing
+
 1. **Tab Navigation**: Test tab switching
 2. **Search & Filter**: Test search functionality
 3. **Detail Sheets**: Test bottom sheet interactions
 4. **Data Loading**: Test data fetching per tab
 
 ### UI Testing
+
 1. **Responsive Layout**: Test pada berbagai screen sizes
 2. **Touch Interactions**: Test card taps dan gestures
 3. **Tab Scrolling**: Test horizontal tab scrolling
@@ -270,11 +296,13 @@ DefaultTabController(
 ## Performance Metrics
 
 ### Load Time
+
 - **Initial Load**: < 2 seconds
 - **Tab Switching**: < 500ms
 - **Search Results**: < 300ms
 
 ### Memory Usage
+
 - **Tab State**: Efficient state management
 - **Image Loading**: Optimized image handling
 - **List Rendering**: Efficient list performance
@@ -282,11 +310,13 @@ DefaultTabController(
 ## Accessibility
 
 ### Screen Reader Support
+
 - **Tab Labels**: Proper accessibility labels
 - **Card Content**: Semantic content structure
 - **Action Buttons**: Clear action descriptions
 
 ### Visual Accessibility
+
 - **High Contrast**: Color-safe design
 - **Font Scaling**: Support untuk large text
 - **Touch Targets**: Minimum 44px touch targets
@@ -294,12 +324,14 @@ DefaultTabController(
 ## Future Enhancements
 
 ### Planned Features
+
 - **Swipe Actions**: Quick edit/delete dengan swipe
 - **Bulk Operations**: Multi-select untuk bulk actions
 - **Offline Support**: Local caching untuk offline access
 - **Advanced Filters**: More sophisticated filtering options
 
 ### Performance Improvements
+
 - **Virtual Scrolling**: Untuk large datasets
 - **Image Caching**: Advanced image caching
 - **State Persistence**: Tab state persistence

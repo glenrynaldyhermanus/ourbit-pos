@@ -7,11 +7,13 @@ Dokumen ini menjelaskan implementasi mobile view untuk aplikasi Ourbit POS. Mobi
 ## Arsitektur Mobile
 
 ### Adaptive Routing
+
 - **Router**: `lib/src/core/routes/app_router.dart`
 - **Responsive Detection**: `lib/src/core/utils/responsive.dart`
 - **Breakpoint**: Mobile < 768px, Tablet 768-1024px, Desktop ≥ 1024px
 
 ### Struktur Folder
+
 ```
 lib/app/admin/mobile/
 ├── cashier/
@@ -46,11 +48,13 @@ lib/app/admin/mobile/
 ## Komponen Mobile-Specific
 
 ### Navigation
+
 - **SidebarDrawer**: `lib/src/widgets/navigation/sidebar_drawer.dart`
 - **TabBar**: Untuk sub-navigation di Management, Organization, Settings
 - **Bottom Sheets**: Untuk detail dan actions
 
 ### UI Patterns
+
 - **List-Card Layout**: Menggantikan desktop table
 - **Search & Filter**: Di setiap section
 - **Bottom Action Bar**: Untuk primary actions
@@ -83,11 +87,13 @@ GoRoute(
 ## Design System
 
 ### Component Priority
+
 1. **Ourbit Custom Widgets** (prioritas utama)
 2. **Shadcn Flutter** (jika Ourbit tidak tersedia)
 3. **Material Widgets** (terakhir)
 
 ### Mobile-Specific Rules
+
 - **SnackBar**: Diperbolehkan di mobile UI (`lib/app/admin/mobile/**`)
 - **OurbitToast**: Default untuk feedback
 - **Bahasa Indonesia**: Semua text dan labels
@@ -95,11 +101,13 @@ GoRoute(
 ## State Management
 
 ### BLoC Integration
+
 - **Cashier**: `CashierBloc`, `PaymentBloc`
 - **Management**: `ManagementBloc` untuk data CRUD
 - **Auth**: `AuthBloc` untuk authentication
 
 ### Data Flow
+
 - **Supabase**: Primary data source
 - **Local Storage**: Untuk user preferences
 - **Real-time**: Untuk inventory updates
@@ -107,11 +115,13 @@ GoRoute(
 ## Performance Considerations
 
 ### Lazy Loading
+
 - Content loaded on demand
 - Efficient Supabase queries
 - Proper dispose patterns
 
 ### Memory Management
+
 - Cleanup resources on dispose
 - Optimized list rendering
 - Efficient state management
@@ -119,12 +129,14 @@ GoRoute(
 ## Testing Strategy
 
 ### Functional Testing
+
 - Navigation flow (Drawer → TabBar → Content)
 - Data loading dan CRUD operations
 - Search dan filter functionality
 - Payment flow (Cart → Payment → Success)
 
 ### UI Testing
+
 - Responsive design pada berbagai screen sizes
 - Touch interactions
 - Bottom sheet dan modal behavior
@@ -133,12 +145,14 @@ GoRoute(
 ## Deployment
 
 ### Platform Support
+
 - **Android**: Full support
 - **iOS**: Full support
 - **Web**: Responsive web support
 - **Desktop**: Fallback ke desktop view
 
 ### Build Configuration
+
 - Adaptive routing enabled
 - Mobile-specific assets
 - Performance optimizations

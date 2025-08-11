@@ -19,20 +19,20 @@ flowchart TD
   A[Mobile Reports Page] --> B[Report Types List]
   A --> C[Search & Filter]
   A --> D[Report Detail Sheet]
-  
+
   B --> E[Sales Reports]
   B --> F[Inventory Reports]
   B --> G[Customer Reports]
   B --> H[Financial Reports]
-  
+
   C --> I[Filter by Period]
   C --> J[Filter by Store]
   C --> K[Search Reports]
-  
+
   D --> L[Generate Report]
   D --> M[View Report Details]
   D --> N[Export Options]
-  
+
   L --> O[Report Generated]
   M --> P[Report Preview]
   N --> Q[Export Report]
@@ -43,10 +43,12 @@ flowchart TD
 ### Main Reports Page
 
 #### Header
+
 - **AppBar**: Title "Laporan" + menu drawer icon
 - **Leading**: Drawer menu button
 
 #### Search & Filter Section
+
 ```dart
 // Search and filter section
 Column(
@@ -69,7 +71,7 @@ Column(
               labelText: 'Periode',
               border: material.OutlineInputBorder(),
             ),
-            items: _periodOptions.map((period) => 
+            items: _periodOptions.map((period) =>
               material.DropdownMenuItem(
                 value: period['value'],
                 child: material.Text(period['label']),
@@ -86,7 +88,7 @@ Column(
               labelText: 'Toko',
               border: material.OutlineInputBorder(),
             ),
-            items: _storeOptions.map((store) => 
+            items: _storeOptions.map((store) =>
               material.DropdownMenuItem(
                 value: store['value'],
                 child: material.Text(store['label']),
@@ -102,6 +104,7 @@ Column(
 ```
 
 #### Report Types List
+
 ```dart
 // Report types list
 material.ListView.separated(
@@ -134,6 +137,7 @@ material.ListView.separated(
 ## Report Types
 
 ### Sales Reports
+
 ```dart
 const salesReports = [
   {
@@ -161,6 +165,7 @@ const salesReports = [
 ```
 
 ### Inventory Reports
+
 ```dart
 const inventoryReports = [
   {
@@ -188,6 +193,7 @@ const inventoryReports = [
 ```
 
 ### Customer Reports
+
 ```dart
 const customerReports = [
   {
@@ -208,6 +214,7 @@ const customerReports = [
 ```
 
 ### Financial Reports
+
 ```dart
 const financialReports = [
   {
@@ -230,6 +237,7 @@ const financialReports = [
 ## Detail Bottom Sheet
 
 ### Report Detail Interface
+
 ```dart
 // Report detail bottom sheet
 material.showModalBottomSheet(
@@ -308,6 +316,7 @@ material.showModalBottomSheet(
 ## Filter System
 
 ### Period Filter
+
 ```dart
 const periodOptions = [
   {'value': 'today', 'label': 'Hari Ini'},
@@ -321,6 +330,7 @@ const periodOptions = [
 ```
 
 ### Store Filter
+
 ```dart
 const storeOptions = [
   {'value': 'all', 'label': 'Semua Toko'},
@@ -331,6 +341,7 @@ const storeOptions = [
 ```
 
 ### Search Filter
+
 ```dart
 // Search functionality
 final filtered = reports.where((report) {
@@ -338,7 +349,7 @@ final filtered = reports.where((report) {
   final description = report['description'].toString().toLowerCase();
   final category = report['category'].toString().toLowerCase();
   final query = _query.toLowerCase();
-  
+
   return name.contains(query) ||
          description.contains(query) ||
          category.contains(query);
@@ -348,6 +359,7 @@ final filtered = reports.where((report) {
 ## Data Integration
 
 ### Report Generation
+
 ```dart
 // Report generation function
 Future<void> _generateReport(Map<String, dynamic> report) async {
@@ -359,10 +371,10 @@ Future<void> _generateReport(Map<String, dynamic> report) async {
         backgroundColor: material.Colors.blue,
       ),
     );
-    
+
     // Generate report logic here
     // This would typically call a backend service or local function
-    
+
     // Show success
     material.ScaffoldMessenger.of(context).showSnackBar(
       material.SnackBar(
@@ -370,7 +382,7 @@ Future<void> _generateReport(Map<String, dynamic> report) async {
         backgroundColor: material.Colors.green,
       ),
     );
-    
+
     material.Navigator.of(context).pop();
   } catch (e) {
     // Show error
@@ -387,16 +399,19 @@ Future<void> _generateReport(Map<String, dynamic> report) async {
 ## Mobile-Specific Features
 
 ### Touch Optimization
+
 - **Card Taps**: Large touch targets untuk navigation
 - **Filter Controls**: Easy-to-use dropdown controls
 - **Bottom Sheet**: Draggable detail interface
 
 ### Responsive Design
+
 - **List Adaptation**: Optimal untuk mobile scrolling
 - **Filter Layout**: Responsive filter controls
 - **Text Scaling**: Responsive text sizes
 
 ### Performance
+
 - **Lazy Loading**: Report types loaded efficiently
 - **Search Optimization**: Real-time search filtering
 - **State Management**: Efficient local state management
@@ -404,12 +419,14 @@ Future<void> _generateReport(Map<String, dynamic> report) async {
 ## Navigation Integration
 
 ### Drawer Navigation
+
 ```dart
 // SidebarDrawer integration
 drawer: const SidebarDrawer(),
 ```
 
 ### Route Navigation
+
 ```dart
 // Navigation to other sections
 context.go('/pos'); // Back to cashier
@@ -419,11 +436,13 @@ context.go('/management'); // To management
 ## Error Handling
 
 ### Network Errors
+
 - **Loading States**: Proper loading indicators
 - **Error Messages**: User-friendly error display
 - **Retry Mechanism**: Retry buttons untuk failed operations
 
 ### Data Validation
+
 - **Empty States**: Proper empty state handling
 - **Search Results**: "No results found" messages
 - **Filter Validation**: Validate filter selections
@@ -431,12 +450,14 @@ context.go('/management'); // To management
 ## Testing Scenarios
 
 ### Functional Testing
+
 1. **Search & Filter**: Test search dan filter functionality
 2. **Report Selection**: Test report type selection
 3. **Detail Sheet**: Test bottom sheet interactions
 4. **Report Generation**: Test report generation process
 
 ### UI Testing
+
 1. **Responsive Layout**: Test pada berbagai screen sizes
 2. **Touch Interactions**: Test card taps dan gestures
 3. **Filter Controls**: Test dropdown interactions
@@ -445,12 +466,14 @@ context.go('/management'); // To management
 ## Performance Metrics
 
 ### Load Time
+
 - **Initial Load**: < 2 seconds
 - **Search Results**: < 300ms
 - **Filter Updates**: < 200ms
 - **Report Generation**: < 5 seconds
 
 ### Memory Usage
+
 - **Report List**: Efficient list rendering
 - **Filter State**: Local state management
 - **Search State**: Optimized search state
@@ -458,11 +481,13 @@ context.go('/management'); // To management
 ## Accessibility
 
 ### Screen Reader Support
+
 - **Report Names**: Proper accessibility labels
 - **Filter Controls**: Clear filter descriptions
 - **Action Buttons**: Descriptive button labels
 
 ### Visual Accessibility
+
 - **High Contrast**: Color-safe design
 - **Font Scaling**: Support untuk large text
 - **Touch Targets**: Minimum 44px touch targets
@@ -470,12 +495,14 @@ context.go('/management'); // To management
 ## Future Enhancements
 
 ### Planned Features
+
 - **Report Templates**: Custom report templates
 - **Scheduled Reports**: Automated report generation
 - **Export Options**: PDF, Excel export
 - **Report Sharing**: Share reports via email/cloud
 
 ### Performance Improvements
+
 - **Caching**: Cache generated reports
 - **Background Generation**: Background report processing
 - **Offline Support**: Offline report access
@@ -484,11 +511,13 @@ context.go('/management'); // To management
 ## Integration Points
 
 ### External Services
+
 - **Report Engine**: Backend report generation service
 - **Export Service**: PDF/Excel export service
 - **Email Service**: Report sharing via email
 
 ### Internal Systems
+
 - **Sales Data**: Integration dengan sales system
 - **Inventory Data**: Integration dengan inventory system
 - **Customer Data**: Integration dengan customer system

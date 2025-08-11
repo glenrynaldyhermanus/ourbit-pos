@@ -19,15 +19,15 @@ flowchart TD
   A[Mobile Settings Page] --> B[TabBar Navigation]
   B --> C[Profile Tab]
   B --> D[Printer Tab]
-  
+
   C --> E[Profile Form]
   D --> F[Printer Settings]
-  
+
   E --> G[Update Profile]
   F --> H[Bluetooth Scan]
   F --> I[OS Printer Pick]
   F --> J[Test Print]
-  
+
   G --> K[Profile Updated]
   H --> L[Connect Device]
   I --> M[Select Printer]
@@ -39,11 +39,13 @@ flowchart TD
 ### Main Settings Page
 
 #### Header
+
 - **AppBar**: Title "Pengaturan" + menu drawer icon
 - **TabBar**: Scrollable tabs untuk sub-modul navigation
 - **Leading**: Drawer menu button
 
 #### TabBar Navigation
+
 ```dart
 const List<Tab> tabs = [
   Tab(text: 'Profil'),
@@ -52,6 +54,7 @@ const List<Tab> tabs = [
 ```
 
 #### TabBarView Content
+
 - **Profile**: `ProfileContentMobile()`
 - **Printer**: `PrinterContentMobile()`
 
@@ -60,6 +63,7 @@ const List<Tab> tabs = [
 ### Profile Content
 
 #### Form Layout
+
 ```dart
 // Profile form structure
 Column(
@@ -98,6 +102,7 @@ Column(
 ```
 
 #### Data Integration
+
 ```dart
 // Load profile data
 final user = Supabase.instance.client.auth.currentUser;
@@ -120,6 +125,7 @@ await Supabase.instance.client.auth.updateUser(
 ```
 
 #### Form Features
+
 - **Name Field**: Editable user name
 - **Email Field**: Read-only email (cannot be changed)
 - **Phone Field**: Editable phone number
@@ -129,6 +135,7 @@ await Supabase.instance.client.auth.updateUser(
 ### Printer Content
 
 #### Bluetooth Section
+
 ```dart
 // Bluetooth printer section
 Column(
@@ -160,6 +167,7 @@ Column(
 ```
 
 #### OS Printer Section
+
 ```dart
 // OS printer section
 Column(
@@ -183,6 +191,7 @@ Column(
 ```
 
 #### Test Print Section
+
 ```dart
 // Test print section
 Column(
@@ -204,6 +213,7 @@ Column(
 ## Data Integration
 
 ### Supabase Auth Integration
+
 ```dart
 // Profile data integration
 final user = Supabase.instance.client.auth.currentUser;
@@ -213,6 +223,7 @@ await Supabase.instance.client.auth.updateUser(
 ```
 
 ### Bluetooth Integration
+
 ```dart
 // Bluetooth print integration
 final BluetoothPrint _bluetoothPrint = BluetoothPrint.instance;
@@ -227,6 +238,7 @@ await _bluetoothPrint.connect(device);
 ```
 
 ### OS Printer Integration
+
 ```dart
 // OS printer integration
 final printer = await Printing.pickPrinter(context: context);
@@ -238,16 +250,19 @@ if (printer != null) {
 ## Mobile-Specific Features
 
 ### Touch Optimization
+
 - **Form Inputs**: Optimized input fields untuk mobile
 - **Button Sizes**: Large touch targets untuk buttons
 - **Device Selection**: Easy device selection interface
 
 ### Responsive Design
+
 - **Form Layout**: Vertical layout untuk forms
 - **Device List**: Scrollable device list
 - **Text Scaling**: Responsive text sizes
 
 ### Performance
+
 - **Bluetooth Scanning**: Efficient device scanning
 - **Form State**: Local state management
 - **Error Handling**: Graceful error handling
@@ -255,12 +270,14 @@ if (printer != null) {
 ## Navigation Integration
 
 ### Drawer Navigation
+
 ```dart
 // SidebarDrawer integration
 drawer: const SidebarDrawer(),
 ```
 
 ### Tab Navigation
+
 ```dart
 // TabBar integration
 DefaultTabController(
@@ -280,16 +297,19 @@ DefaultTabController(
 ## Error Handling
 
 ### Network Errors
+
 - **Loading States**: Proper loading indicators
 - **Error Messages**: User-friendly error display
 - **Retry Mechanism**: Retry buttons untuk failed operations
 
 ### Bluetooth Errors
+
 - **Device Not Found**: Clear error messages
 - **Connection Failed**: Retry connection options
 - **Permission Issues**: Permission request handling
 
 ### Form Validation
+
 - **Required Fields**: Validation untuk required fields
 - **Email Format**: Email format validation
 - **Phone Format**: Phone number format validation
@@ -297,6 +317,7 @@ DefaultTabController(
 ## Testing Scenarios
 
 ### Functional Testing
+
 1. **Tab Navigation**: Test tab switching
 2. **Profile Update**: Test profile form submission
 3. **Bluetooth Scan**: Test device scanning
@@ -304,6 +325,7 @@ DefaultTabController(
 5. **Test Print**: Test print functionality
 
 ### UI Testing
+
 1. **Responsive Layout**: Test pada berbagai screen sizes
 2. **Form Interactions**: Test form inputs dan validation
 3. **Device Selection**: Test device selection interface
@@ -312,12 +334,14 @@ DefaultTabController(
 ## Performance Metrics
 
 ### Load Time
+
 - **Initial Load**: < 2 seconds
 - **Tab Switching**: < 500ms
 - **Bluetooth Scan**: < 6 seconds
 - **Form Submission**: < 1 second
 
 ### Memory Usage
+
 - **Tab State**: Efficient state management
 - **Form State**: Local state management
 - **Bluetooth State**: Efficient device management
@@ -325,12 +349,14 @@ DefaultTabController(
 ## Accessibility
 
 ### Screen Reader Support
+
 - **Tab Labels**: Proper accessibility labels
 - **Form Labels**: Clear form field labels
 - **Button Labels**: Descriptive button labels
 - **Device Names**: Clear device identification
 
 ### Visual Accessibility
+
 - **High Contrast**: Color-safe design
 - **Font Scaling**: Support untuk large text
 - **Touch Targets**: Minimum 44px touch targets
@@ -338,11 +364,13 @@ DefaultTabController(
 ## Security Considerations
 
 ### Profile Data
+
 - **Email Protection**: Email field read-only
 - **Data Validation**: Input validation untuk user data
 - **Secure Updates**: Secure profile update process
 
 ### Printer Security
+
 - **Device Validation**: Validate connected devices
 - **Permission Handling**: Proper permission requests
 - **Error Logging**: Secure error logging
@@ -350,16 +378,19 @@ DefaultTabController(
 ## Platform Support
 
 ### Android
+
 - **Bluetooth**: Full Bluetooth printer support
 - **OS Printer**: Android printing service
 - **Permissions**: Camera, Bluetooth permissions
 
 ### iOS
+
 - **Bluetooth**: Full Bluetooth printer support
 - **OS Printer**: iOS printing service
 - **Permissions**: Bluetooth permissions
 
 ### Web
+
 - **Bluetooth**: Web Bluetooth API support
 - **OS Printer**: Browser printing support
 - **Fallback**: Graceful fallback untuk unsupported features
@@ -367,12 +398,14 @@ DefaultTabController(
 ## Future Enhancements
 
 ### Planned Features
+
 - **Advanced Profile**: More profile fields
 - **Printer Management**: Multiple printer support
 - **Print Templates**: Custom print templates
 - **Cloud Print**: Cloud printing integration
 
 ### Performance Improvements
+
 - **Bluetooth Caching**: Cache discovered devices
 - **Print Queue**: Print queue management
 - **Offline Support**: Offline settings access
@@ -381,11 +414,13 @@ DefaultTabController(
 ## Integration Points
 
 ### External Services
+
 - **Bluetooth Service**: Bluetooth device management
 - **Printing Service**: OS printing integration
 - **Auth Service**: User authentication integration
 
 ### Internal Systems
+
 - **User Management**: User profile integration
 - **Printing System**: Print service integration
 - **Settings Storage**: Local settings persistence
