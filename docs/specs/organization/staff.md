@@ -27,9 +27,11 @@ Dokumen ini menjelaskan spesifikasi halaman dan form Manajemen Staff pada aplika
   - `store_id` dari `LocalStorageService.getStoreId()`
 
 #### Query utama (list)
+
 - Ambil `role_assignments` by `business_id` dan `store_id`, susun mapping `role_id` → `roles.name` dan `user_id` → `profiles`.
 
 #### Mutasi
+
 - Create assignment: `insert({ user_id, business_id, role_id, store_id })` → tabel `role_assignments`.
 - Update assignment (role): `update({ role_id })` by `id` (role_assignment_id).
 - Delete assignment: `delete()` by `id` (role_assignment_id).
@@ -94,5 +96,3 @@ Dokumen ini menjelaskan spesifikasi halaman dan form Manajemen Staff pada aplika
 - Auto-suggest dengan debounce dan highlighting pada hasil pencarian email.
 - Manajemen role (CRUD role) terpisah.
 - Integrasi BLoC untuk konsistensi arsitektur dan testability.
-
-

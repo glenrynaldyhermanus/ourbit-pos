@@ -30,4 +30,5 @@ alwaysApply: true
 **Cara Menggunakan shadcn** - Cek shadcn-rule.mdc untuk penggunaan widget Ourbit dan Shadcn.
 **Default UI Import** - Kalau sudah pakai import 'package:shadcn_flutter/shadcn_flutter.dart', tidak perlu import 'package:flutter/material.dart' lagi, kalau masih perlu import material, dibuat seperti ini import 'package:flutter/material.dart' as material
 
-Jangan gunakan showSnackBar, instead gunakan OurbitToast
+**Default: gunakan OurbitToast** - Untuk feedback dan notifikasi, prioritaskan OurbitToast
+**Pengecualian mobile UI** - Pada UI mobile di path `lib/app/admin/mobile/**`, boleh menggunakan SnackBar untuk notifikasi ringan dengan styling Ourbit. Hindari penggunaan SnackBar di desktop/web

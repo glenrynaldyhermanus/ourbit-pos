@@ -20,11 +20,13 @@ Catatan: Online store tidak list-based. Satu bisnis hanya memiliki satu konfigur
 - Tabel lokasi: `stores` dan `warehouses` untuk toggle `is_online_delivery_active`.
 
 #### Query utama
+
 - `business_online_settings`: `select('*').eq('business_id', businessId).maybeSingle()`.
 - `stores`: `select('id, name, is_online_delivery_active').eq('business_id', businessId)`.
 - `warehouses`: `select('id, name, is_online_delivery_active').eq('business_id', businessId)`.
 
 #### Mutasi
+
 - Simpan pengaturan:
   - Jika aktif: `insert` (ketika belum ada) atau `update` (ketika sudah ada) ke `business_online_settings`.
   - Jika nonaktif: `delete` record `business_online_settings` untuk business tersebut.
@@ -66,5 +68,3 @@ Catatan: Online store tidak list-based. Satu bisnis hanya memiliki satu konfigur
 
 - Saat aktif: `business_id` wajib ada.
 - Subdomain/email/sosial opsional namun direkomendasikan sesuai kebutuhan bisnis.
-
-

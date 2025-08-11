@@ -1,17 +1,24 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ourbit_pos/app/cashier/cashier_page.dart';
+import 'package:ourbit_pos/app/admin/desktop/cashier/cashier_page.dart';
+import 'package:ourbit_pos/app/admin/desktop/cashier/payment/payment_page.dart';
+import 'package:ourbit_pos/app/admin/desktop/cashier/payment/success_page.dart';
+import 'package:ourbit_pos/app/admin/desktop/management/management_page.dart';
+import 'package:ourbit_pos/app/admin/mobile/management/management_page_mobile.dart';
+import 'package:ourbit_pos/app/admin/desktop/organization/organization_page.dart';
+import 'package:ourbit_pos/app/admin/mobile/organization/organization_page_mobile.dart';
+import 'package:ourbit_pos/app/admin/desktop/reports/reports_page.dart';
+import 'package:ourbit_pos/app/admin/mobile/reports/reports_page_mobile.dart';
+import 'package:ourbit_pos/app/admin/desktop/settings/settings_page.dart';
+import 'package:ourbit_pos/app/admin/mobile/settings/settings_page_mobile.dart';
+import 'package:ourbit_pos/app/admin/mobile/cashier/cashier_page_mobile.dart';
+import 'package:ourbit_pos/app/admin/mobile/cashier/payment/payment_page_mobile.dart';
+import 'package:ourbit_pos/app/admin/mobile/cashier/payment/success_page_mobile.dart';
+import 'package:ourbit_pos/src/core/utils/responsive.dart';
 import 'package:ourbit_pos/app/login/login_page.dart';
-import 'package:ourbit_pos/app/management/management_page.dart';
-
-import 'package:ourbit_pos/app/organization/organization_page.dart';
-import 'package:ourbit_pos/app/cashier/payment/payment_page.dart';
-import 'package:ourbit_pos/app/cashier/payment/success_page.dart';
-import 'package:ourbit_pos/app/reports/reports_page.dart';
-import 'package:ourbit_pos/app/settings/settings_page.dart';
-import 'package:flutter/foundation.dart';
-import 'package:ourbit_pos/src/core/services/token_service.dart';
 import 'package:ourbit_pos/src/core/services/supabase_service.dart';
+import 'package:ourbit_pos/src/core/services/token_service.dart';
 import 'package:ourbit_pos/src/core/utils/logger.dart';
 
 class AppRouter {
@@ -130,7 +137,9 @@ class AppRouter {
         pageBuilder: (context, state) => _buildPageWithFadeTransition(
           context,
           state,
-          const CashierPage(),
+          Responsive.isMobile(context)
+              ? const CashierPageMobile()
+              : const CashierPage(),
         ),
       ),
       GoRoute(
@@ -139,7 +148,9 @@ class AppRouter {
         pageBuilder: (context, state) => _buildPageWithFadeTransition(
           context,
           state,
-          const ManagementPage(),
+          Responsive.isMobile(context)
+              ? const ManagementPageMobile()
+              : const ManagementPage(),
         ),
       ),
       GoRoute(
@@ -148,7 +159,9 @@ class AppRouter {
         pageBuilder: (context, state) => _buildPageWithFadeTransition(
           context,
           state,
-          const OrganizationPage(),
+          Responsive.isMobile(context)
+              ? const OrganizationPageMobile()
+              : const OrganizationPage(),
         ),
       ),
       GoRoute(
@@ -157,7 +170,9 @@ class AppRouter {
         pageBuilder: (context, state) => _buildPageWithFadeTransition(
           context,
           state,
-          const ReportsPage(),
+          Responsive.isMobile(context)
+              ? const ReportsPageMobile()
+              : const ReportsPage(),
         ),
       ),
       GoRoute(
@@ -166,7 +181,9 @@ class AppRouter {
         pageBuilder: (context, state) => _buildPageWithFadeTransition(
           context,
           state,
-          const SettingsPage(),
+          Responsive.isMobile(context)
+              ? const SettingsPageMobile()
+              : const SettingsPage(),
         ),
       ),
       GoRoute(
@@ -175,7 +192,9 @@ class AppRouter {
         pageBuilder: (context, state) => _buildPageWithFadeTransition(
           context,
           state,
-          const PaymentPage(),
+          Responsive.isMobile(context)
+              ? const PaymentPageMobile()
+              : const PaymentPage(),
         ),
       ),
       GoRoute(
@@ -184,7 +203,9 @@ class AppRouter {
         pageBuilder: (context, state) => _buildPageWithFadeTransition(
           context,
           state,
-          const SuccessPage(),
+          Responsive.isMobile(context)
+              ? const SuccessPageMobile()
+              : const SuccessPage(),
         ),
       ),
     ],
