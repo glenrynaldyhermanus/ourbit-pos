@@ -8,6 +8,7 @@ import 'package:ourbit_pos/blocs/auth_state.dart';
 import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/core/utils/responsive.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_icon_button.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_theme_toggle.dart';
 import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_toast.dart';
@@ -381,19 +382,20 @@ class _LoginPanelState extends State<LoginPanel> with TickerProviderStateMixin {
                                         },
                                         features: [
                                           InputFeature.trailing(
-                                            IconButton(
+                                            OurbitIconButton.ghost(
                                               onPressed: () {
                                                 setState(() {
                                                   _isPasswordVisible =
                                                       !_isPasswordVisible;
                                                 });
                                               },
+                                              size: 36,
                                               icon: Icon(
                                                 _isPasswordVisible
                                                     ? LucideIcons.eyeOff
                                                     : LucideIcons.eye,
+                                                size: 18,
                                               ),
-                                              variance: ButtonVariance.ghost,
                                             ),
                                           ),
                                         ],
@@ -409,24 +411,29 @@ class _LoginPanelState extends State<LoginPanel> with TickerProviderStateMixin {
                                             : null,
                                         label: 'Masuk',
                                         isLoading: _isLoading,
-                                        trailingIcon: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 6, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white
-                                                .withValues(alpha: 0.2),
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                          ),
-                                          child: const Text(
-                                            '↵',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
+                                        trailingIcon: Responsive.isMobile(
+                                                context)
+                                            ? null
+                                            : Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 6,
+                                                        vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white
+                                                      .withValues(alpha: 0.2),
+                                                  borderRadius:
+                                                      BorderRadius.circular(4),
+                                                ),
+                                                child: const Text(
+                                                  '↵',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ),
                                       );
                                     },
                                   ),

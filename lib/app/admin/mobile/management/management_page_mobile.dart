@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart' as material;
 import 'package:ourbit_pos/src/widgets/navigation/sidebar_drawer.dart';
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:ourbit_pos/app/admin/desktop/management/products/widgets/product_form_sheet.dart';
+import 'package:ourbit_pos/app/admin/desktop/management/categories/widgets/category_form_sheet.dart';
+import 'package:ourbit_pos/app/admin/desktop/management/customers/widgets/customer_form_sheet.dart';
+import 'package:ourbit_pos/app/admin/desktop/management/suppliers/widgets/supplier_form_sheet.dart';
 import 'products/products_content_mobile.dart';
 import 'inventory/inventory_content_mobile.dart';
 import 'categories/categories_content_mobile.dart';
@@ -66,9 +72,53 @@ class ManagementPageMobile extends material.StatelessWidget {
             const LoyaltyContentMobile(),
           ],
         ),
+        floatingActionButton: material.Builder(
+          builder: (fabContext) => material.FloatingActionButton(
+            backgroundColor: AppColors.primary,
+            onPressed: () {
+              final controller = material.DefaultTabController.of(fabContext);
+              final idx = controller.index;
+              switch (idx) {
+                case 0: // Produk
+                  openSheet(
+                    context: fabContext,
+                    builder: (c) => const ProductFormSheet(),
+                    position: OverlayPosition.bottom,
+                  );
+                  break;
+                case 2: // Kategori
+                  openSheet(
+                    context: fabContext,
+                    builder: (c) => const CategoryFormSheet(),
+                    position: OverlayPosition.bottom,
+                  );
+                  break;
+                case 3: // Pelanggan
+                  openSheet(
+                    context: fabContext,
+                    builder: (c) => const CustomerFormSheet(),
+                    position: OverlayPosition.bottom,
+                  );
+                  break;
+                case 4: // Supplier
+                  openSheet(
+                    context: fabContext,
+                    builder: (c) => const SupplierFormSheet(),
+                    position: OverlayPosition.bottom,
+                  );
+                  break;
+                default:
+                  // no-op for tabs without add action
+                  break;
+              }
+            },
+            child: const material.Icon(
+              material.Icons.add,
+              color: material.Colors.white,
+            ),
+          ),
+        ),
       ),
     );
   }
-
-
 }

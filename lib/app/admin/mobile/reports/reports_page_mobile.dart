@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' as material;
 import 'package:ourbit_pos/src/widgets/navigation/sidebar_drawer.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
+import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
 
 class ReportsPageMobile extends material.StatefulWidget {
   const ReportsPageMobile({super.key});
@@ -10,10 +11,14 @@ class ReportsPageMobile extends material.StatefulWidget {
   material.State<ReportsPageMobile> createState() => _ReportsPageMobileState();
 }
 
-class _ReportsPageMobileState extends material.State<ReportsPageMobile> {
-
+class _ReportsPageMobileState extends material.State<ReportsPageMobile>
+    with material.TickerProviderStateMixin {
   String _selectedPeriod = 'today';
   String _selectedStore = 'all';
+
+  // Animation controllers
+  late material.AnimationController _listController;
+  late material.AnimationController _filterController;
 
   final List<Map<String, dynamic>> _reportTypes = [
     {
@@ -70,8 +75,40 @@ class _ReportsPageMobileState extends material.State<ReportsPageMobile> {
     {'value': 'store3', 'label': 'Cabang 2'},
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _initAnimationControllers();
+  }
+
+  void _initAnimationControllers() {
+    _listController = material.AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    _filterController = material.AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    // Start list animation after frame
+    material.WidgetsBinding.instance.addPostFrameCallback((_) {
+      _listController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _listController.dispose();
+    _filterController.dispose();
+    super.dispose();
+  }
+
   void _showReportDetail(Map<String, dynamic> reportType) {
-    material.showModalBottomSheet(
+    _filterController.forward();
+
+    material
+        .showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) => material.Container(
@@ -122,40 +159,47 @@ class _ReportsPageMobileState extends material.State<ReportsPageMobile> {
                   ?.copyWith(fontWeight: material.FontWeight.w600),
             ),
             const material.SizedBox(height: 12),
-            material.DropdownButtonFormField<String>(
-              value: _selectedPeriod,
-              decoration: const material.InputDecoration(
-                border: material.OutlineInputBorder(),
-                contentPadding:
-                    material.EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            material.AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              child: material.Column(
+                children: [
+                  material.DropdownButtonFormField<String>(
+                    value: _selectedPeriod,
+                    decoration: const material.InputDecoration(
+                      border: material.OutlineInputBorder(),
+                      contentPadding: material.EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                    ),
+                    items: _periods
+                        .map((p) => material.DropdownMenuItem(
+                              value: p['value'] as String,
+                              child: material.Text(p['label'] as String),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() => _selectedPeriod = value ?? 'today');
+                    },
+                  ),
+                  const material.SizedBox(height: 12),
+                  material.DropdownButtonFormField<String>(
+                    value: _selectedStore,
+                    decoration: const material.InputDecoration(
+                      border: material.OutlineInputBorder(),
+                      contentPadding: material.EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                    ),
+                    items: _stores
+                        .map((s) => material.DropdownMenuItem(
+                              value: s['value'] as String,
+                              child: material.Text(s['label'] as String),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() => _selectedStore = value ?? 'all');
+                    },
+                  ),
+                ],
               ),
-              items: _periods
-                  .map((p) => material.DropdownMenuItem(
-                        value: p['value'] as String,
-                        child: material.Text(p['label'] as String),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() => _selectedPeriod = value ?? 'today');
-              },
-            ),
-            const material.SizedBox(height: 12),
-            material.DropdownButtonFormField<String>(
-              value: _selectedStore,
-              decoration: const material.InputDecoration(
-                border: material.OutlineInputBorder(),
-                contentPadding:
-                    material.EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              ),
-              items: _stores
-                  .map((s) => material.DropdownMenuItem(
-                        value: s['value'] as String,
-                        child: material.Text(s['label'] as String),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() => _selectedStore = value ?? 'all');
-              },
             ),
             const material.SizedBox(height: 16),
             material.Row(
@@ -164,6 +208,7 @@ class _ReportsPageMobileState extends material.State<ReportsPageMobile> {
                   child: OurbitButton.secondary(
                     onPressed: () {
                       material.Navigator.of(context).pop();
+                      _filterController.reverse();
                     },
                     label: 'Batal',
                   ),
@@ -173,6 +218,7 @@ class _ReportsPageMobileState extends material.State<ReportsPageMobile> {
                   child: OurbitButton.primary(
                     onPressed: () {
                       material.Navigator.of(context).pop();
+                      _filterController.reverse();
                       _generateReport(reportType);
                     },
                     label: 'Generate',
@@ -183,7 +229,10 @@ class _ReportsPageMobileState extends material.State<ReportsPageMobile> {
           ],
         ),
       ),
-    );
+    )
+        .then((_) {
+      _filterController.reverse();
+    });
   }
 
   void _generateReport(Map<String, dynamic> reportType) {
@@ -199,6 +248,48 @@ class _ReportsPageMobileState extends material.State<ReportsPageMobile> {
     // TODO: Implement actual report generation
     // This would typically call a service to generate the report
     // and then show it in a new screen or download it
+  }
+
+  material.Widget _buildReportCard(Map<String, dynamic> reportType, int index) {
+    return material.TweenAnimationBuilder<double>(
+      duration: Duration(milliseconds: 200 + (index * 100)),
+      tween: material.Tween(begin: 0.0, end: 1.0),
+      builder: (context, progress, child) {
+        return material.Opacity(
+          opacity: progress,
+          child: material.Transform.translate(
+            offset: material.Offset(0, 30 * (1 - progress)),
+            child: OurbitCard(
+              child: material.ListTile(
+                leading: material.CircleAvatar(
+                  backgroundColor: reportType['color'][50],
+                  child: material.Icon(
+                    reportType['icon'],
+                    color: reportType['color'],
+                  ),
+                ),
+                title: material.Text(
+                  reportType['name'],
+                  style: const material.TextStyle(
+                    fontWeight: material.FontWeight.w600,
+                  ),
+                ),
+                subtitle: material.Text(
+                  reportType['description'],
+                  maxLines: 2,
+                  overflow: material.TextOverflow.ellipsis,
+                ),
+                trailing: material.IconButton(
+                  icon: const material.Icon(material.Icons.arrow_forward_ios),
+                  onPressed: () => _showReportDetail(reportType),
+                ),
+                onTap: () => _showReportDetail(reportType),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -275,41 +366,17 @@ class _ReportsPageMobileState extends material.State<ReportsPageMobile> {
 
           // Report Types List
           material.Expanded(
-            child: material.ListView.separated(
-              padding: const material.EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _reportTypes.length,
-              separatorBuilder: (_, __) => const material.SizedBox(height: 8),
-              itemBuilder: (context, index) {
-                final reportType = _reportTypes[index];
-                return material.Card(
-                  child: material.ListTile(
-                    leading: material.CircleAvatar(
-                      backgroundColor: reportType['color'][50],
-                      child: material.Icon(
-                        reportType['icon'],
-                        color: reportType['color'],
-                      ),
-                    ),
-                    title: material.Text(
-                      reportType['name'],
-                      style: const material.TextStyle(
-                        fontWeight: material.FontWeight.w600,
-                      ),
-                    ),
-                    subtitle: material.Text(
-                      reportType['description'],
-                      maxLines: 2,
-                      overflow: material.TextOverflow.ellipsis,
-                    ),
-                    trailing: material.IconButton(
-                      icon:
-                          const material.Icon(material.Icons.arrow_forward_ios),
-                      onPressed: () => _showReportDetail(reportType),
-                    ),
-                    onTap: () => _showReportDetail(reportType),
-                  ),
-                );
-              },
+            child: material.FadeTransition(
+              opacity: _listController,
+              child: material.ListView.separated(
+                padding: const material.EdgeInsets.symmetric(horizontal: 16),
+                itemCount: _reportTypes.length,
+                separatorBuilder: (_, __) => const material.SizedBox(height: 8),
+                itemBuilder: (context, index) {
+                  final reportType = _reportTypes[index];
+                  return _buildReportCard(reportType, index);
+                },
+              ),
             ),
           ),
         ],

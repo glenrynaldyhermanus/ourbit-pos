@@ -14,16 +14,28 @@ class CategoriesContentMobile extends material.StatefulWidget {
       _CategoriesContentMobileState();
 }
 
-class _CategoriesContentMobileState
-    extends material.State<CategoriesContentMobile> {
+class _CategoriesContentMobileState extends material
+    .State<CategoriesContentMobile> with material.TickerProviderStateMixin {
   String _query = '';
+  late final material.AnimationController _listController;
 
   @override
   void initState() {
     super.initState();
     material.WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ManagementBloc>().add(LoadCategories());
+      _listController.forward();
     });
+    _listController = material.AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _listController.dispose();
+    super.dispose();
   }
 
   @override
@@ -70,43 +82,65 @@ class _CategoriesContentMobileState
               ),
             ),
             material.Expanded(
-              child: filtered.isEmpty
-                  ? const material.Center(
-                      child: material.Text('Tidak ada kategori'))
-                  : material.ListView.separated(
-                      padding: const material.EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      itemCount: filtered.length,
-                      separatorBuilder: (_, __) =>
-                          const material.SizedBox(height: 8),
-                      itemBuilder: (context, index) {
-                        final c = filtered[index];
-                        return OurbitCard(
-                          child: material.ListTile(
-                            leading: material.CircleAvatar(
-                              backgroundColor: material.Colors.orange[50],
-                              child: const material.Icon(
-                                  material.Icons.grid_view,
-                                  color: material.Colors.orange),
-                            ),
-                            title: material.Text(
-                              (c['name'] ?? '-').toString(),
-                              style: const material.TextStyle(
-                                  fontWeight: material.FontWeight.w600),
-                            ),
-                            subtitle: material.Text(
-                              (c['description'] ?? 'Tanpa deskripsi')
-                                  .toString(),
-                              maxLines: 2,
-                              overflow: material.TextOverflow.ellipsis,
-                            ),
-                            trailing: material.Text(
-                                '${c['product_count'] ?? 0} produk'),
-                            onTap: () {},
-                          ),
-                        );
-                      },
-                    ),
+              child: material.AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: filtered.isEmpty
+                    ? const material.Center(
+                        key: material.ValueKey('empty'),
+                        child: material.Text('Tidak ada kategori'))
+                    : material.FadeTransition(
+                        key: const material.ValueKey('list'),
+                        opacity: _listController,
+                        child: material.ListView.separated(
+                          padding: const material.EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          itemCount: filtered.length,
+                          separatorBuilder: (_, __) =>
+                              const material.SizedBox(height: 8),
+                          itemBuilder: (context, index) {
+                            final c = filtered[index];
+                            return material.TweenAnimationBuilder<double>(
+                              duration:
+                                  Duration(milliseconds: 150 + index * 50),
+                              tween: material.Tween(begin: 0.0, end: 1.0),
+                              builder: (context, t, child) {
+                                return material.Opacity(
+                                  opacity: t,
+                                  child: material.Transform.translate(
+                                    offset: material.Offset(0, 16 * (1 - t)),
+                                    child: child,
+                                  ),
+                                );
+                              },
+                              child: OurbitCard(
+                                child: material.ListTile(
+                                  leading: material.CircleAvatar(
+                                    backgroundColor: material.Colors.orange[50],
+                                    child: const material.Icon(
+                                        material.Icons.grid_view,
+                                        color: material.Colors.orange),
+                                  ),
+                                  title: material.Text(
+                                    (c['name'] ?? '-').toString(),
+                                    style: const material.TextStyle(
+                                        fontWeight: material.FontWeight.w600),
+                                  ),
+                                  subtitle: material.Text(
+                                    (c['description'] ?? 'Tanpa deskripsi')
+                                        .toString(),
+                                    maxLines: 2,
+                                    overflow: material.TextOverflow.ellipsis,
+                                  ),
+                                  trailing: material.Text(
+                                      '${c['product_count'] ?? 0} produk'),
+                                  onTap: () {},
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+              ),
             ),
           ],
         );

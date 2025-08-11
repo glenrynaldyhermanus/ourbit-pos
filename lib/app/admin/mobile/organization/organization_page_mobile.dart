@@ -3,6 +3,7 @@ import 'package:ourbit_pos/src/widgets/navigation/sidebar_drawer.dart';
 import 'package:ourbit_pos/app/admin/mobile/organization/stores/stores_content_mobile.dart';
 import 'package:ourbit_pos/app/admin/mobile/organization/staffs/staffs_content_mobile.dart';
 import 'package:ourbit_pos/app/admin/mobile/organization/onlinestores/onlinestores_content_mobile.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class OrganizationPageMobile extends material.StatefulWidget {
   const OrganizationPageMobile({super.key});
@@ -52,7 +53,7 @@ class _OrganizationPageMobileState
               text: 'Staff',
             ),
             material.Tab(
-              icon: material.Icon(material.Icons.shopping_cart),
+              icon: material.Icon(LucideIcons.shoppingCart),
               text: 'Online',
             ),
           ],

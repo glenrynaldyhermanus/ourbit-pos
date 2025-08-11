@@ -13,16 +13,28 @@ class ExpensesContentMobile extends material.StatefulWidget {
       _ExpensesContentMobileState();
 }
 
-class _ExpensesContentMobileState
-    extends material.State<ExpensesContentMobile> {
+class _ExpensesContentMobileState extends material.State<ExpensesContentMobile>
+    with material.TickerProviderStateMixin {
   String _query = '';
+  late final material.AnimationController _listController;
 
   @override
   void initState() {
     super.initState();
     material.WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ManagementBloc>().add(LoadExpenses());
+      _listController.forward();
     });
+    _listController = material.AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _listController.dispose();
+    super.dispose();
   }
 
   String _formatCurrency(num amount) {
@@ -64,64 +76,88 @@ class _ExpensesContentMobileState
               ),
             ),
             material.Expanded(
-              child: filtered.isEmpty
-                  ? const material.Center(
-                      child: material.Text('Tidak ada pengeluaran'))
-                  : material.ListView.separated(
-                      padding: const material.EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      itemCount: filtered.length,
-                      separatorBuilder: (_, __) =>
-                          const material.SizedBox(height: 8),
-                      itemBuilder: (context, index) {
-                        final e = filtered[index];
-                        final isPaid = (e['is_paid'] ?? false) as bool;
-                        return OurbitCard(
-                          child: material.ListTile(
-                            leading: material.CircleAvatar(
-                              backgroundColor: material.Colors.red[50],
-                              child: const material.Icon(
-                                  material.Icons.receipt_long,
-                                  color: material.Colors.red),
-                            ),
-                            title: material.Text(
-                              (e['category'] ?? '-').toString(),
-                              style: const material.TextStyle(
-                                  fontWeight: material.FontWeight.w600),
-                            ),
-                            subtitle: material.Text(
-                              (e['note'] ?? '—').toString(),
-                              maxLines: 2,
-                              overflow: material.TextOverflow.ellipsis,
-                            ),
-                            trailing: material.Column(
-                              mainAxisAlignment:
-                                  material.MainAxisAlignment.center,
-                              crossAxisAlignment:
-                                  material.CrossAxisAlignment.end,
-                              children: [
-                                material.Text(
-                                  _formatCurrency((e['amount'] ?? 0) as num),
-                                  style: const material.TextStyle(
-                                      fontWeight: material.FontWeight.bold),
-                                ),
-                                const material.SizedBox(height: 4),
-                                material.Text(
-                                  isPaid ? 'Dibayar' : 'Belum dibayar',
-                                  style: material.TextStyle(
-                                    fontSize: 12,
-                                    color: isPaid
-                                        ? material.Colors.green
-                                        : material.Colors.orange,
+              child: material.AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: filtered.isEmpty
+                    ? const material.Center(
+                        key: material.ValueKey('empty'),
+                        child: material.Text('Tidak ada pengeluaran'))
+                    : material.FadeTransition(
+                        key: const material.ValueKey('list'),
+                        opacity: _listController,
+                        child: material.ListView.separated(
+                          padding: const material.EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          itemCount: filtered.length,
+                          separatorBuilder: (_, __) =>
+                              const material.SizedBox(height: 8),
+                          itemBuilder: (context, index) {
+                            final e = filtered[index];
+                            final isPaid = (e['is_paid'] ?? false) as bool;
+                            return material.TweenAnimationBuilder<double>(
+                              duration:
+                                  Duration(milliseconds: 150 + index * 50),
+                              tween: material.Tween(begin: 0.0, end: 1.0),
+                              builder: (context, t, child) {
+                                return material.Opacity(
+                                  opacity: t,
+                                  child: material.Transform.translate(
+                                    offset: material.Offset(0, 16 * (1 - t)),
+                                    child: child,
                                   ),
+                                );
+                              },
+                              child: OurbitCard(
+                                child: material.ListTile(
+                                  leading: material.CircleAvatar(
+                                    backgroundColor: material.Colors.red[50],
+                                    child: const material.Icon(
+                                        material.Icons.receipt_long,
+                                        color: material.Colors.red),
+                                  ),
+                                  title: material.Text(
+                                    (e['category'] ?? '-').toString(),
+                                    style: const material.TextStyle(
+                                        fontWeight: material.FontWeight.w600),
+                                  ),
+                                  subtitle: material.Text(
+                                    (e['note'] ?? '—').toString(),
+                                    maxLines: 2,
+                                    overflow: material.TextOverflow.ellipsis,
+                                  ),
+                                  trailing: material.Column(
+                                    mainAxisAlignment:
+                                        material.MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        material.CrossAxisAlignment.end,
+                                    children: [
+                                      material.Text(
+                                        _formatCurrency(
+                                            (e['amount'] ?? 0) as num),
+                                        style: const material.TextStyle(
+                                            fontWeight:
+                                                material.FontWeight.bold),
+                                      ),
+                                      const material.SizedBox(height: 4),
+                                      material.Text(
+                                        isPaid ? 'Dibayar' : 'Belum dibayar',
+                                        style: material.TextStyle(
+                                          fontSize: 12,
+                                          color: isPaid
+                                              ? material.Colors.green
+                                              : material.Colors.orange,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  onTap: () {},
                                 ),
-                              ],
-                            ),
-                            onTap: () {},
-                          ),
-                        );
-                      },
-                    ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+              ),
             ),
           ],
         );

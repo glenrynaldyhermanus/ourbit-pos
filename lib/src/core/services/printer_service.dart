@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 
-import 'package:bluetooth_print/bluetooth_print.dart';
-import 'package:bluetooth_print/bluetooth_print_model.dart';
+// Temporarily remove direct bluetooth_print dependency. We will re-implement using
+// flutter_bluetooth_printer API later.
+// import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
 
 class PrinterService {
   PrinterService._internal();
@@ -10,46 +11,19 @@ class PrinterService {
   static final PrinterService _instance = PrinterService._internal();
   static PrinterService get instance => _instance;
 
-  final BluetoothPrint _bluetoothPrint = BluetoothPrint.instance;
-  BluetoothDevice? _connectedDevice;
+  // TODO: Rewire to flutter_bluetooth_printer implementation
+  dynamic _connectedDevice;
 
-  Future<BluetoothDevice?> connectPreferredPrinter(
+  Future<dynamic> connectPreferredPrinter(
       {Duration timeout = const Duration(seconds: 6)}) async {
     try {
       if (!(Platform.isAndroid || Platform.isIOS)) {
         throw UnsupportedError(
             'Bluetooth printing hanya didukung di Android/iOS');
       }
-      final bool isConnected = await _bluetoothPrint.isConnected ?? false;
-      if (isConnected && _connectedDevice != null) return _connectedDevice;
-
-      await _bluetoothPrint.startScan(timeout: timeout);
-      final List<BluetoothDevice> devices = await _bluetoothPrint
-          .scanResults.first
-          .timeout(timeout + const Duration(seconds: 1));
-
-      BluetoothDevice? candidate;
-      for (final d in devices) {
-        final name = (d.name ?? '').toLowerCase();
-        if (name.contains('rpp02') ||
-            name.contains('mp-58') ||
-            name.contains('mp58') ||
-            name.contains('rpp02n')) {
-          candidate = d;
-          break;
-        }
-      }
-
-      candidate ??= devices.isNotEmpty ? devices.first : null;
-      if (candidate == null) return null;
-
-      await _bluetoothPrint.connect(candidate);
-      _connectedDevice = candidate;
-      return candidate;
+      return null; // No-op for now
     } catch (_) {
       return null;
-    } finally {
-      await _bluetoothPrint.stopScan();
     }
   }
 
@@ -65,77 +39,9 @@ class PrinterService {
       throw UnsupportedError(
           'Bluetooth printing hanya didukung di Android/iOS');
     }
-    final bool isConnected = await _bluetoothPrint.isConnected ?? false;
-    if (!isConnected) {
-      final device = await connectPreferredPrinter();
-      if (device == null) return;
-    }
+    // No-op until bluetooth printer re-integrated
 
-    final List<LineText> lines = [];
-    lines.add(LineText(
-      type: LineText.TYPE_TEXT,
-      content: title,
-      weight: 2,
-      width: 2,
-      height: 2,
-      align: LineText.ALIGN_CENTER,
-      linefeed: 1,
-    ));
-    lines.add(LineText(
-        type: LineText.TYPE_TEXT,
-        content: '--------------------------------',
-        linefeed: 1));
-
-    for (final item in items) {
-      final String name = item['product']['name'] ?? '';
-      final int qty = item['quantity'] ?? 0;
-      final double price = (item['price'] ?? 0).toDouble();
-      final double amount = price * qty;
-      lines.add(LineText(type: LineText.TYPE_TEXT, content: name, linefeed: 1));
-      lines.add(LineText(
-          type: LineText.TYPE_TEXT,
-          content:
-              '$qty x ${_formatCurrency(price)}   ${_formatCurrency(amount)}',
-          align: LineText.ALIGN_RIGHT,
-          linefeed: 1));
-    }
-
-    lines.add(LineText(
-        type: LineText.TYPE_TEXT,
-        content: '--------------------------------',
-        linefeed: 1));
-    lines.add(LineText(
-        type: LineText.TYPE_TEXT,
-        content: 'Subtotal: ${_formatCurrency(subtotal)}',
-        align: LineText.ALIGN_RIGHT,
-        linefeed: 1));
-    lines.add(LineText(
-        type: LineText.TYPE_TEXT,
-        content: 'Pajak (11%): ${_formatCurrency(tax)}',
-        align: LineText.ALIGN_RIGHT,
-        linefeed: 1));
-    lines.add(LineText(
-        type: LineText.TYPE_TEXT,
-        content: 'Total: ${_formatCurrency(total)}',
-        weight: 2,
-        align: LineText.ALIGN_RIGHT,
-        linefeed: 2));
-
-    if (footerNote != null && footerNote.isNotEmpty) {
-      lines.add(LineText(
-          type: LineText.TYPE_TEXT,
-          content: footerNote,
-          align: LineText.ALIGN_CENTER,
-          linefeed: 1));
-    }
-
-    lines.add(LineText(
-        type: LineText.TYPE_TEXT,
-        content: 'Terima kasih!',
-        align: LineText.ALIGN_CENTER,
-        linefeed: 2));
-
-    await _bluetoothPrint.printReceipt({}, lines);
+    // Intentionally no-op for now to keep build green while migrating plugin
   }
 
   String _formatCurrency(double amount) {

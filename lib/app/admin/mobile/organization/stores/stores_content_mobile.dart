@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' as material;
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_dialog.dart';
+import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
 import 'package:ourbit_pos/src/core/services/local_storage_service.dart';
 import 'package:ourbit_pos/src/core/utils/logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -14,16 +15,41 @@ class StoresContentMobile extends material.StatefulWidget {
       _StoresContentMobileState();
 }
 
-class _StoresContentMobileState extends material.State<StoresContentMobile> {
+class _StoresContentMobileState extends material.State<StoresContentMobile>
+    with material.TickerProviderStateMixin {
   String _query = '';
   String? _businessId;
   bool _loading = false;
   List<Map<String, dynamic>> _stores = [];
+  
+  // Animation controllers
+  late material.AnimationController _listController;
+  late material.AnimationController _detailController;
+  String? _selectedStoreId;
 
   @override
   void initState() {
     super.initState();
+    _initAnimationControllers();
     _initialize();
+  }
+
+  void _initAnimationControllers() {
+    _listController = material.AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _detailController = material.AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _listController.dispose();
+    _detailController.dispose();
+    super.dispose();
   }
 
   Future<void> _initialize() async {
@@ -36,7 +62,10 @@ class _StoresContentMobileState extends material.State<StoresContentMobile> {
     } catch (e) {
       Logger.error('STORES_MOBILE_INIT_ERROR: $e');
     } finally {
-      if (mounted) setState(() => _loading = false);
+      if (mounted) {
+        setState(() => _loading = false);
+        _listController.forward();
+      }
     }
   }
 
@@ -94,6 +123,9 @@ class _StoresContentMobileState extends material.State<StoresContentMobile> {
   }
 
   void _showStoreDetail(Map<String, dynamic> store) {
+    _selectedStoreId = store['id']?.toString();
+    _detailController.forward();
+    
     material.showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -137,14 +169,15 @@ class _StoresContentMobileState extends material.State<StoresContentMobile> {
               ],
             ),
             const material.SizedBox(height: 16),
-            _buildDetailRow('Alamat', (store['address'] ?? '-').toString()),
-            _buildDetailRow(
+            _buildAnimatedDetailRow('Alamat', (store['address'] ?? '-').toString(), 0),
+            _buildAnimatedDetailRow(
               'Telepon',
               '${store['phone_country_code'] ?? ''} ${store['phone_number'] ?? ''}',
+              1,
             ),
-            _buildDetailRow(
-                'Tipe', store['is_branch'] == true ? 'Cabang' : 'Pusat'),
-            _buildDetailRow('Mata Uang', (store['currency'] ?? '-').toString()),
+            _buildAnimatedDetailRow(
+                'Tipe', store['is_branch'] == true ? 'Cabang' : 'Pusat', 2),
+            _buildAnimatedDetailRow('Mata Uang', (store['currency'] ?? '-').toString(), 3),
             const material.SizedBox(height: 16),
             material.Row(
               children: [
@@ -175,6 +208,25 @@ class _StoresContentMobileState extends material.State<StoresContentMobile> {
           ],
         ),
       ),
+    ).then((_) {
+      _selectedStoreId = null;
+      _detailController.reset();
+    });
+  }
+
+  material.Widget _buildAnimatedDetailRow(String label, String value, int index) {
+    return material.TweenAnimationBuilder<double>(
+      duration: Duration(milliseconds: 200 + (index * 50)),
+      tween: material.Tween(begin: 0.0, end: 1.0),
+      builder: (context, opacity, child) {
+        return material.Opacity(
+          opacity: opacity,
+          child: material.Transform.translate(
+            offset: material.Offset(0, 10 * (1 - opacity)),
+            child: _buildDetailRow(label, value),
+          ),
+        );
+      },
     );
   }
 
@@ -201,6 +253,41 @@ class _StoresContentMobileState extends material.State<StoresContentMobile> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  material.Widget _buildStoreTypeBadge(bool isBranch, String storeId) {
+    final isSelected = _selectedStoreId == storeId;
+    final isBranchStore = isBranch;
+    
+    return material.AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      padding: const material.EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 4,
+      ),
+      decoration: material.BoxDecoration(
+        color: isSelected 
+            ? (isBranchStore ? material.Colors.orange[100] : material.Colors.green[100])
+            : (isBranchStore ? material.Colors.orange[50] : material.Colors.green[50]),
+        borderRadius: material.BorderRadius.circular(12),
+        border: isSelected 
+            ? material.Border.all(
+                color: isBranchStore ? material.Colors.orange[300]! : material.Colors.green[300]!,
+                width: 1,
+              )
+            : null,
+      ),
+      child: material.Text(
+        isBranchStore ? 'Cabang' : 'Pusat',
+        style: material.TextStyle(
+          fontSize: 12,
+          color: isSelected 
+              ? (isBranchStore ? material.Colors.orange[800] : material.Colors.green[800])
+              : (isBranchStore ? material.Colors.orange[700] : material.Colors.green[700]),
+          fontWeight: material.FontWeight.w500,
+        ),
       ),
     );
   }
@@ -241,97 +328,98 @@ class _StoresContentMobileState extends material.State<StoresContentMobile> {
 
         // List
         material.Expanded(
-          child: filtered.isEmpty
-              ? const material.Center(
-                  child: material.Text('Tidak ada toko'),
-                )
-              : material.ListView.separated(
-                  padding: const material.EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  itemCount: filtered.length,
-                  separatorBuilder: (_, __) =>
-                      const material.SizedBox(height: 8),
-                  itemBuilder: (context, index) {
-                    final s = filtered[index];
-                    return material.Card(
-                      child: material.ListTile(
-                        leading: material.CircleAvatar(
-                          backgroundColor: material.Colors.blue[50],
-                          child: material.Icon(
-                            material.Icons.store,
-                            color: material.Colors.blue,
-                          ),
-                        ),
-                        title: material.Text(
-                          (s['name'] ?? '-').toString(),
-                          style: const material.TextStyle(
-                            fontWeight: material.FontWeight.w600,
-                          ),
-                        ),
-                        subtitle: material.Column(
-                          crossAxisAlignment: material.CrossAxisAlignment.start,
-                          children: [
-                            material.Text(
-                              (s['business_field'] ?? '—').toString(),
-                              maxLines: 1,
-                              overflow: material.TextOverflow.ellipsis,
-                            ),
-                            const material.SizedBox(height: 4),
-                            material.Text(
-                              (s['address'] ?? '—').toString(),
-                              maxLines: 1,
-                              overflow: material.TextOverflow.ellipsis,
-                              style: material.TextStyle(
-                                fontSize: 12,
-                                color: material.Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                        trailing: material.Column(
-                          mainAxisAlignment: material.MainAxisAlignment.center,
-                          crossAxisAlignment: material.CrossAxisAlignment.end,
-                          children: [
-                            material.Container(
-                              padding: const material.EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: material.BoxDecoration(
-                                color: s['is_branch'] == true
-                                    ? material.Colors.orange[50]
-                                    : material.Colors.green[50],
-                                borderRadius:
-                                    material.BorderRadius.circular(12),
-                              ),
-                              child: material.Text(
-                                s['is_branch'] == true ? 'Cabang' : 'Pusat',
-                                style: material.TextStyle(
-                                  fontSize: 12,
-                                  color: s['is_branch'] == true
-                                      ? material.Colors.orange[700]
-                                      : material.Colors.green[700],
-                                  fontWeight: material.FontWeight.w500,
+          child: material.AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: filtered.isEmpty
+                ? const material.Center(
+                    key: material.ValueKey('empty'),
+                    child: material.Text('Tidak ada toko'),
+                  )
+                : material.FadeTransition(
+                    opacity: _listController,
+                    child: material.ListView.separated(
+                      key: const material.ValueKey('list'),
+                      padding: const material.EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      itemCount: filtered.length,
+                      separatorBuilder: (_, __) =>
+                          const material.SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final s = filtered[index];
+                        return material.TweenAnimationBuilder<double>(
+                          duration: Duration(milliseconds: 150 + (index * 50)),
+                          tween: material.Tween(begin: 0.0, end: 1.0),
+                          builder: (context, opacity, child) {
+                            return material.Opacity(
+                              opacity: opacity,
+                              child: material.Transform.translate(
+                                offset: material.Offset(0, 20 * (1 - opacity)),
+                                child: OurbitCard(
+                                  child: material.ListTile(
+                                    leading: material.CircleAvatar(
+                                      backgroundColor: material.Colors.blue[50],
+                                      child: material.Icon(
+                                        material.Icons.store,
+                                        color: material.Colors.blue,
+                                      ),
+                                    ),
+                                    title: material.Text(
+                                      (s['name'] ?? '-').toString(),
+                                      style: const material.TextStyle(
+                                        fontWeight: material.FontWeight.w600,
+                                      ),
+                                    ),
+                                    subtitle: material.Column(
+                                      crossAxisAlignment: material.CrossAxisAlignment.start,
+                                      children: [
+                                        material.Text(
+                                          (s['business_field'] ?? '—').toString(),
+                                          maxLines: 1,
+                                          overflow: material.TextOverflow.ellipsis,
+                                        ),
+                                        const material.SizedBox(height: 4),
+                                        material.Text(
+                                          (s['address'] ?? '—').toString(),
+                                          maxLines: 1,
+                                          overflow: material.TextOverflow.ellipsis,
+                                          style: material.TextStyle(
+                                            fontSize: 12,
+                                            color: material.Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    trailing: material.Column(
+                                      mainAxisAlignment: material.MainAxisAlignment.center,
+                                      crossAxisAlignment: material.CrossAxisAlignment.end,
+                                      children: [
+                                        _buildStoreTypeBadge(
+                                          s['is_branch'] == true,
+                                          (s['id'] ?? '').toString(),
+                                        ),
+                                        const material.SizedBox(height: 4),
+                                        material.Text(
+                                          (s['currency'] ?? '—').toString(),
+                                          style: material.TextStyle(
+                                            fontSize: 12,
+                                            color: material.Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () => _showStoreDetail(s),
+                                  ),
                                 ),
                               ),
-                            ),
-                            const material.SizedBox(height: 4),
-                            material.Text(
-                              (s['currency'] ?? '—').toString(),
-                              style: material.TextStyle(
-                                fontSize: 12,
-                                color: material.Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                        onTap: () => _showStoreDetail(s),
-                      ),
-                    );
-                  },
-                ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+          ),
         ),
       ],
     );

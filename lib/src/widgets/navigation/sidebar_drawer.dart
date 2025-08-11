@@ -1,3 +1,4 @@
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,94 +6,98 @@ import 'package:ourbit_pos/blocs/auth_bloc.dart';
 import 'package:ourbit_pos/blocs/auth_event.dart';
 import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 
-class SidebarDrawer extends material.StatelessWidget {
+class SidebarDrawer extends StatelessWidget {
   const SidebarDrawer({super.key});
 
   @override
-  material.Widget build(material.BuildContext context) {
+  Widget build(BuildContext context) {
     final currentLocation = GoRouterState.of(context).uri.path;
-    
+
     return material.Drawer(
-      child: material.SafeArea(
-        child: material.ListView(
-          padding: const material.EdgeInsets.symmetric(vertical: 8),
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.transparent,
+      child: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 8),
           children: [
             // Header
-            material.Container(
-              padding: const material.EdgeInsets.all(16),
-              child: material.Text(
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: const Text(
                 'Menu',
-                style: material.TextStyle(
+                style: TextStyle(
                   fontSize: 18,
-                  fontWeight: material.FontWeight.w600,
+                  fontWeight: FontWeight.w600,
                   color: AppColors.primary,
                 ),
               ),
             ),
-            const material.Divider(),
-            
+            const Divider(),
+
             // Navigation Items
             _buildNavItem(
               context,
-              icon: material.Icons.point_of_sale,
-              label: 'POS',
+              icon: LucideIcons.layoutDashboard,
+              label: 'Kasir',
               route: '/pos',
               isSelected: currentLocation == '/pos',
             ),
             _buildNavItem(
               context,
-              icon: material.Icons.inventory_2_outlined,
+              icon: LucideIcons.package,
               label: 'Data',
               route: '/management',
               isSelected: currentLocation.startsWith('/management'),
             ),
             _buildNavItem(
               context,
-              icon: material.Icons.apartment_outlined,
+              icon: LucideIcons.building2,
               label: 'Organisasi',
               route: '/organization',
               isSelected: currentLocation.startsWith('/organization'),
             ),
             _buildNavItem(
               context,
-              icon: material.Icons.insert_chart_outlined,
+              icon: LucideIcons.fileText,
               label: 'Laporan',
               route: '/reports',
               isSelected: currentLocation.startsWith('/reports'),
             ),
-            const material.Divider(),
+            const Divider(),
             _buildNavItem(
               context,
-              icon: material.Icons.settings_outlined,
+              icon: LucideIcons.settings,
               label: 'Pengaturan',
               route: '/settings',
               isSelected: currentLocation.startsWith('/settings'),
             ),
             _buildNavItem(
               context,
-              icon: material.Icons.help_outline,
+              icon: LucideIcons.messageCircleQuestion,
               label: 'Bantuan',
               route: '/help',
               isSelected: currentLocation.startsWith('/help'),
             ),
-            const material.Divider(),
-            
+            const Divider(),
+
             // Logout
             material.ListTile(
-              leading: const material.Icon(
-                material.Icons.logout,
+              leading: const Icon(
+                LucideIcons.logOut,
                 color: material.Colors.redAccent,
               ),
-              title: const material.Text(
-                'Logout',
-                style: material.TextStyle(
+              title: const Text(
+                'Keluar',
+                style: TextStyle(
                   color: material.Colors.redAccent,
-                  fontWeight: material.FontWeight.w500,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               onTap: () {
-                material.Navigator.of(context).pop();
+                Navigator.of(context).pop();
                 context.read<AuthBloc>().add(SignOutRequested());
+                // Pastikan redirect ke halaman login setelah logout
+                context.go('/login');
               },
             ),
           ],
@@ -101,28 +106,28 @@ class SidebarDrawer extends material.StatelessWidget {
     );
   }
 
-  material.Widget _buildNavItem(
-    material.BuildContext context, {
-    required material.IconData icon,
+  Widget _buildNavItem(
+    BuildContext context, {
+    required IconData icon,
     required String label,
     required String route,
     required bool isSelected,
   }) {
     return material.ListTile(
-      leading: material.Icon(
+      leading: Icon(
         icon,
         color: isSelected ? AppColors.primary : null,
       ),
-      title: material.Text(
+      title: Text(
         label,
-        style: material.TextStyle(
-          fontWeight: isSelected ? material.FontWeight.w600 : material.FontWeight.normal,
+        style: TextStyle(
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           color: isSelected ? AppColors.primary : null,
         ),
       ),
       tileColor: isSelected ? AppColors.primary.withValues(alpha: 0.1) : null,
       onTap: () {
-        material.Navigator.of(context).pop();
+        Navigator.of(context).pop();
         context.go(route);
       },
     );

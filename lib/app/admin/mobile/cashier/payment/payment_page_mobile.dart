@@ -21,6 +21,8 @@ class PaymentPageMobile extends StatefulWidget {
 class _PaymentPageMobileState extends State<PaymentPageMobile>
     with material.TickerProviderStateMixin {
   late material.AnimationController _animationController;
+  late material.AnimationController _summaryController;
+  late material.AnimationController _buttonController;
   late material.Animation<double> _fadeAnimation;
   String salesDraftNote = '';
   Map<String, dynamic>? selectedPaymentMethod;
@@ -32,19 +34,35 @@ class _PaymentPageMobileState extends State<PaymentPageMobile>
   @override
   void initState() {
     super.initState();
+    _initAnimationControllers();
+    context.read<PaymentBloc>().add(LoadPaymentData());
+  }
+
+  void _initAnimationControllers() {
     _animationController = material.AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    _fadeAnimation = material.Tween<double>(begin: 0.0, end: 1.0).animate(
-      material.CurvedAnimation(parent: _animationController, curve: material.Curves.easeInOut),
+    _summaryController = material.AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
     );
-    context.read<PaymentBloc>().add(LoadPaymentData());
+    _buttonController = material.AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    
+    _fadeAnimation = material.Tween<double>(begin: 0.0, end: 1.0).animate(
+      material.CurvedAnimation(
+          parent: _animationController, curve: material.Curves.easeInOut),
+    );
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    _summaryController.dispose();
+    _buttonController.dispose();
     super.dispose();
   }
 
@@ -64,7 +82,34 @@ class _PaymentPageMobileState extends State<PaymentPageMobile>
         )}';
   }
 
+  String? _getPaymentMethodId(Map<String, dynamic> method) {
+    final dynamic pmPlural = method['payment_methods'];
+    final dynamic pm = method['payment_method'];
+    final dynamic id = method['payment_method_id'] ??
+        (pmPlural is Map ? pmPlural['id'] : null) ??
+        (pm is Map ? pm['id'] : null) ??
+        method['id'];
+    return id?.toString();
+  }
 
+  String _getPaymentMethodName(Map<String, dynamic> method) {
+    final dynamic pmPlural = method['payment_methods'];
+    final dynamic pm = method['payment_method'];
+    final dynamic name = (pmPlural is Map ? pmPlural['name'] : null) ??
+        (pm is Map ? pm['name'] : null) ??
+        method['name'];
+    final String nameStr = name?.toString() ?? '';
+    return nameStr.trim().isNotEmpty ? nameStr : 'Metode Pembayaran';
+  }
+
+  String _getPaymentMethodDescription(Map<String, dynamic> method) {
+    final dynamic pmPlural = method['payment_methods'];
+    final dynamic pm = method['payment_method'];
+    final dynamic desc = (pmPlural is Map ? pmPlural['description'] : null) ??
+        (pm is Map ? pm['description'] : null) ??
+        method['description'];
+    return desc?.toString() ?? '';
+  }
 
   void _processPayment(List<Map<String, dynamic>> cartItems, double subtotal,
       double tax, double total) {
@@ -77,14 +122,183 @@ class _PaymentPageMobileState extends State<PaymentPageMobile>
       return;
     }
 
+    final String? methodId = _getPaymentMethodId(selectedPaymentMethod!);
+    if (methodId == null || methodId.isEmpty) {
+      OurbitToast.error(
+        context: context,
+        title: 'Gagal',
+        content: 'Metode pembayaran tidak valid',
+      );
+      return;
+    }
+
+    _buttonController.forward();
     context.read<PaymentBloc>().add(ProcessPayment(
           cartItems: cartItems,
           subtotal: subtotal,
           tax: tax,
           total: total,
-          paymentMethodId: selectedPaymentMethod!['payment_method_id'],
+          paymentMethodId: methodId,
           salesNotes: salesDraftNote,
         ));
+  }
+
+  material.Widget _buildOrderSummaryItem(Map<String, dynamic> item, int index) {
+    return material.TweenAnimationBuilder<double>(
+      duration: Duration(milliseconds: 200 + (index * 100)),
+      tween: material.Tween(begin: 0.0, end: 1.0),
+      builder: (context, progress, child) {
+        return material.Opacity(
+          opacity: progress,
+          child: material.Transform.translate(
+            offset: material.Offset(0, 20 * (1 - progress)),
+            child: material.Padding(
+              padding: const material.EdgeInsets.symmetric(vertical: 8),
+              child: material.Row(
+                children: [
+                  material.ClipRRect(
+                    borderRadius: material.BorderRadius.circular(8),
+                    child: material.Image.network(
+                      item['product']['image_url'] ?? '',
+                      width: 50,
+                      height: 50,
+                      fit: material.BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          material.Container(
+                        width: 50,
+                        height: 50,
+                        decoration: material.BoxDecoration(
+                          color: material.Colors.grey[300],
+                          borderRadius: material.BorderRadius.circular(8),
+                        ),
+                        child: material.Icon(
+                            material.Icons.image,
+                            color: material.Colors.grey[600]),
+                      ),
+                    ),
+                  ),
+                  const material.SizedBox(width: 12),
+                  material.Expanded(
+                    child: material.Column(
+                      crossAxisAlignment: material.CrossAxisAlignment.start,
+                      children: [
+                        material.Text(
+                          item['product']['name'] ?? '',
+                          style: const material.TextStyle(
+                            fontWeight: material.FontWeight.w600,
+                          ),
+                        ),
+                        material.Text(
+                          'Qty: ${item['quantity']}',
+                          style: material.TextStyle(
+                            color: material.Colors.grey[600],
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  material.Text(
+                    _formatCurrency(item['price'] * item['quantity']),
+                    style: const material.TextStyle(
+                      fontWeight: material.FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  material.Widget _buildPaymentMethodTile(Map<String, dynamic> method) {
+    final String? methodId = _getPaymentMethodId(method);
+    final String name = _getPaymentMethodName(method);
+    final String desc = _getPaymentMethodDescription(method);
+    final String? selectedId = selectedPaymentMethod == null
+        ? null
+        : _getPaymentMethodId(selectedPaymentMethod!);
+    final bool isSelected = methodId == selectedId;
+    
+    if (methodId == null) {
+      return const material.SizedBox.shrink();
+    }
+    
+    return material.AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      margin: const material.EdgeInsets.symmetric(vertical: 4),
+      decoration: material.BoxDecoration(
+        color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : material.Colors.transparent,
+        borderRadius: material.BorderRadius.circular(8),
+        border: isSelected 
+            ? material.Border.all(color: AppColors.primary, width: 1)
+            : null,
+      ),
+      child: material.RadioListTile<String>(
+        title: material.Text(name),
+        subtitle: desc.isEmpty ? null : material.Text(desc),
+        value: methodId,
+        groupValue: selectedId,
+        onChanged: (value) {
+          if (value == null) return;
+          setState(() {
+            selectedPaymentMethod = method;
+          });
+        },
+      ),
+    );
+  }
+
+  material.Widget _buildProcessButton(bool isProcessing) {
+    return material.AnimatedCrossFade(
+      duration: const Duration(milliseconds: 300),
+      crossFadeState: isProcessing 
+          ? material.CrossFadeState.showFirst 
+          : material.CrossFadeState.showSecond,
+      firstChild: material.SizedBox(
+        width: double.infinity,
+        child: material.Container(
+          padding: const material.EdgeInsets.symmetric(vertical: 12),
+          decoration: material.BoxDecoration(
+            color: AppColors.primary,
+            borderRadius: material.BorderRadius.circular(8),
+          ),
+          child: const material.Row(
+            mainAxisAlignment: material.MainAxisAlignment.center,
+            children: [
+              material.SizedBox(
+                width: 20,
+                height: 20,
+                child: material.CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: material.AlwaysStoppedAnimation<material.Color>(
+                    material.Colors.white,
+                  ),
+                ),
+              ),
+              material.SizedBox(width: 12),
+              material.Text(
+                'Memproses...',
+                style: material.TextStyle(
+                  color: material.Colors.white,
+                  fontWeight: material.FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      secondChild: material.SizedBox(
+        width: double.infinity,
+        child: OurbitButton.primary(
+          onPressed: () => _processPayment(
+            _lastCartItems, _lastSubtotal, _lastTax, _lastTotal),
+          label: 'Proses Pembayaran',
+        ),
+      ),
+    );
   }
 
   @override
@@ -97,19 +311,28 @@ class _PaymentPageMobileState extends State<PaymentPageMobile>
         elevation: 0,
         leading: material.IconButton(
           icon: const material.Icon(material.Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (material.Navigator.of(context).canPop()) {
+              context.pop();
+            } else {
+              context.go('/pos');
+            }
+          },
         ),
       ),
       body: BlocListener<PaymentBloc, PaymentState>(
         listener: (context, state) {
           if (state is PaymentLoaded) {
             _animationController.forward();
+            _summaryController.forward();
           } else if (state is PaymentSuccess) {
             if (_lastCartItems.isNotEmpty && _lastTotal > 0) {
               (() async {
                 try {
-                  if (material.Theme.of(context).platform == material.TargetPlatform.android ||
-                      material.Theme.of(context).platform == material.TargetPlatform.iOS) {
+                  if (material.Theme.of(context).platform ==
+                          material.TargetPlatform.android ||
+                      material.Theme.of(context).platform ==
+                          material.TargetPlatform.iOS) {
                     await PrinterService.instance.printReceipt(
                       title: 'Struk Pembelian',
                       items: _lastCartItems,
@@ -139,6 +362,7 @@ class _PaymentPageMobileState extends State<PaymentPageMobile>
             }
             context.go('/success');
           } else if (state is PaymentError) {
+            _buttonController.reverse();
             OurbitToast.error(
               context: context,
               title: 'Gagal',
@@ -149,7 +373,8 @@ class _PaymentPageMobileState extends State<PaymentPageMobile>
         child: BlocBuilder<PaymentBloc, PaymentState>(
           builder: (context, state) {
             if (state is PaymentLoading || state is PaymentInitial) {
-              return const material.Center(child: material.CircularProgressIndicator());
+              return const material.Center(
+                  child: material.CircularProgressIndicator());
             }
 
             if (state is PaymentError) {
@@ -157,7 +382,8 @@ class _PaymentPageMobileState extends State<PaymentPageMobile>
                 child: material.Column(
                   mainAxisAlignment: material.MainAxisAlignment.center,
                   children: [
-                    material.Icon(material.Icons.error_outline, size: 64, color: material.Colors.red[400]),
+                    material.Icon(material.Icons.error_outline,
+                        size: 64, color: material.Colors.red[400]),
                     const material.SizedBox(height: 16),
                     material.Text('Error: ${state.message}'),
                     const material.SizedBox(height: 16),
@@ -219,63 +445,22 @@ class _PaymentPageMobileState extends State<PaymentPageMobile>
                               ],
                             ),
                             const material.SizedBox(height: 16),
-                            ...cartItems.map((item) => material.Padding(
-                                  padding: const material.EdgeInsets.symmetric(vertical: 8),
-                                  child: material.Row(
-                                    children: [
-                                      material.ClipRRect(
-                                        borderRadius: material.BorderRadius.circular(8),
-                                        child: material.Image.network(
-                                          item['product']['image_url'] ?? '',
-                                          width: 50,
-                                          height: 50,
-                                          fit: material.BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) =>
-                                              material.Container(
-                                            width: 50,
-                                            height: 50,
-                                            decoration: material.BoxDecoration(
-                                              color: material.Colors.grey[300],
-                                              borderRadius: material.BorderRadius.circular(8),
-                                            ),
-                                            child: material.Icon(material.Icons.image,
-                                                color: material.Colors.grey[600]),
-                                          ),
-                                        ),
-                                      ),
-                                      const material.SizedBox(width: 12),
-                                      material.Expanded(
-                                        child: material.Column(
-                                          crossAxisAlignment: material.CrossAxisAlignment.start,
-                                          children: [
-                                            material.Text(
-                                              item['product']['name'] ?? '',
-                                              style: const material.TextStyle(
-                                                fontWeight: material.FontWeight.w600,
-                                              ),
-                                            ),
-                                            material.Text(
-                                              'Qty: ${item['quantity']}',
-                                              style: material.TextStyle(
-                                                color: material.Colors.grey[600],
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      material.Text(
-                                        _formatCurrency(item['price'] * item['quantity']),
-                                        style: const material.TextStyle(
-                                          fontWeight: material.FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )),
+                            material.FadeTransition(
+                              opacity: _summaryController,
+                              child: material.Column(
+                                children: [
+                                  ...cartItems.asMap().entries.map((entry) {
+                                    final index = entry.key;
+                                    final item = entry.value;
+                                    return _buildOrderSummaryItem(item, index);
+                                  }),
+                                ],
+                              ),
+                            ),
                             const material.Divider(),
                             material.Row(
-                              mainAxisAlignment: material.MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment:
+                                  material.MainAxisAlignment.spaceBetween,
                               children: [
                                 const material.Text('Subtotal:'),
                                 material.Text(_formatCurrency(subtotal)),
@@ -283,7 +468,8 @@ class _PaymentPageMobileState extends State<PaymentPageMobile>
                             ),
                             const material.SizedBox(height: 8),
                             material.Row(
-                              mainAxisAlignment: material.MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment:
+                                  material.MainAxisAlignment.spaceBetween,
                               children: [
                                 const material.Text('Pajak (11%):'),
                                 material.Text(_formatCurrency(tax)),
@@ -291,7 +477,8 @@ class _PaymentPageMobileState extends State<PaymentPageMobile>
                             ),
                             const material.Divider(),
                             material.Row(
-                              mainAxisAlignment: material.MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment:
+                                  material.MainAxisAlignment.spaceBetween,
                               children: [
                                 const material.Text(
                                   'Total:',
@@ -314,9 +501,9 @@ class _PaymentPageMobileState extends State<PaymentPageMobile>
                         ),
                       ),
                     ),
-                    
+
                     const material.SizedBox(height: 16),
-                    
+
                     // Payment Methods
                     OurbitCard(
                       child: material.Padding(
@@ -332,24 +519,14 @@ class _PaymentPageMobileState extends State<PaymentPageMobile>
                               ),
                             ),
                             const material.SizedBox(height: 16),
-                            ...storePaymentMethods.map((method) => material.RadioListTile<String>(
-                                  title: material.Text(method['payment_method']['name'] ?? ''),
-                                  subtitle: material.Text(method['payment_method']['description'] ?? ''),
-                                  value: method['payment_method_id'],
-                                  groupValue: selectedPaymentMethod?['payment_method_id'],
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedPaymentMethod = method;
-                                    });
-                                  },
-                                )),
+                            ...storePaymentMethods.map((method) => _buildPaymentMethodTile(method)),
                           ],
                         ),
                       ),
                     ),
-                    
+
                     const material.SizedBox(height: 16),
-                    
+
                     // Notes Section
                     OurbitCard(
                       child: material.Padding(
@@ -375,17 +552,11 @@ class _PaymentPageMobileState extends State<PaymentPageMobile>
                         ),
                       ),
                     ),
-                    
+
                     const material.SizedBox(height: 24),
-                    
+
                     // Process Payment Button
-                    material.SizedBox(
-                      width: double.infinity,
-                      child: OurbitButton.primary(
-                        onPressed: isProcessing ? null : () => _processPayment(cartItems, subtotal, tax, total),
-                        label: isProcessing ? 'Memproses...' : 'Proses Pembayaran',
-                      ),
-                    ),
+                    _buildProcessButton(isProcessing),
                   ],
                 ),
               ),

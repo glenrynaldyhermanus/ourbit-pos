@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' as material;
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_dialog.dart';
+import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
 import 'package:ourbit_pos/src/core/services/local_storage_service.dart';
 import 'package:ourbit_pos/src/core/utils/logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -15,17 +16,42 @@ class StaffsContentMobile extends material.StatefulWidget {
       _StaffsContentMobileState();
 }
 
-class _StaffsContentMobileState extends material.State<StaffsContentMobile> {
+class _StaffsContentMobileState extends material.State<StaffsContentMobile>
+    with material.TickerProviderStateMixin {
   String _query = '';
   String? _businessId;
   String? _storeId;
   bool _loading = false;
   List<Map<String, dynamic>> _staff = [];
 
+  // Animation controllers
+  late material.AnimationController _listController;
+  late material.AnimationController _detailController;
+  String? _selectedStaffId;
+
   @override
   void initState() {
     super.initState();
+    _initAnimationControllers();
     _initialize();
+  }
+
+  void _initAnimationControllers() {
+    _listController = material.AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _detailController = material.AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _listController.dispose();
+    _detailController.dispose();
+    super.dispose();
   }
 
   Future<void> _initialize() async {
@@ -38,7 +64,10 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile> {
     } catch (e) {
       Logger.error('STAFF_MOBILE_INIT_ERROR: $e');
     } finally {
-      if (mounted) setState(() => _loading = false);
+      if (mounted) {
+        setState(() => _loading = false);
+        _listController.forward();
+      }
     }
   }
 
@@ -157,7 +186,11 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile> {
   }
 
   void _showStaffDetail(Map<String, dynamic> staff) {
-    material.showModalBottomSheet(
+    _selectedStaffId = staff['user_id']?.toString();
+    _detailController.forward();
+
+    material
+        .showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) => material.Container(
@@ -200,13 +233,17 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile> {
               ],
             ),
             const material.SizedBox(height: 16),
-            _buildDetailRow('Email', (staff['email'] ?? '-').toString()),
-            _buildDetailRow('Telepon', (staff['phone'] ?? '-').toString()),
-            _buildDetailRow('Role', (staff['role']['name'] ?? '-').toString()),
-            _buildDetailRow(
+            _buildAnimatedDetailRow(
+                'Email', (staff['email'] ?? '-').toString(), 0),
+            _buildAnimatedDetailRow(
+                'Telepon', (staff['phone'] ?? '-').toString(), 1),
+            _buildAnimatedDetailRow(
+                'Role', (staff['role']['name'] ?? '-').toString(), 2),
+            _buildAnimatedDetailRow(
               'Bergabung',
               DateFormat('dd MMM yyyy')
                   .format(DateTime.parse(staff['created_at'])),
+              3,
             ),
             const material.SizedBox(height: 16),
             material.Row(
@@ -238,6 +275,27 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile> {
           ],
         ),
       ),
+    )
+        .then((_) {
+      _selectedStaffId = null;
+      _detailController.reset();
+    });
+  }
+
+  material.Widget _buildAnimatedDetailRow(
+      String label, String value, int index) {
+    return material.TweenAnimationBuilder<double>(
+      duration: Duration(milliseconds: 200 + (index * 50)),
+      tween: material.Tween(begin: 0.0, end: 1.0),
+      builder: (context, opacity, child) {
+        return material.Opacity(
+          opacity: opacity,
+          child: material.Transform.translate(
+            offset: material.Offset(0, 10 * (1 - opacity)),
+            child: _buildDetailRow(label, value),
+          ),
+        );
+      },
     );
   }
 
@@ -264,6 +322,36 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  material.Widget _buildRoleBadge(String roleName, String userId) {
+    final isSelected = _selectedStaffId == userId;
+
+    return material.AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      padding: const material.EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 4,
+      ),
+      decoration: material.BoxDecoration(
+        color:
+            isSelected ? material.Colors.blue[100] : material.Colors.blue[50],
+        borderRadius: material.BorderRadius.circular(12),
+        border: isSelected
+            ? material.Border.all(color: material.Colors.blue[300]!, width: 1)
+            : null,
+      ),
+      child: material.Text(
+        roleName,
+        style: material.TextStyle(
+          fontSize: 12,
+          color: isSelected
+              ? material.Colors.blue[800]
+              : material.Colors.blue[700],
+          fontWeight: material.FontWeight.w500,
+        ),
       ),
     );
   }
@@ -304,78 +392,88 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile> {
 
         // List
         material.Expanded(
-          child: filtered.isEmpty
-              ? const material.Center(
-                  child: material.Text('Tidak ada staff'),
-                )
-              : material.ListView.separated(
-                  padding: const material.EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  itemCount: filtered.length,
-                  separatorBuilder: (_, __) =>
-                      const material.SizedBox(height: 8),
-                  itemBuilder: (context, index) {
-                    final s = filtered[index];
-                    return material.Card(
-                      child: material.ListTile(
-                        leading: material.CircleAvatar(
-                          backgroundColor: material.Colors.green[50],
-                          child: material.Icon(
-                            material.Icons.person,
-                            color: material.Colors.green,
-                          ),
-                        ),
-                        title: material.Text(
-                          (s['name'] ?? '-').toString(),
-                          style: const material.TextStyle(
-                            fontWeight: material.FontWeight.w600,
-                          ),
-                        ),
-                        subtitle: material.Column(
-                          crossAxisAlignment: material.CrossAxisAlignment.start,
-                          children: [
-                            material.Text(
-                              (s['email'] ?? '—').toString(),
-                              maxLines: 1,
-                              overflow: material.TextOverflow.ellipsis,
-                            ),
-                            const material.SizedBox(height: 4),
-                            material.Text(
-                              (s['phone'] ?? '—').toString(),
-                              maxLines: 1,
-                              overflow: material.TextOverflow.ellipsis,
-                              style: material.TextStyle(
-                                fontSize: 12,
-                                color: material.Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                        trailing: material.Container(
-                          padding: const material.EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: material.BoxDecoration(
-                            color: material.Colors.blue[50],
-                            borderRadius: material.BorderRadius.circular(12),
-                          ),
-                          child: material.Text(
-                            (s['role']['name'] ?? '—').toString(),
-                            style: material.TextStyle(
-                              fontSize: 12,
-                              color: material.Colors.blue[700],
-                              fontWeight: material.FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        onTap: () => _showStaffDetail(s),
+          child: material.AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: filtered.isEmpty
+                ? const material.Center(
+                    key: material.ValueKey('empty'),
+                    child: material.Text('Tidak ada staff'),
+                  )
+                : material.FadeTransition(
+                    opacity: _listController,
+                    child: material.ListView.separated(
+                      key: const material.ValueKey('list'),
+                      padding: const material.EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
                       ),
-                    );
-                  },
-                ),
+                      itemCount: filtered.length,
+                      separatorBuilder: (_, __) =>
+                          const material.SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final s = filtered[index];
+                        return material.TweenAnimationBuilder<double>(
+                          duration: Duration(milliseconds: 150 + (index * 50)),
+                          tween: material.Tween(begin: 0.0, end: 1.0),
+                          builder: (context, opacity, child) {
+                            return material.Opacity(
+                              opacity: opacity,
+                              child: material.Transform.translate(
+                                offset: material.Offset(0, 20 * (1 - opacity)),
+                                child: OurbitCard(
+                                  child: material.ListTile(
+                                    leading: material.CircleAvatar(
+                                      backgroundColor:
+                                          material.Colors.green[50],
+                                      child: material.Icon(
+                                        material.Icons.person,
+                                        color: material.Colors.green,
+                                      ),
+                                    ),
+                                    title: material.Text(
+                                      (s['name'] ?? '-').toString(),
+                                      style: const material.TextStyle(
+                                        fontWeight: material.FontWeight.w600,
+                                      ),
+                                    ),
+                                    subtitle: material.Column(
+                                      crossAxisAlignment:
+                                          material.CrossAxisAlignment.start,
+                                      children: [
+                                        material.Text(
+                                          (s['email'] ?? '—').toString(),
+                                          maxLines: 1,
+                                          overflow:
+                                              material.TextOverflow.ellipsis,
+                                        ),
+                                        const material.SizedBox(height: 4),
+                                        material.Text(
+                                          (s['phone'] ?? '—').toString(),
+                                          maxLines: 1,
+                                          overflow:
+                                              material.TextOverflow.ellipsis,
+                                          style: material.TextStyle(
+                                            fontSize: 12,
+                                            color: material.Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    trailing: _buildRoleBadge(
+                                      (s['role']['name'] ?? '—').toString(),
+                                      (s['user_id'] ?? '').toString(),
+                                    ),
+                                    onTap: () => _showStaffDetail(s),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+          ),
         ),
       ],
     );

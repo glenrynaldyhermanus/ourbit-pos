@@ -62,12 +62,12 @@ dependencies:
 
   # Image & File Picker
   image_picker: ^1.0.7
-  file_picker: ^6.1.1
+  file_picker: ^10.2.4
 
   #UI
   shadcn_flutter: ^0.0.37
   gap: ^3.0.1
-  bluetooth_print: ^4.3.0
+  flutter_bluetooth_printer: ^2.19.0
   printing: ^5.14.2
   pdf: ^3.11.3
 

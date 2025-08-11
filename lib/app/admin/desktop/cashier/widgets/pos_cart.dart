@@ -67,7 +67,7 @@ class PosCart extends StatelessWidget {
                 Row(
                   children: [
                     const Icon(
-                      Icons.shopping_cart_outlined,
+                      LucideIcons.shoppingCart,
                       color: AppColors.primary,
                       size: 24,
                     ),
@@ -166,7 +166,7 @@ class PosCart extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.shopping_cart_outlined,
+            LucideIcons.shoppingCart,
             size: 64,
             color:
                 isDark ? AppColors.darkSecondaryText : AppColors.secondaryText,

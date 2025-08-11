@@ -63,11 +63,21 @@ class MyApp extends StatelessWidget {
                 themeService.isDarkMode ? ThemeMode.dark : ThemeMode.light,
             routerConfig: AppRouter.router,
             builder: (context, child) {
-              // Force landscape orientation for desktop/tablet
-              SystemChrome.setPreferredOrientations([
-                DeviceOrientation.landscapeLeft,
-                DeviceOrientation.landscapeRight,
-              ]);
+              // Kunci orientasi berdasarkan platform
+              if (!kIsWeb &&
+                  (defaultTargetPlatform == TargetPlatform.android ||
+                      defaultTargetPlatform == TargetPlatform.iOS)) {
+                // Mobile: portrait only
+                SystemChrome.setPreferredOrientations([
+                  DeviceOrientation.portraitUp,
+                ]);
+              } else {
+                // Desktop/Web: landscape
+                SystemChrome.setPreferredOrientations([
+                  DeviceOrientation.landscapeLeft,
+                  DeviceOrientation.landscapeRight,
+                ]);
+              }
 
               // Set system UI overlay style
               SystemChrome.setSystemUIOverlayStyle(
@@ -82,7 +92,11 @@ class MyApp extends StatelessWidget {
                 ),
               );
 
-              return child!;
+              // Pastikan overlay shadcn tersedia. Batasi hanya untuk mobile agar tidak mengganggu desktop/web
+              final isMobile = !kIsWeb &&
+                  (defaultTargetPlatform == TargetPlatform.android ||
+                      defaultTargetPlatform == TargetPlatform.iOS);
+              return isMobile ? DrawerOverlay(child: child!) : child!;
             },
           );
         },

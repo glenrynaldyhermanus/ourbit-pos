@@ -1,7 +1,7 @@
 import 'dart:io' show Platform;
 
-import 'package:bluetooth_print/bluetooth_print.dart';
-import 'package:bluetooth_print/bluetooth_print_model.dart';
+// Bluetooth printing temporarily disabled while migrating plugin
+// import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:ourbit_pos/src/core/theme/app_theme.dart';
@@ -19,9 +19,9 @@ class PrinterContent extends StatefulWidget {
 }
 
 class _PrinterContentState extends State<PrinterContent> {
-  final BluetoothPrint _bluetoothPrint = BluetoothPrint.instance;
-  List<BluetoothDevice> _devices = const [];
-  BluetoothDevice? _connected;
+  // Placeholder types until migration completes
+  List<dynamic> _devices = const [];
+  dynamic _connected;
   bool _scanning = false;
   Printer? _pickedOsPrinter;
 
@@ -32,40 +32,14 @@ class _PrinterContentState extends State<PrinterContent> {
   }
 
   Future<void> _init() async {
-    if (!(Platform.isAndroid || Platform.isIOS)) {
-      // Desktop init
-      return;
-    }
-    final isConnected = await _bluetoothPrint.isConnected ?? false;
-    if (isConnected) {
-      // Note: plugin doesn't expose current device directly
-      setState(() {
-        _connected = null;
-      });
-    }
-    await _refreshDevices();
+    // Skip bluetooth init for now
   }
 
   Future<void> _refreshDevices() async {
-    if (!(Platform.isAndroid || Platform.isIOS)) {
-      setState(() {
-        _devices = const [];
-      });
-      return;
-    }
-
-    setState(() => _scanning = true);
-    await _bluetoothPrint.startScan(timeout: const Duration(seconds: 4));
-    try {
-      final list = await _bluetoothPrint.scanResults.first
-          .timeout(const Duration(seconds: 6));
-      setState(() {
-        _devices = list;
-      });
-    } finally {
-      await _bluetoothPrint.stopScan();
-      if (mounted) setState(() => _scanning = false);
-    }
+    setState(() {
+      _devices = const [];
+      _scanning = false;
+    });
   }
 
   Future<void> _pickOsPrinter() async {
@@ -88,33 +62,12 @@ class _PrinterContentState extends State<PrinterContent> {
     }
   }
 
-  Future<void> _connect(BluetoothDevice device) async {
-    try {
-      await _bluetoothPrint.connect(device);
-      setState(() => _connected = device);
-      if (mounted) {
-        OurbitToast.success(
-          context: context,
-          title: 'Berhasil',
-          content: 'Printer terhubung',
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        OurbitToast.error(
-          context: context,
-          title: 'Gagal',
-          content: 'Gagal menghubungkan: $e',
-        );
-      }
-    }
+  Future<void> _connect(dynamic device) async {
+    // Disabled for now
   }
 
   Future<void> _disconnect() async {
-    try {
-      await _bluetoothPrint.disconnect();
-      setState(() => _connected = null);
-    } catch (_) {}
+    setState(() => _connected = null);
   }
 
   Future<void> _testPrint() async {
@@ -126,16 +79,7 @@ class _PrinterContentState extends State<PrinterContent> {
           'price': 10000.0,
         }
       ];
-      if (Platform.isAndroid || Platform.isIOS) {
-        await PrinterService.instance.printReceipt(
-          title: 'Tes Printer',
-          items: items,
-          subtotal: 10000,
-          tax: 1100,
-          total: 11100,
-          footerNote: 'Tes berhasil',
-        );
-      } else {
+      if (!(Platform.isAndroid || Platform.isIOS)) {
         if (_pickedOsPrinter != null) {
           final bytes = await ReceiptPdfService.instance.buildReceipt(
             title: 'Tes Printer',
@@ -159,6 +103,12 @@ class _PrinterContentState extends State<PrinterContent> {
             footerNote: 'Tes berhasil',
           );
         }
+      } else {
+        OurbitToast.info(
+          context: context,
+          title: 'Info',
+          content: 'Cetak Bluetooth sementara dinonaktifkan',
+        );
       }
     } catch (e) {
       if (mounted) {

@@ -15,9 +15,10 @@ class ProductsContentMobile extends material.StatefulWidget {
       _ProductsContentMobileState();
 }
 
-class _ProductsContentMobileState
-    extends material.State<ProductsContentMobile> {
+class _ProductsContentMobileState extends material.State<ProductsContentMobile>
+    with material.TickerProviderStateMixin {
   String _query = '';
+  late final material.AnimationController _listController;
 
   @override
   void initState() {
@@ -25,7 +26,18 @@ class _ProductsContentMobileState
     // Trigger load products once
     material.WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ManagementBloc>().add(LoadProducts());
+      _listController.forward();
     });
+    _listController = material.AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _listController.dispose();
+    super.dispose();
   }
 
   @override
@@ -91,52 +103,71 @@ class _ProductsContentMobileState
 
             // List
             material.Expanded(
-              child: filtered.isEmpty
-                  ? const material.Center(
-                      child: material.Text('Tidak ada produk'))
-                  : material.ListView.separated(
-                      padding: const material.EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      itemBuilder: (context, index) {
-                        final product = filtered[index];
-                        return OurbitCard(
-                          child: material.ListTile(
-                            leading: material.CircleAvatar(
-                              backgroundColor: material.Colors.blue[50],
-                              child: material.Text(
-                                product.name.isNotEmpty
-                                    ? product.name[0].toUpperCase()
-                                    : '?',
-                                style: const material.TextStyle(
-                                  color: material.Colors.blue,
-                                  fontWeight: material.FontWeight.bold,
+              child: material.AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: filtered.isEmpty
+                    ? const material.Center(
+                        key: material.ValueKey('empty'),
+                        child: material.Text('Tidak ada produk'))
+                    : material.FadeTransition(
+                        key: const material.ValueKey('list'),
+                        opacity: _listController,
+                        child: material.ListView.separated(
+                          padding: const material.EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          itemBuilder: (context, index) {
+                            final product = filtered[index];
+                            return material.TweenAnimationBuilder<double>(
+                              duration:
+                                  Duration(milliseconds: 150 + index * 50),
+                              tween: material.Tween(begin: 0.0, end: 1.0),
+                              builder: (context, t, child) {
+                                return material.Opacity(
+                                  opacity: t,
+                                  child: material.Transform.translate(
+                                    offset: material.Offset(0, 16 * (1 - t)),
+                                    child: child,
+                                  ),
+                                );
+                              },
+                              child: OurbitCard(
+                                child: material.ListTile(
+                                  leading: material.CircleAvatar(
+                                    backgroundColor: material.Colors.blue[50],
+                                    child: material.Text(
+                                      product.name.isNotEmpty
+                                          ? product.name[0].toUpperCase()
+                                          : '?',
+                                      style: const material.TextStyle(
+                                        color: material.Colors.blue,
+                                        fontWeight: material.FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  title: material.Text(
+                                    product.name,
+                                    style: const material.TextStyle(
+                                        fontWeight: material.FontWeight.w600),
+                                  ),
+                                  subtitle: material.Text(
+                                    'Harga: Rp ${product.sellingPrice.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}\nStok: ${product.stock}',
+                                  ),
+                                  isThreeLine: true,
+                                  trailing: const material.Icon(
+                                      material.Icons.chevron_right),
+                                  onTap: () {
+                                    // Placeholder action; future: open detail/edit sheet
+                                  },
                                 ),
                               ),
-                            ),
-                            title: material.Text(
-                              product.name,
-                              style: const material.TextStyle(
-                                  fontWeight: material.FontWeight.w600),
-                            ),
-                            subtitle: material.Text(
-                              'Harga: Rp ${product.sellingPrice.toStringAsFixed(0).replaceAllMapped(
-                                    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                                    (m) => '${m[1]}.',
-                                  )}\nStok: ${product.stock}',
-                            ),
-                            isThreeLine: true,
-                            trailing: const material.Icon(
-                                material.Icons.chevron_right),
-                            onTap: () {
-                              // Placeholder action; future: open detail/edit sheet
-                            },
-                          ),
-                        );
-                      },
-                      separatorBuilder: (_, __) =>
-                          const material.SizedBox(height: 8),
-                      itemCount: filtered.length,
-                    ),
+                            );
+                          },
+                          separatorBuilder: (_, __) =>
+                              const material.SizedBox(height: 8),
+                          itemCount: filtered.length,
+                        ),
+                      ),
+              ),
             ),
           ],
         );

@@ -14,6 +14,7 @@ import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_toast.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_select.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
+import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class CashierPageMobile extends StatefulWidget {
@@ -23,12 +24,31 @@ class CashierPageMobile extends StatefulWidget {
   State<CashierPageMobile> createState() => _CashierPageMobileState();
 }
 
-class _CashierPageMobileState extends State<CashierPageMobile> {
+class _CashierPageMobileState extends State<CashierPageMobile>
+    with material.TickerProviderStateMixin {
+  // Keys for fly-to-cart animation
+  final GlobalKey _cartIconKey = GlobalKey();
+  final Map<String, GlobalKey> _productImageKeys = {};
+
+  // Badge animation
+  late final material.AnimationController _badgeController;
+  late final material.Animation<double> _badgeScale;
+  int _lastItemCount = 0;
+
   @override
   void initState() {
     super.initState();
     Logger.cashier('CashierPageMobile - initState called');
-    
+
+    _badgeController = material.AnimationController(
+      duration: const Duration(milliseconds: 250),
+      vsync: this,
+    );
+    _badgeScale = material.CurvedAnimation(
+      parent: _badgeController,
+      curve: material.Curves.easeOutBack,
+    );
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Logger.cashier('CashierPageMobile - Post frame callback executed');
       LocalStorageService.debugStoredData();
@@ -43,10 +63,87 @@ class _CashierPageMobileState extends State<CashierPageMobile> {
     });
   }
 
+  @override
+  void dispose() {
+    _badgeController.dispose();
+    super.dispose();
+  }
+
   void _addToCart(Product product) {
     context
         .read<CashierBloc>()
         .add(AddToCart(productId: product.id, quantity: 1));
+  }
+
+  Future<void> _animateAddToCart(GlobalKey fromKey, {String? imageUrl}) async {
+    final overlay = material.Overlay.of(context);
+    final startContext = fromKey.currentContext;
+    final endContext = _cartIconKey.currentContext;
+    if (startContext == null || endContext == null) return;
+
+    final startBox = startContext.findRenderObject() as material.RenderBox?;
+    final endBox = endContext.findRenderObject() as material.RenderBox?;
+    if (startBox == null || endBox == null) return;
+
+    final startPos = startBox.localToGlobal(material.Offset.zero);
+    final endPos = endBox.localToGlobal(material.Offset.zero);
+    final startSize = startBox.size;
+    final endSize = endBox.size;
+
+    final controller = material.AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    final curve = material.CurvedAnimation(
+      parent: controller,
+      curve: material.Curves.easeInOutCubic,
+    );
+
+    final entry = material.OverlayEntry(
+      builder: (_) {
+        final t = curve.value;
+        final x = startPos.dx + (endPos.dx - startPos.dx) * t;
+        final y = startPos.dy + (endPos.dy - startPos.dy) * t;
+        final w =
+            (startSize.width + (endSize.width - startSize.width) * t) * 0.5;
+        final h =
+            (startSize.height + (endSize.height - startSize.height) * t) * 0.5;
+        final opacity = 1.0 - (t * 0.2);
+
+        return material.IgnorePointer(
+          child: material.Stack(
+            children: [
+              material.Positioned(
+                left: x,
+                top: y,
+                width: w,
+                height: h,
+                child: material.Opacity(
+                  opacity: opacity,
+                  child: material.Material(
+                    color: material.Colors.transparent,
+                    child: material.ClipRRect(
+                      borderRadius:
+                          material.BorderRadius.circular(12 * (1 - t) + 16),
+                      child: (imageUrl != null && imageUrl.isNotEmpty)
+                          ? material.Image.network(imageUrl,
+                              fit: material.BoxFit.cover)
+                          : material.Container(
+                              color: AppColors.secondaryBackground),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    overlay.insert(entry);
+    await controller.forward();
+    entry.remove();
+    controller.dispose();
   }
 
   void _updateQuantity(int index, int newQuantity) {
@@ -139,7 +236,8 @@ class _CashierPageMobileState extends State<CashierPageMobile> {
       },
       child: BlocBuilder<CashierBloc, CashierState>(
         builder: (context, state) {
-          Logger.cashier('CashierPageMobile - Current state: ${state.runtimeType}');
+          Logger.cashier(
+              'CashierPageMobile - Current state: ${state.runtimeType}');
 
           if (state is CashierInitial) {
             Logger.cashier(
@@ -158,7 +256,7 @@ class _CashierPageMobileState extends State<CashierPageMobile> {
             return material.Scaffold(
               drawer: const SidebarDrawer(),
               appBar: material.AppBar(
-                title: const material.Text('POS'),
+                title: const material.Text('Ourbit Kasir'),
                 backgroundColor: isDark
                     ? AppColors.darkSurfaceBackground
                     : AppColors.surfaceBackground,
@@ -177,7 +275,7 @@ class _CashierPageMobileState extends State<CashierPageMobile> {
             return material.Scaffold(
               drawer: const SidebarDrawer(),
               appBar: material.AppBar(
-                title: const material.Text('POS'),
+                title: const material.Text('Ourbit Kasir'),
                 backgroundColor: isDark
                     ? AppColors.darkSurfaceBackground
                     : AppColors.surfaceBackground,
@@ -229,13 +327,23 @@ class _CashierPageMobileState extends State<CashierPageMobile> {
 
           if (state is CashierLoaded) {
             final cartItems = state.cartItems;
-                          final total = cartItems.fold<double>(
-                  0, (sum, item) => sum + (item.product.sellingPrice * item.quantity));
+            final total = cartItems.fold<double>(
+                0,
+                (sum, item) =>
+                    sum + (item.product.sellingPrice * item.quantity));
+            final itemCount =
+                cartItems.fold<int>(0, (sum, item) => sum + item.quantity);
+
+            // Trigger badge bounce when count changes
+            if (itemCount != _lastItemCount) {
+              _badgeController.forward(from: 0);
+              _lastItemCount = itemCount;
+            }
 
             return material.Scaffold(
               drawer: const SidebarDrawer(),
               appBar: material.AppBar(
-                title: const material.Text('POS'),
+                title: const material.Text('Ourbit Kasir'),
                 backgroundColor: isDark
                     ? AppColors.darkSurfaceBackground
                     : AppColors.surfaceBackground,
@@ -246,13 +354,41 @@ class _CashierPageMobileState extends State<CashierPageMobile> {
                   ),
                 ),
                 actions: [
-                  if (cartItems.isNotEmpty)
-                    material.IconButton(
-                      icon: const material.Icon(material.Icons.shopping_cart),
-                      onPressed: () {
-                        _showCartBottomSheet(context, cartItems, total);
-                      },
-                    ),
+                  material.Stack(
+                    clipBehavior: material.Clip.none,
+                    children: [
+                      material.IconButton(
+                        key: _cartIconKey,
+                        icon: const material.Icon(LucideIcons.shoppingCart),
+                        onPressed: () {
+                          _showCartBottomSheet(context, cartItems, total);
+                        },
+                      ),
+                      material.Positioned(
+                        right: 8,
+                        top: 8,
+                        child: material.ScaleTransition(
+                          scale: _badgeScale,
+                          child: material.Container(
+                            padding: const material.EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
+                            decoration: material.BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: material.BorderRadius.circular(12),
+                            ),
+                            child: material.Text(
+                              '$itemCount',
+                              style: const material.TextStyle(
+                                color: material.Colors.white,
+                                fontSize: 11,
+                                fontWeight: material.FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
               body: material.Column(
@@ -321,12 +457,14 @@ class _CashierPageMobileState extends State<CashierPageMobile> {
                       ],
                     ),
                   ),
-                  
+
                   // Products Grid
                   Expanded(
                     child: material.GridView.builder(
-                      padding: const material.EdgeInsets.symmetric(horizontal: 16),
-                      gridDelegate: const material.SliverGridDelegateWithFixedCrossAxisCount(
+                      padding:
+                          const material.EdgeInsets.symmetric(horizontal: 16),
+                      gridDelegate: const material
+                          .SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                         childAspectRatio: 0.8,
                         crossAxisSpacing: 12,
@@ -339,60 +477,78 @@ class _CashierPageMobileState extends State<CashierPageMobile> {
                       },
                     ),
                   ),
-                  
+
                   // Bottom Action Bar
-                  if (cartItems.isNotEmpty)
-                    material.Container(
-                      padding: const material.EdgeInsets.all(16),
-                      decoration: material.BoxDecoration(
-                        color: isDark
-                            ? AppColors.darkSurfaceBackground
-                            : AppColors.surfaceBackground,
-                        border: material.Border(
-                          top: material.BorderSide(
-                            color: isDark
-                                ? AppColors.darkBorder
-                                : AppColors.border,
-                          ),
-                        ),
-                      ),
-                      child: material.Row(
-                        children: [
-                          material.Expanded(
-                            child: material.Column(
-                              crossAxisAlignment: material.CrossAxisAlignment.start,
-                              mainAxisSize: material.MainAxisSize.min,
+                  material.AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 220),
+                    transitionBuilder: (child, animation) {
+                      final offset = material.Tween<material.Offset>(
+                        begin: const material.Offset(0, 0.1),
+                        end: material.Offset.zero,
+                      ).animate(animation);
+                      return material.SlideTransition(
+                        position: offset,
+                        child: material.FadeTransition(
+                            opacity: animation, child: child),
+                      );
+                    },
+                    child: cartItems.isNotEmpty
+                        ? material.Container(
+                            key: const material.ValueKey('bottomBar'),
+                            padding: const material.EdgeInsets.all(16),
+                            decoration: material.BoxDecoration(
+                              color: isDark
+                                  ? AppColors.darkSurfaceBackground
+                                  : AppColors.surfaceBackground,
+                              border: material.Border(
+                                top: material.BorderSide(
+                                  color: isDark
+                                      ? AppColors.darkBorder
+                                      : AppColors.border,
+                                ),
+                              ),
+                            ),
+                            child: material.Row(
                               children: [
-                                material.Text(
-                                  'Total:',
-                                  style: material.TextStyle(
-                                    fontSize: 12,
-                                    color: isDark
-                                        ? AppColors.darkSecondaryText
-                                        : AppColors.secondaryText,
+                                material.Expanded(
+                                  child: material.Column(
+                                    crossAxisAlignment:
+                                        material.CrossAxisAlignment.start,
+                                    mainAxisSize: material.MainAxisSize.min,
+                                    children: [
+                                      material.Text(
+                                        'Total : $itemCount produk',
+                                        style: material.TextStyle(
+                                          fontSize: 14,
+                                          color: isDark
+                                              ? AppColors.darkSecondaryText
+                                              : AppColors.secondaryText,
+                                        ),
+                                      ),
+                                      material.Text(
+                                        'Rp ${total.toStringAsFixed(0).replaceAllMapped(
+                                              RegExp(
+                                                  r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                                              (Match m) => '${m[1]}.',
+                                            )}',
+                                        style: material.TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: material.FontWeight.bold,
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                material.Text(
-                                  'Rp ${total.toStringAsFixed(0).replaceAllMapped(
-                                    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                                    (Match m) => '${m[1]}.',
-                                  )}',
-                                  style: material.TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: material.FontWeight.bold,
-                                    color: AppColors.primary,
-                                  ),
+                                OurbitButton.primary(
+                                  onPressed: _processPayment,
+                                  label: 'Bayar',
                                 ),
                               ],
                             ),
-                          ),
-                          OurbitButton.primary(
-                            onPressed: _processPayment,
-                            label: 'Bayar',
-                          ),
-                        ],
-                      ),
-                    ),
+                          )
+                        : const material.SizedBox.shrink(),
+                  ),
                 ],
               ),
             );
@@ -408,75 +564,166 @@ class _CashierPageMobileState extends State<CashierPageMobile> {
 
   material.Widget _buildProductCard(Product product) {
     final isDark = Theme.of(context).brightness == material.Brightness.dark;
-    
-    return material.Card(
-      child: material.InkWell(
-        onTap: () => _addToCart(product),
-        borderRadius: material.BorderRadius.circular(12),
-        child: material.Padding(
-          padding: const material.EdgeInsets.all(12),
-          child: material.Column(
-            crossAxisAlignment: material.CrossAxisAlignment.start,
-            children: [
-              // Product Image
-              material.Expanded(
+    final currentState = context.read<CashierBloc>().state;
+    int quantityInCart = 0;
+    if (currentState is CashierLoaded) {
+      final existing = currentState.cartItems
+          .where((item) => item.product.id == product.id)
+          .toList();
+      if (existing.isNotEmpty) {
+        quantityInCart = existing.first.quantity;
+      }
+    }
+
+    final imageKey =
+        _productImageKeys.putIfAbsent(product.id, () => GlobalKey());
+
+    return material.InkWell(
+      onTap: quantityInCart == 0
+          ? () {
+              _animateAddToCart(imageKey, imageUrl: product.imageUrl);
+              _addToCart(product);
+            }
+          : null,
+      borderRadius: material.BorderRadius.circular(12),
+      child: OurbitCard(
+        padding: const material.EdgeInsets.all(12),
+        child: material.Column(
+          crossAxisAlignment: material.CrossAxisAlignment.start,
+          children: [
+            // Product Image
+            material.Expanded(
+              child: material.Container(
+                key: imageKey,
+                width: double.infinity,
+                decoration: material.BoxDecoration(
+                  borderRadius: material.BorderRadius.circular(8),
+                  color: isDark
+                      ? AppColors.darkSecondaryBackground
+                      : AppColors.secondaryBackground,
+                ),
+                child: product.imageUrl != null && product.imageUrl!.isNotEmpty
+                    ? material.ClipRRect(
+                        borderRadius: material.BorderRadius.circular(8),
+                        child: material.Image.network(
+                          product.imageUrl!,
+                          fit: material.BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const material.Icon(
+                            material.Icons.image,
+                            size: 48,
+                            color: AppColors.secondaryText,
+                          ),
+                        ),
+                      )
+                    : const material.Icon(
+                        material.Icons.image,
+                        size: 48,
+                        color: AppColors.secondaryText,
+                      ),
+              ),
+            ),
+            const material.SizedBox(height: 8),
+
+            // Product Name
+            material.Text(
+              product.name,
+              style: material.TextStyle(
+                fontWeight: material.FontWeight.w600,
+                fontSize: 14,
+              ),
+              maxLines: 2,
+              overflow: material.TextOverflow.ellipsis,
+            ),
+            const material.SizedBox(height: 4),
+
+            // Product Price
+            material.Text(
+              'Rp ${product.sellingPrice.toStringAsFixed(0).replaceAllMapped(
+                    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                    (Match m) => '${m[1]}.',
+                  )}',
+              style: material.TextStyle(
+                fontSize: 16,
+                fontWeight: material.FontWeight.bold,
+                color: AppColors.primary,
+              ),
+            ),
+
+            if (quantityInCart > 0) ...[
+              const material.SizedBox(height: 8),
+              material.Center(
                 child: material.Container(
-                  width: double.infinity,
                   decoration: material.BoxDecoration(
-                    borderRadius: material.BorderRadius.circular(8),
-                    color: isDark
-                        ? AppColors.darkSecondaryBackground
-                        : AppColors.secondaryBackground,
+                    border: material.Border.all(
+                      color: isDark ? AppColors.darkBorder : AppColors.border,
+                      width: 0.5,
+                    ),
+                    borderRadius: material.BorderRadius.circular(12),
                   ),
-                  child: product.imageUrl != null && product.imageUrl!.isNotEmpty
-                      ? material.ClipRRect(
-                          borderRadius: material.BorderRadius.circular(8),
-                          child: material.Image.network(
-                            product.imageUrl!,
-                            fit: material.BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const material.Icon(
-                              material.Icons.image,
-                              size: 48,
-                              color: AppColors.secondaryText,
+                  padding: const material.EdgeInsets.symmetric(horizontal: 6),
+                  child: material.Row(
+                    mainAxisSize: material.MainAxisSize.min,
+                    children: [
+                      material.SizedBox(
+                        width: 36,
+                        height: 36,
+                        child: material.IconButton(
+                          padding: material.EdgeInsets.zero,
+                          constraints: const material.BoxConstraints(),
+                          icon: const material.Icon(material.Icons.remove),
+                          onPressed: () {
+                            final newQty = quantityInCart - 1;
+                            context.read<CashierBloc>().add(
+                                  UpdateCartQuantity(
+                                    productId: product.id,
+                                    quantity: newQty,
+                                  ),
+                                );
+                          },
+                        ),
+                      ),
+                      material.Padding(
+                        padding:
+                            const material.EdgeInsets.symmetric(horizontal: 8),
+                        child: material.AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 150),
+                          transitionBuilder: (child, animation) =>
+                              material.ScaleTransition(
+                                  scale: animation, child: child),
+                          child: material.Text(
+                            '$quantityInCart',
+                            key: material.ValueKey<int>(quantityInCart),
+                            style: const material.TextStyle(
+                              fontWeight: material.FontWeight.bold,
                             ),
                           ),
-                        )
-                      : const material.Icon(
-                          material.Icons.image,
-                          size: 48,
-                          color: AppColors.secondaryText,
                         ),
-                ),
-              ),
-              const material.SizedBox(height: 8),
-              
-              // Product Name
-              material.Text(
-                product.name,
-                style: material.TextStyle(
-                  fontWeight: material.FontWeight.w600,
-                  fontSize: 14,
-                ),
-                maxLines: 2,
-                overflow: material.TextOverflow.ellipsis,
-              ),
-              const material.SizedBox(height: 4),
-              
-              // Product Price
-              material.Text(
-                                 'Rp ${product.sellingPrice.toStringAsFixed(0).replaceAllMapped(
-                  RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                  (Match m) => '${m[1]}.',
-                )}',
-                style: material.TextStyle(
-                  fontSize: 16,
-                  fontWeight: material.FontWeight.bold,
-                  color: AppColors.primary,
+                      ),
+                      material.SizedBox(
+                        width: 36,
+                        height: 36,
+                        child: material.IconButton(
+                          padding: material.EdgeInsets.zero,
+                          constraints: const material.BoxConstraints(),
+                          icon: const material.Icon(material.Icons.add),
+                          onPressed: () {
+                            final newQty = quantityInCart + 1;
+                            context.read<CashierBloc>().add(
+                                  UpdateCartQuantity(
+                                    productId: product.id,
+                                    quantity: newQty,
+                                  ),
+                                );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
-          ),
+          ],
         ),
       ),
     );
@@ -491,162 +738,218 @@ class _CashierPageMobileState extends State<CashierPageMobile> {
       context: context,
       isScrollControlled: true,
       backgroundColor: material.Colors.transparent,
-      builder: (context) => material.Container(
-        height: material.MediaQuery.of(context).size.height * 0.7,
-        decoration: const material.BoxDecoration(
-          color: material.Colors.white,
-          borderRadius: material.BorderRadius.vertical(
-            top: material.Radius.circular(20),
-          ),
-        ),
-        child: material.Column(
-          children: [
-            // Handle
-            material.Container(
-              margin: const material.EdgeInsets.only(top: 8),
-              width: 40,
-              height: 4,
-              decoration: material.BoxDecoration(
-                color: material.Colors.grey[300],
-                borderRadius: material.BorderRadius.circular(2),
+      builder: (context) => BlocBuilder<CashierBloc, CashierState>(
+        builder: (context, state) {
+          final items = state is CashierLoaded ? state.cartItems : <dynamic>[];
+
+          return material.Container(
+            height: material.MediaQuery.of(context).size.height * 0.7,
+            decoration: const material.BoxDecoration(
+              color: material.Colors.white,
+              borderRadius: material.BorderRadius.vertical(
+                top: material.Radius.circular(20),
               ),
             ),
-            
-            // Header
-            material.Padding(
-              padding: const material.EdgeInsets.all(16),
-              child: material.Row(
-                children: [
-                  const material.Icon(material.Icons.shopping_cart),
-                  const material.SizedBox(width: 8),
-                  const material.Text(
-                    'Keranjang',
-                    style: material.TextStyle(
-                      fontSize: 18,
-                      fontWeight: material.FontWeight.bold,
-                    ),
-                  ),
-                  const material.Spacer(),
-                  material.TextButton(
-                    onPressed: () {
-                      _clearCart();
-                      material.Navigator.of(context).pop();
-                    },
-                    child: const material.Text('Kosongkan'),
-                  ),
-                ],
-              ),
-            ),
-            
-            const material.Divider(),
-            
-            // Cart Items
-            material.Expanded(
-              child: material.ListView.builder(
-                padding: const material.EdgeInsets.symmetric(horizontal: 16),
-                itemCount: cartItems.length,
-                itemBuilder: (context, index) {
-                  final item = cartItems[index];
-                  return material.Card(
-                    margin: const material.EdgeInsets.only(bottom: 8),
-                    child: material.ListTile(
-                      leading: material.CircleAvatar(
-                        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                        child: material.Text(
-                          item.product.name[0].toUpperCase(),
-                          style: const material.TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: material.FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      title: material.Text(
-                        item.product.name,
-                        style: const material.TextStyle(
-                          fontWeight: material.FontWeight.w600,
-                        ),
-                      ),
-                      subtitle: material.Text(
-                                                 'Rp ${item.product.sellingPrice.toStringAsFixed(0).replaceAllMapped(
-                          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                          (Match m) => '${m[1]}.',
-                        )}',
-                      ),
-                      trailing: material.Row(
-                        mainAxisSize: material.MainAxisSize.min,
-                        children: [
-                          material.IconButton(
-                            icon: const material.Icon(material.Icons.remove),
-                            onPressed: () => _updateQuantity(index, item.quantity - 1),
-                          ),
-                          material.Text(
-                            '${item.quantity}',
-                            style: const material.TextStyle(
-                              fontWeight: material.FontWeight.bold,
-                            ),
-                          ),
-                          material.IconButton(
-                            icon: const material.Icon(material.Icons.add),
-                            onPressed: () => _updateQuantity(index, item.quantity + 1),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            
-            // Total and Checkout
-            material.Container(
-              padding: const material.EdgeInsets.all(16),
-              decoration: material.BoxDecoration(
-                border: material.Border(
-                  top: material.BorderSide(
-                    color: material.Colors.grey[300]!,
+            child: material.Column(
+              children: [
+                // Handle
+                material.Container(
+                  margin: const material.EdgeInsets.only(top: 8),
+                  width: 40,
+                  height: 4,
+                  decoration: material.BoxDecoration(
+                    color: material.Colors.grey[300],
+                    borderRadius: material.BorderRadius.circular(2),
                   ),
                 ),
-              ),
-              child: material.Row(
-                children: [
-                  material.Expanded(
-                    child: material.Column(
-                      crossAxisAlignment: material.CrossAxisAlignment.start,
-                      mainAxisSize: material.MainAxisSize.min,
-                      children: [
-                        const material.Text(
-                          'Total:',
-                          style: material.TextStyle(
-                            fontSize: 14,
-                            color: material.Colors.grey,
-                          ),
+
+                // Header
+                material.Padding(
+                  padding: const material.EdgeInsets.all(16),
+                  child: material.Row(
+                    children: [
+                      const material.Icon(LucideIcons.shoppingCart),
+                      const material.SizedBox(width: 8),
+                      const material.Text(
+                        'Keranjang',
+                        style: material.TextStyle(
+                          fontSize: 18,
+                          fontWeight: material.FontWeight.bold,
                         ),
-                        material.Text(
-                          'Rp ${total.toStringAsFixed(0).replaceAllMapped(
-                            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                            (Match m) => '${m[1]}.',
-                          )}',
-                          style: const material.TextStyle(
-                            fontSize: 20,
-                            fontWeight: material.FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
+                      ),
+                      const material.Spacer(),
+                      material.TextButton(
+                        onPressed: () {
+                          _clearCart();
+                          material.Navigator.of(context).pop();
+                        },
+                        child: const material.Text('Kosongkan'),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const material.Divider(),
+
+                // Cart Items
+                material.Expanded(
+                  child: material.ListView.builder(
+                    padding:
+                        const material.EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      final isDark = material.Theme.of(context).brightness ==
+                          material.Brightness.dark;
+                      return OurbitCard(
+                        padding: const material.EdgeInsets.all(12),
+                        child: material.Row(
+                          crossAxisAlignment:
+                              material.CrossAxisAlignment.center,
+                          children: [
+                            material.Expanded(
+                              child: material.Column(
+                                crossAxisAlignment:
+                                    material.CrossAxisAlignment.start,
+                                mainAxisSize: material.MainAxisSize.min,
+                                children: [
+                                  material.Text(
+                                    item.product.name,
+                                    style: const material.TextStyle(
+                                      fontWeight: material.FontWeight.w600,
+                                    ),
+                                  ),
+                                  const material.SizedBox(height: 4),
+                                  material.Text(
+                                    'Rp ${item.product.sellingPrice.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\\d{1,3})(?=(\\d{3})+(?!\\d))'), (Match m) => '${m[1]}.')}',
+                                  ),
+                                ],
+                              ),
+                            ),
+                            material.Container(
+                              decoration: material.BoxDecoration(
+                                border: material.Border.all(
+                                  color: isDark
+                                      ? AppColors.darkBorder
+                                      : AppColors.border,
+                                  width: 0.5,
+                                ),
+                                borderRadius:
+                                    material.BorderRadius.circular(12),
+                              ),
+                              padding: const material.EdgeInsets.symmetric(
+                                  horizontal: 6),
+                              child: material.Row(
+                                mainAxisSize: material.MainAxisSize.min,
+                                children: [
+                                  material.SizedBox(
+                                    width: 36,
+                                    height: 36,
+                                    child: material.IconButton(
+                                      padding: material.EdgeInsets.zero,
+                                      constraints:
+                                          const material.BoxConstraints(),
+                                      icon: const material.Icon(
+                                          material.Icons.remove),
+                                      onPressed: () => _updateQuantity(
+                                          index, item.quantity - 1),
+                                    ),
+                                  ),
+                                  material.Padding(
+                                    padding:
+                                        const material.EdgeInsets.symmetric(
+                                            horizontal: 8),
+                                    child: material.AnimatedSwitcher(
+                                      duration:
+                                          const Duration(milliseconds: 150),
+                                      transitionBuilder: (child, animation) =>
+                                          material.ScaleTransition(
+                                              scale: animation, child: child),
+                                      child: material.Text(
+                                        '${item.quantity}',
+                                        key: material.ValueKey<int>(
+                                            item.quantity),
+                                        style: const material.TextStyle(
+                                          fontWeight: material.FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  material.SizedBox(
+                                    width: 36,
+                                    height: 36,
+                                    child: material.IconButton(
+                                      padding: material.EdgeInsets.zero,
+                                      constraints:
+                                          const material.BoxConstraints(),
+                                      icon: const material.Icon(
+                                          material.Icons.add),
+                                      onPressed: () => _updateQuantity(
+                                          index, item.quantity + 1),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      );
+                    },
+                  ),
+                ),
+
+                // Total and Checkout
+                material.Container(
+                  padding: const material.EdgeInsets.all(16),
+                  decoration: material.BoxDecoration(
+                    border: material.Border(
+                      top: material.BorderSide(
+                        color: material.Colors.grey[300]!,
+                      ),
                     ),
                   ),
-                  OurbitButton.primary(
-                    onPressed: () {
-                      material.Navigator.of(context).pop();
-                      _processPayment();
-                    },
-                    label: 'Bayar',
+                  child: material.Row(
+                    children: [
+                      material.Expanded(
+                        child: material.Column(
+                          crossAxisAlignment: material.CrossAxisAlignment.start,
+                          mainAxisSize: material.MainAxisSize.min,
+                          children: [
+                            const material.Text(
+                              'Total:',
+                              style: material.TextStyle(
+                                fontSize: 14,
+                                color: material.Colors.grey,
+                              ),
+                            ),
+                            material.Text(
+                              'Rp ${total.toStringAsFixed(0).replaceAllMapped(
+                                    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                                    (Match m) => '${m[1]}.',
+                                  )}',
+                              style: const material.TextStyle(
+                                fontSize: 20,
+                                fontWeight: material.FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      OurbitButton.primary(
+                        onPressed: () {
+                          material.Navigator.of(context).pop();
+                          _processPayment();
+                        },
+                        label: 'Bayar',
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

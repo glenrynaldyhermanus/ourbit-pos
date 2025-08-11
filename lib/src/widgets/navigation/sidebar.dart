@@ -117,7 +117,7 @@ class _SidebarState extends State<Sidebar> {
             const NavigationDivider(),
 
             // POS - Point of Sale
-            buildButton('POS', LucideIcons.layoutDashboard, '/pos'),
+            buildButton('Kasir', LucideIcons.layoutDashboard, '/pos'),
 
             // Management Data
             buildButton('Data', LucideIcons.package, '/management'),
@@ -134,7 +134,7 @@ class _SidebarState extends State<Sidebar> {
             buildButton('Pengaturan', LucideIcons.settings, '/settings'),
 
             // Bantuan
-            buildButton('Bantuan', LucideIcons.info, '/help'),
+            buildButton('Bantuan', LucideIcons.messageCircleQuestion, '/help'),
 
             const NavigationDivider(),
 
