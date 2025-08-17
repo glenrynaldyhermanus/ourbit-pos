@@ -32,6 +32,7 @@ class _StoresContentState extends State<StoresContent> {
   String? _businessId;
   bool _loading = false;
   List<Map<String, dynamic>> _stores = [];
+  Map<String, String> _businessFieldOptions = {};
 
   @override
   void initState() {
@@ -53,11 +54,32 @@ class _StoresContentState extends State<StoresContent> {
       final businessData = await LocalStorageService.getBusinessData();
       final idValue = businessData?['id'];
       _businessId = idValue is String ? idValue : (idValue?.toString());
+      await _loadBusinessFieldOptions();
       await _loadStores();
     } catch (e) {
       Logger.error('STORES_INIT_ERROR: $e');
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _loadBusinessFieldOptions() async {
+    try {
+      final res = await Supabase.instance.client
+          .schema('common')
+          .from('options')
+          .select('key, value')
+          .eq('type', 'business_field');
+      final map = <String, String>{};
+      for (final e in (res as List)) {
+        final m = Map<String, dynamic>.from(e);
+        final k = (m['key'] ?? '').toString();
+        final v = (m['value'] ?? '').toString();
+        if (k.isNotEmpty) map[k] = v;
+      }
+      _businessFieldOptions = map;
+    } catch (e) {
+      Logger.error('STORES_LOAD_OPTIONS_ERROR: $e');
     }
   }
 
@@ -69,6 +91,7 @@ class _StoresContentState extends State<StoresContent> {
     }
     try {
       final res = await Supabase.instance.client
+          .schema('common')
           .from('stores')
           .select()
           .eq('business_id', _businessId as Object);
@@ -93,7 +116,11 @@ class _StoresContentState extends State<StoresContent> {
     );
     if (confirmed != true) return;
     try {
-      await Supabase.instance.client.from('stores').delete().eq('id', id);
+      await Supabase.instance.client
+          .schema('common')
+          .from('stores')
+          .delete()
+          .eq('id', id);
       await _loadStores();
       if (!mounted) return;
       showToast(
@@ -308,8 +335,11 @@ class _StoresContentState extends State<StoresContent> {
                                                 fontWeight: FontWeight.w600),
                                           ),
                                           Text(
-                                            (s['business_field'] ?? '-')
-                                                .toString(),
+                                            _businessFieldOptions[
+                                                    (s['business_field'] ?? '')
+                                                        .toString()] ??
+                                                (s['business_field'] ?? '-')
+                                                    .toString(),
                                             overflow: TextOverflow.ellipsis,
                                             maxLines: 1,
                                             style: TextStyle(

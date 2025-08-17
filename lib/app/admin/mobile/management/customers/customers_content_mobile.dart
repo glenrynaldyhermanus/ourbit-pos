@@ -3,30 +3,32 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ourbit_pos/blocs/management_bloc.dart';
 import 'package:ourbit_pos/blocs/management_event.dart';
 import 'package:ourbit_pos/blocs/management_state.dart';
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
-import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_toast.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
+import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_circular_progress.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 
-class CustomersContentMobile extends material.StatefulWidget {
+class CustomersContentMobile extends StatefulWidget {
   const CustomersContentMobile({super.key});
 
   @override
-  material.State<CustomersContentMobile> createState() =>
-      _CustomersContentMobileState();
+  State<CustomersContentMobile> createState() => _CustomersContentMobileState();
 }
 
-class _CustomersContentMobileState extends material
-    .State<CustomersContentMobile> with material.TickerProviderStateMixin {
+class _CustomersContentMobileState extends State<CustomersContentMobile>
+    with TickerProviderStateMixin {
   String _query = '';
-  late final material.AnimationController _listController;
+  late final AnimationController _listController;
 
   @override
   void initState() {
     super.initState();
-    material.WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ManagementBloc>().add(LoadCustomers());
       _listController.forward();
     });
-    _listController = material.AnimationController(
+    _listController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
@@ -39,21 +41,25 @@ class _CustomersContentMobileState extends material
   }
 
   @override
-  material.Widget build(material.BuildContext context) {
+  Widget build(BuildContext context) {
     return BlocConsumer<ManagementBloc, ManagementState>(
       listener: (context, state) {
         if (state is ManagementError) {
-          OurbitToast.error(
-            context: context,
-            title: 'Gagal',
-            content: state.message,
+          material.ScaffoldMessenger.of(context).showSnackBar(
+            material.SnackBar(
+              content: material.Text(state.message),
+              backgroundColor: AppColors.error,
+              behavior: material.SnackBarBehavior.floating,
+              shape: material.RoundedRectangleBorder(
+                borderRadius: material.BorderRadius.circular(8),
+              ),
+            ),
           );
         }
       },
       builder: (context, state) {
         if (state is ManagementLoading || state is ManagementInitial) {
-          return const material.Center(
-              child: material.CircularProgressIndicator());
+          return const Center(child: OurbitCircularProgress());
         }
 
         final data = state is CustomersLoaded
@@ -71,26 +77,32 @@ class _CustomersContentMobileState extends material
                     phone.contains(q);
               }).toList();
 
-        return material.Column(
+        return Column(
           children: [
-            material.Padding(
-              padding: const material.EdgeInsets.all(16),
-              child: material.TextField(
-                decoration: const material.InputDecoration(
-                  hintText: 'Cari pelanggan (nama/email/telepon)...',
-                  prefixIcon: material.Icon(material.Icons.search),
-                  border: material.OutlineInputBorder(),
-                ),
-                onChanged: (v) => setState(() => _query = v),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: OurbitTextInput(
+                placeholder: 'Cari pelanggan (nama/email/telepon)...',
+                leading: const Icon(Icons.search, size: 16),
+                onChanged: (v) => setState(() => _query = (v ?? '')),
               ),
             ),
             material.Expanded(
               child: material.AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
                 child: filtered.isEmpty
-                    ? const material.Center(
-                        key: material.ValueKey('empty'),
-                        child: material.Text('Tidak ada pelanggan'))
+                    ? material.Center(
+                        key: const material.ValueKey('empty'),
+                        child: material.Text(
+                          'Tidak ada pelanggan',
+                          style: material.TextStyle(
+                            color: material.Theme.of(context).brightness ==
+                                    material.Brightness.dark
+                                ? AppColors.darkSecondaryText
+                                : AppColors.secondaryText,
+                          ),
+                        ),
+                      )
                     : material.FadeTransition(
                         key: const material.ValueKey('list'),
                         opacity: _listController,
@@ -119,17 +131,25 @@ class _CustomersContentMobileState extends material
                               child: OurbitCard(
                                 child: material.ListTile(
                                   leading: material.CircleAvatar(
-                                    backgroundColor: material.Colors.grey[200],
-                                    child: const material.Icon(
-                                        material.Icons.person,
-                                        color: material.Colors.grey),
+                                    backgroundColor: material.Theme.of(context)
+                                        .colorScheme
+                                        .primary
+                                        .withValues(alpha: 0.1),
+                                    child: material.Icon(material.Icons.person,
+                                        color: material.Theme.of(context)
+                                            .colorScheme
+                                            .primary),
                                   ),
-                                  title: material.Text(
+                                  title: Text(
                                     (c['name'] ?? '-').toString(),
-                                    style: const material.TextStyle(
-                                        fontWeight: material.FontWeight.w600),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: Theme.of(context).brightness ==
+                                                material.Brightness.dark
+                                            ? AppColors.darkPrimaryText
+                                            : AppColors.primaryText),
                                   ),
-                                  subtitle: material.Text(
+                                  subtitle: Text(
                                     [
                                       (c['email'] ?? '—').toString(),
                                       (c['phone'] ?? '—').toString(),
@@ -138,29 +158,33 @@ class _CustomersContentMobileState extends material
                                             s.trim().isNotEmpty && s != '—')
                                         .join(' · '),
                                     maxLines: 2,
-                                    overflow: material.TextOverflow.ellipsis,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        color: Theme.of(context).brightness ==
+                                                material.Brightness.dark
+                                            ? AppColors.darkSecondaryText
+                                            : AppColors.secondaryText),
                                   ),
                                   trailing: material.Container(
                                     padding:
                                         const material.EdgeInsets.symmetric(
                                             horizontal: 8, vertical: 4),
                                     decoration: material.BoxDecoration(
-                                      color: isActive
-                                          ? material.Colors.green
-                                              .withValues(alpha: 0.1)
-                                          : material.Colors.red
-                                              .withValues(alpha: 0.1),
+                                      color: (isActive
+                                              ? material.Colors.green
+                                              : material.Colors.red)
+                                          .withValues(alpha: 0.1),
                                       borderRadius:
                                           material.BorderRadius.circular(999),
                                     ),
-                                    child: material.Text(
+                                    child: Text(
                                       isActive ? 'Aktif' : 'Nonaktif',
-                                      style: material.TextStyle(
+                                      style: TextStyle(
                                         fontSize: 12,
-                                        fontWeight: material.FontWeight.w600,
+                                        fontWeight: FontWeight.w600,
                                         color: isActive
-                                            ? material.Colors.green[700]
-                                            : material.Colors.red[700],
+                                            ? Colors.green[600]
+                                            : Colors.red[600],
                                       ),
                                     ),
                                   ),

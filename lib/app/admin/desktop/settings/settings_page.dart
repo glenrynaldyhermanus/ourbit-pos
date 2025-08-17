@@ -9,6 +9,9 @@ import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 
 import 'printer/printer_content.dart';
 import 'profile/profile_content.dart';
+import 'store/store_content.dart';
+import 'notifications/notifications_content.dart';
+import 'system/system_content.dart';
 
 class SettingsPage extends StatefulWidget {
   final String? selectedMenu;
@@ -28,6 +31,24 @@ class _SettingsPageState extends State<SettingsPage> {
       title: 'Profil',
       description: 'Pengaturan akun dan informasi pengguna',
       icon: Icons.person,
+    ),
+    _SettingsMenuItem(
+      id: 'store',
+      title: 'Toko',
+      description: 'Informasi dan pengaturan toko',
+      icon: Icons.store,
+    ),
+    _SettingsMenuItem(
+      id: 'notifications',
+      title: 'Notifikasi',
+      description: 'Preferensi notifikasi sistem',
+      icon: Icons.notifications,
+    ),
+    _SettingsMenuItem(
+      id: 'system',
+      title: 'Sistem',
+      description: 'Tema, bahasa, dan pengaturan sistem',
+      icon: Icons.settings,
     ),
     _SettingsMenuItem(
       id: 'printer',
@@ -205,6 +226,12 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildContent(String menuId) {
     switch (menuId) {
+      case 'store':
+        return const StoreContent();
+      case 'notifications':
+        return const NotificationsContent();
+      case 'system':
+        return const SystemContent();
       case 'printer':
         return const PrinterContent();
       case 'profile':

@@ -1,19 +1,21 @@
-import 'package:flutter/material.dart' as material;
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 // Bluetooth printing temporarily disabled while migrating plugin
 // import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
 import 'package:printing/printing.dart';
+import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart' as material;
 
-class PrinterContentMobile extends material.StatefulWidget {
+class PrinterContentMobile extends StatefulWidget {
   const PrinterContentMobile({super.key});
 
   @override
-  material.State<PrinterContentMobile> createState() =>
-      _PrinterContentMobileState();
+  State<PrinterContentMobile> createState() => _PrinterContentMobileState();
 }
 
-class _PrinterContentMobileState extends material.State<PrinterContentMobile>
-    with material.TickerProviderStateMixin {
+class _PrinterContentMobileState extends State<PrinterContentMobile>
+    with TickerProviderStateMixin {
   // Placeholder types until migration completes
   List<dynamic> _devices = const [];
   dynamic _connected;
@@ -21,9 +23,9 @@ class _PrinterContentMobileState extends material.State<PrinterContentMobile>
   Printer? _pickedOsPrinter;
 
   // Animation controllers
-  late material.AnimationController _connectionController;
-  late material.AnimationController _osPrinterController;
-  late material.AnimationController _scanController;
+  late AnimationController _connectionController;
+  late AnimationController _osPrinterController;
+  late AnimationController _scanController;
 
   @override
   void initState() {
@@ -33,15 +35,15 @@ class _PrinterContentMobileState extends material.State<PrinterContentMobile>
   }
 
   void _initAnimationControllers() {
-    _connectionController = material.AnimationController(
+    _connectionController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _osPrinterController = material.AnimationController(
+    _osPrinterController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _scanController = material.AnimationController(
+    _scanController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
@@ -86,16 +88,16 @@ class _PrinterContentMobileState extends material.State<PrinterContentMobile>
         _osPrinterController.forward();
         material.ScaffoldMessenger.of(context).showSnackBar(
           const material.SnackBar(
-            content: material.Text('Printer OS dipilih'),
-            backgroundColor: material.Colors.green,
+            content: Text('Printer OS dipilih'),
+            backgroundColor: Colors.green,
           ),
         );
       }
     } catch (e) {
       material.ScaffoldMessenger.of(context).showSnackBar(
         material.SnackBar(
-          content: material.Text('Gagal memilih printer OS: $e'),
-          backgroundColor: material.Colors.red,
+          content: Text('Gagal memilih printer OS: $e'),
+          backgroundColor: Colors.red,
         ),
       );
     }
@@ -115,70 +117,70 @@ class _PrinterContentMobileState extends material.State<PrinterContentMobile>
     try {
       material.ScaffoldMessenger.of(context).showSnackBar(
         const material.SnackBar(
-          content: material.Text('Cetak Bluetooth sementara dinonaktifkan'),
-          backgroundColor: material.Colors.blue,
+          content: Text('Cetak Bluetooth sementara dinonaktifkan'),
+          backgroundColor: Colors.blue,
         ),
       );
     } catch (e) {
       material.ScaffoldMessenger.of(context).showSnackBar(
         material.SnackBar(
-          content: material.Text('Gagal test print: $e'),
-          backgroundColor: material.Colors.red,
+          content: Text('Gagal test print: $e'),
+          backgroundColor: Colors.red,
         ),
       );
     }
   }
 
-  material.Widget _buildConnectionStatus() {
-    return material.AnimatedCrossFade(
+  Widget _buildConnectionStatus() {
+    return AnimatedCrossFade(
       duration: const Duration(milliseconds: 300),
       crossFadeState: _connected != null
-          ? material.CrossFadeState.showFirst
-          : material.CrossFadeState.showSecond,
-      firstChild: material.Container(
-        padding: const material.EdgeInsets.all(12),
-        decoration: material.BoxDecoration(
-          color: material.Colors.green[50],
-          borderRadius: material.BorderRadius.circular(8),
-          border: material.Border.all(color: material.Colors.green),
+          ? CrossFadeState.showFirst
+          : CrossFadeState.showSecond,
+      firstChild: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.green[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.green),
         ),
-        child: material.Row(
+        child: Row(
           children: [
-            material.Icon(
-              material.Icons.bluetooth_connected,
-              color: material.Colors.green,
+            Icon(
+              Icons.bluetooth_connected,
+              color: Colors.green,
             ),
-            const material.SizedBox(width: 8),
-            material.Expanded(
-              child: material.Text(
-                'Terhubung ke: ${_connected!.name}',
-                style: material.TextStyle(
-                  color: material.Colors.green[700],
-                  fontWeight: material.FontWeight.w500,
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Terhubung ke: ${_connected?.name ?? 'Perangkat'}',
+                style: TextStyle(
+                  color: Colors.green[700],
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
           ],
         ),
       ),
-      secondChild: material.Container(
-        padding: const material.EdgeInsets.all(12),
-        decoration: material.BoxDecoration(
-          color: material.Colors.grey[50],
-          borderRadius: material.BorderRadius.circular(8),
-          border: material.Border.all(color: material.Colors.grey),
+      secondChild: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.gray[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.gray),
         ),
-        child: material.Row(
+        child: Row(
           children: [
-            material.Icon(
-              material.Icons.bluetooth_disabled,
-              color: material.Colors.grey[600],
+            Icon(
+              Icons.bluetooth_disabled,
+              color: Colors.gray[600],
             ),
-            const material.SizedBox(width: 8),
-            material.Text(
+            const SizedBox(width: 8),
+            Text(
               'Tidak terhubung',
-              style: material.TextStyle(
-                color: material.Colors.grey[600],
+              style: TextStyle(
+                color: Colors.gray[600],
               ),
             ),
           ],
@@ -187,58 +189,58 @@ class _PrinterContentMobileState extends material.State<PrinterContentMobile>
     );
   }
 
-  material.Widget _buildOsPrinterStatus() {
-    return material.AnimatedOpacity(
+  Widget _buildOsPrinterStatus() {
+    return AnimatedOpacity(
       duration: const Duration(milliseconds: 300),
       opacity: _pickedOsPrinter != null ? 1.0 : 0.0,
-      child: material.AnimatedContainer(
+      child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         height: _pickedOsPrinter != null ? null : 0,
         child: _pickedOsPrinter != null
-            ? material.Container(
-                padding: const material.EdgeInsets.all(12),
-                decoration: material.BoxDecoration(
-                  color: material.Colors.blue[50],
-                  borderRadius: material.BorderRadius.circular(8),
-                  border: material.Border.all(color: material.Colors.blue),
+            ? Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.blue),
                 ),
-                child: material.Row(
+                child: Row(
                   children: [
-                    material.Icon(
-                      material.Icons.print,
-                      color: material.Colors.blue,
+                    Icon(
+                      Icons.print,
+                      color: Colors.blue,
                     ),
-                    const material.SizedBox(width: 8),
-                    material.Expanded(
-                      child: material.Text(
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
                         'Dipilih: ${_pickedOsPrinter!.name}',
-                        style: material.TextStyle(
-                          color: material.Colors.blue[700],
-                          fontWeight: material.FontWeight.w500,
+                        style: TextStyle(
+                          color: Colors.blue[700],
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
                   ],
                 ),
               )
-            : material.Container(
-                padding: const material.EdgeInsets.all(12),
-                decoration: material.BoxDecoration(
-                  color: material.Colors.grey[50],
-                  borderRadius: material.BorderRadius.circular(8),
-                  border: material.Border.all(color: material.Colors.grey),
+            : Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.gray[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.gray),
                 ),
-                child: material.Row(
+                child: Row(
                   children: [
-                    material.Icon(
-                      material.Icons.print_disabled,
-                      color: material.Colors.grey[600],
+                    Icon(
+                      Icons.print_disabled,
+                      color: Colors.gray[600],
                     ),
-                    const material.SizedBox(width: 8),
-                    material.Text(
+                    const SizedBox(width: 8),
+                    Text(
                       'Belum ada printer dipilih',
-                      style: material.TextStyle(
-                        color: material.Colors.grey[600],
+                      style: TextStyle(
+                        color: Colors.gray[600],
                       ),
                     ),
                   ],
@@ -248,11 +250,11 @@ class _PrinterContentMobileState extends material.State<PrinterContentMobile>
     );
   }
 
-  material.Widget _buildScanButton() {
-    return material.AnimatedSwitcher(
+  Widget _buildScanButton() {
+    return AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
-      child: material.SizedBox(
-        key: material.ValueKey(_scanning),
+      child: SizedBox(
+        key: ValueKey(_scanning),
         width: double.infinity,
         child: OurbitButton.primary(
           onPressed: _scanning ? null : _refreshDevices,
@@ -263,50 +265,56 @@ class _PrinterContentMobileState extends material.State<PrinterContentMobile>
   }
 
   @override
-  material.Widget build(material.BuildContext context) {
-    return material.SingleChildScrollView(
-      padding: const material.EdgeInsets.all(16),
-      child: material.Column(
-        crossAxisAlignment: material.CrossAxisAlignment.start,
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          material.Text(
+          Text(
             'Pengaturan Printer',
-            style: material.Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: material.FontWeight.bold,
-                ),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).brightness == material.Brightness.dark
+                  ? AppColors.darkPrimaryText
+                  : AppColors.primaryText,
+            ),
           ),
-          const material.SizedBox(height: 8),
-          material.Text(
+          const SizedBox(height: 8),
+          Text(
             'Kelola printer untuk cetak struk dan laporan',
-            style: material.Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: material.Colors.grey[600],
-                ),
+            style: TextStyle(
+              color: Theme.of(context).brightness == material.Brightness.dark
+                  ? AppColors.darkSecondaryText
+                  : AppColors.secondaryText,
+            ),
           ),
-          const material.SizedBox(height: 24),
+          const SizedBox(height: 24),
 
           // Bluetooth Printer Section
-          material.Card(
-            child: material.Padding(
-              padding: const material.EdgeInsets.all(16),
-              child: material.Column(
-                crossAxisAlignment: material.CrossAxisAlignment.start,
+          OurbitCard(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  material.Text(
+                  Text(
                     'Printer Bluetooth',
                     style: material.Theme.of(context)
                         .textTheme
                         .titleMedium
-                        ?.copyWith(fontWeight: material.FontWeight.w600),
+                        ?.copyWith(fontWeight: FontWeight.w600),
                   ),
-                  const material.SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   // Connection Status
                   _buildConnectionStatus(),
 
                   if (_connected != null) ...[
-                    const material.SizedBox(height: 12),
-                    material.SizedBox(
+                    const SizedBox(height: 12),
+                    SizedBox(
                       width: double.infinity,
                       child: OurbitButton.secondary(
                         onPressed: _disconnect,
@@ -315,28 +323,28 @@ class _PrinterContentMobileState extends material.State<PrinterContentMobile>
                     ),
                   ],
 
-                  const material.SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   // Scan Button
                   _buildScanButton(),
 
-                  const material.SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
                   // Device List
                   if (_devices.isNotEmpty) ...[
-                    material.Text(
+                    Text(
                       'Perangkat Tersedia',
                       style: material.Theme.of(context)
                           .textTheme
                           .titleSmall
-                          ?.copyWith(fontWeight: material.FontWeight.w600),
+                          ?.copyWith(fontWeight: FontWeight.w600),
                     ),
-                    const material.SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     ...(_devices.map((device) => material.ListTile(
-                          title: material.Text(device.name ?? 'Unknown'),
-                          subtitle: material.Text(device.address ?? ''),
+                          title: Text(device.name ?? 'Unknown'),
+                          subtitle: Text(device.address ?? ''),
                           trailing: material.IconButton(
-                            icon: const material.Icon(material.Icons.bluetooth),
+                            icon: const Icon(Icons.bluetooth),
                             onPressed: () => _connect(device),
                           ),
                         ))),
@@ -346,26 +354,26 @@ class _PrinterContentMobileState extends material.State<PrinterContentMobile>
             ),
           ),
 
-          const material.SizedBox(height: 16),
+          const SizedBox(height: 16),
 
           // OS Printer Section
-          material.Card(
-            child: material.Padding(
-              padding: const material.EdgeInsets.all(16),
-              child: material.Column(
-                crossAxisAlignment: material.CrossAxisAlignment.start,
+          OurbitCard(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  material.Text(
+                  Text(
                     'Printer Sistem',
                     style: material.Theme.of(context)
                         .textTheme
                         .titleMedium
-                        ?.copyWith(fontWeight: material.FontWeight.w600),
+                        ?.copyWith(fontWeight: FontWeight.w600),
                   ),
-                  const material.SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   _buildOsPrinterStatus(),
-                  const material.SizedBox(height: 16),
-                  material.SizedBox(
+                  const SizedBox(height: 16),
+                  SizedBox(
                     width: double.infinity,
                     child: OurbitButton.primary(
                       onPressed: _pickOsPrinter,
@@ -377,10 +385,10 @@ class _PrinterContentMobileState extends material.State<PrinterContentMobile>
             ),
           ),
 
-          const material.SizedBox(height: 16),
+          const SizedBox(height: 16),
 
           // Test Print Button
-          material.SizedBox(
+          SizedBox(
             width: double.infinity,
             child: OurbitButton.primary(
               onPressed: _testPrint,

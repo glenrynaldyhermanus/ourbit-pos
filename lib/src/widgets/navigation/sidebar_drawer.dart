@@ -12,9 +12,11 @@ class SidebarDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentLocation = GoRouterState.of(context).uri.path;
+    final bool isDark =
+        Theme.of(context).brightness == material.Brightness.dark;
 
     return material.Drawer(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? AppColors.darkPrimaryBackground : Colors.white,
       surfaceTintColor: Colors.transparent,
       child: SafeArea(
         child: ListView(
@@ -32,7 +34,7 @@ class SidebarDrawer extends StatelessWidget {
                 ),
               ),
             ),
-            const Divider(),
+            Divider(color: isDark ? AppColors.darkBorder : AppColors.border),
 
             // Navigation Items
             _buildNavItem(
@@ -41,6 +43,7 @@ class SidebarDrawer extends StatelessWidget {
               label: 'Kasir',
               route: '/pos',
               isSelected: currentLocation == '/pos',
+              isDark: isDark,
             ),
             _buildNavItem(
               context,
@@ -48,6 +51,7 @@ class SidebarDrawer extends StatelessWidget {
               label: 'Data',
               route: '/management',
               isSelected: currentLocation.startsWith('/management'),
+              isDark: isDark,
             ),
             _buildNavItem(
               context,
@@ -55,6 +59,7 @@ class SidebarDrawer extends StatelessWidget {
               label: 'Organisasi',
               route: '/organization',
               isSelected: currentLocation.startsWith('/organization'),
+              isDark: isDark,
             ),
             _buildNavItem(
               context,
@@ -62,14 +67,16 @@ class SidebarDrawer extends StatelessWidget {
               label: 'Laporan',
               route: '/reports',
               isSelected: currentLocation.startsWith('/reports'),
+              isDark: isDark,
             ),
-            const Divider(),
+            Divider(color: isDark ? AppColors.darkBorder : AppColors.border),
             _buildNavItem(
               context,
               icon: LucideIcons.settings,
               label: 'Pengaturan',
               route: '/settings',
               isSelected: currentLocation.startsWith('/settings'),
+              isDark: isDark,
             ),
             _buildNavItem(
               context,
@@ -77,8 +84,9 @@ class SidebarDrawer extends StatelessWidget {
               label: 'Bantuan',
               route: '/help',
               isSelected: currentLocation.startsWith('/help'),
+              isDark: isDark,
             ),
-            const Divider(),
+            Divider(color: isDark ? AppColors.darkBorder : AppColors.border),
 
             // Logout
             material.ListTile(
@@ -112,20 +120,27 @@ class SidebarDrawer extends StatelessWidget {
     required String label,
     required String route,
     required bool isSelected,
+    required bool isDark,
   }) {
     return material.ListTile(
       leading: Icon(
         icon,
-        color: isSelected ? AppColors.primary : null,
+        color: isSelected
+            ? AppColors.primary
+            : (isDark ? AppColors.darkPrimaryText : null),
       ),
       title: Text(
         label,
         style: TextStyle(
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-          color: isSelected ? AppColors.primary : null,
+          color: isSelected
+              ? AppColors.primary
+              : (isDark ? AppColors.darkPrimaryText : null),
         ),
       ),
-      tileColor: isSelected ? AppColors.primary.withValues(alpha: 0.1) : null,
+      tileColor: isSelected
+          ? AppColors.primary.withValues(alpha: isDark ? 0.2 : 0.1)
+          : null,
       onTap: () {
         Navigator.of(context).pop();
         context.go(route);

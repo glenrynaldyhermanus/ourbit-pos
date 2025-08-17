@@ -54,8 +54,10 @@ class _StaffFormSheetState extends State<StaffFormSheet> {
 
   Future<void> _loadRoles() async {
     try {
-      final res =
-          await Supabase.instance.client.from('roles').select('id, name');
+      final res = await Supabase.instance.client
+          .schema('common')
+          .from('roles')
+          .select('id, name');
       setState(() {
         _roles =
             (res as List).map((e) => Map<String, dynamic>.from(e)).toList();
@@ -73,6 +75,7 @@ class _StaffFormSheetState extends State<StaffFormSheet> {
     try {
       // assuming profiles table with email/name
       final res = await Supabase.instance.client
+          .schema('common')
           .from('profiles')
           .select('id, email, name')
           .ilike('email', '%$email%')
@@ -103,6 +106,7 @@ class _StaffFormSheetState extends State<StaffFormSheet> {
           throw Exception('Data tidak lengkap');
         }
         await supabase
+            .schema('common')
             .from('role_assignments')
             .update({'role_id': _selectedRoleId}).eq('id', id);
       } else {
@@ -115,7 +119,7 @@ class _StaffFormSheetState extends State<StaffFormSheet> {
             widget.storeId!.isEmpty) {
           throw Exception('Business ID atau Store ID tidak tersedia');
         }
-        await supabase.from('role_assignments').insert([
+        await supabase.schema('common').from('role_assignments').insert([
           {
             'user_id': _selectedUserId,
             'business_id': widget.businessId,

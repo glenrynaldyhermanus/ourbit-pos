@@ -20,9 +20,11 @@ class ManagementRepositoryImpl implements ManagementRepository {
       }
 
       final response = await _supabaseClient
+          .schema('ourbit')
           .from('products')
           .select('*, categories(name)')
           .eq('store_id', storeId)
+          .filter('deleted_at', 'is', null)
           .order('created_at', ascending: false);
 
       return (response as List).map((json) => Product.fromJson(json)).toList();
@@ -35,9 +37,11 @@ class ManagementRepositoryImpl implements ManagementRepository {
   Future<Product> getProductById(String id) async {
     try {
       final response = await _supabaseClient
+          .schema('ourbit')
           .from('products')
           .select('*, categories(name)')
           .eq('id', id)
+          .filter('deleted_at', 'is', null)
           .single();
 
       return Product.fromJson(response);
@@ -64,8 +68,10 @@ class ManagementRepositoryImpl implements ManagementRepository {
       Logger.supabase(
           'REPO: createProduct payload=${productDataWithStore.toString()}');
 
-      final res =
-          await _supabaseClient.from('products').insert(productDataWithStore);
+      final res = await _supabaseClient
+          .schema('ourbit')
+          .from('products')
+          .insert(productDataWithStore);
       Logger.supabase('REPO: createProduct response=$res');
     } catch (e) {
       Logger.error('REPO: createProduct error=${e.toString()}');
@@ -80,6 +86,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
       Logger.supabase(
           'REPO: updateProduct id=$id payload=${productData.toString()}');
       final res = await _supabaseClient
+          .schema('ourbit')
           .from('products')
           .update(productData)
           .eq('id', id);
@@ -94,7 +101,11 @@ class ManagementRepositoryImpl implements ManagementRepository {
   Future<void> deleteProduct(String id) async {
     try {
       Logger.supabase('REPO: deleteProduct id=$id');
-      final res = await _supabaseClient.from('products').delete().eq('id', id);
+      final res = await _supabaseClient
+          .schema('ourbit')
+          .from('products')
+          .delete()
+          .eq('id', id);
       Logger.supabase('REPO: deleteProduct response=$res');
     } catch (e) {
       Logger.error('REPO: deleteProduct error=${e.toString()}');
@@ -113,6 +124,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
       }
 
       final response = await _supabaseClient
+          .schema('ourbit')
           .from('categories')
           .select('*, products(count)')
           .eq('business_id', businessId)
@@ -151,7 +163,10 @@ class ManagementRepositoryImpl implements ManagementRepository {
         'business_id': businessId,
       };
 
-      await _supabaseClient.from('categories').insert(categoryDataWithBusiness);
+      await _supabaseClient
+          .schema('ourbit')
+          .from('categories')
+          .insert(categoryDataWithBusiness);
     } catch (e) {
       throw Exception('Failed to create category');
     }
@@ -162,6 +177,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
       String id, Map<String, dynamic> categoryData) async {
     try {
       await _supabaseClient
+          .schema('ourbit')
           .from('categories')
           .update(categoryData)
           .eq('id', id);
@@ -173,7 +189,11 @@ class ManagementRepositoryImpl implements ManagementRepository {
   @override
   Future<void> deleteCategory(String id) async {
     try {
-      await _supabaseClient.from('categories').delete().eq('id', id);
+      await _supabaseClient
+          .schema('ourbit')
+          .from('categories')
+          .delete()
+          .eq('id', id);
     } catch (e) {
       throw Exception('Failed to delete category');
     }
@@ -184,6 +204,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
   Future<List<Map<String, dynamic>>> getProductTypes() async {
     try {
       final response = await _supabaseClient
+          .schema('common')
           .from('options')
           .select('*')
           .eq('type', 'product_type')
@@ -206,6 +227,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
       }
 
       final response = await _supabaseClient
+          .schema('ourbit')
           .from('customers')
           .select('*')
           .eq('business_id', businessId)
@@ -231,7 +253,10 @@ class ManagementRepositoryImpl implements ManagementRepository {
         'business_id': businessId,
       };
 
-      await _supabaseClient.from('customers').insert(customerDataWithBusiness);
+      await _supabaseClient
+          .schema('ourbit')
+          .from('customers')
+          .insert(customerDataWithBusiness);
     } catch (e) {
       throw Exception('Failed to create customer');
     }
@@ -241,7 +266,11 @@ class ManagementRepositoryImpl implements ManagementRepository {
   Future<void> updateCustomer(
       String id, Map<String, dynamic> customerData) async {
     try {
-      await _supabaseClient.from('customers').update(customerData).eq('id', id);
+      await _supabaseClient
+          .schema('ourbit')
+          .from('customers')
+          .update(customerData)
+          .eq('id', id);
     } catch (e) {
       throw Exception('Failed to update customer');
     }
@@ -250,7 +279,11 @@ class ManagementRepositoryImpl implements ManagementRepository {
   @override
   Future<void> deleteCustomer(String id) async {
     try {
-      await _supabaseClient.from('customers').delete().eq('id', id);
+      await _supabaseClient
+          .schema('ourbit')
+          .from('customers')
+          .delete()
+          .eq('id', id);
     } catch (e) {
       throw Exception('Failed to delete customer');
     }
@@ -267,6 +300,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
       }
 
       final response = await _supabaseClient
+          .schema('ourbit')
           .from('suppliers')
           .select('*')
           .eq('business_id', businessId)
@@ -292,7 +326,10 @@ class ManagementRepositoryImpl implements ManagementRepository {
         'business_id': businessId,
       };
 
-      await _supabaseClient.from('suppliers').insert(supplierDataWithBusiness);
+      await _supabaseClient
+          .schema('ourbit')
+          .from('suppliers')
+          .insert(supplierDataWithBusiness);
     } catch (e) {
       throw Exception('Failed to create supplier');
     }
@@ -302,7 +339,11 @@ class ManagementRepositoryImpl implements ManagementRepository {
   Future<void> updateSupplier(
       String id, Map<String, dynamic> supplierData) async {
     try {
-      await _supabaseClient.from('suppliers').update(supplierData).eq('id', id);
+      await _supabaseClient
+          .schema('ourbit')
+          .from('suppliers')
+          .update(supplierData)
+          .eq('id', id);
     } catch (e) {
       throw Exception('Failed to update supplier');
     }
@@ -311,7 +352,11 @@ class ManagementRepositoryImpl implements ManagementRepository {
   @override
   Future<void> deleteSupplier(String id) async {
     try {
-      await _supabaseClient.from('suppliers').delete().eq('id', id);
+      await _supabaseClient
+          .schema('ourbit')
+          .from('suppliers')
+          .delete()
+          .eq('id', id);
     } catch (e) {
       throw Exception('Failed to delete supplier');
     }
@@ -322,8 +367,10 @@ class ManagementRepositoryImpl implements ManagementRepository {
   Future<List<Map<String, dynamic>>> getInventory() async {
     try {
       final response = await _supabaseClient
+          .schema('ourbit')
           .from('products')
           .select('id, name, stock, min_stock, categories(name)')
+          .filter('deleted_at', 'is', null)
           .order('name', ascending: true);
 
       return List<Map<String, dynamic>>.from(response);
@@ -336,6 +383,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
   Future<void> updateStock(String productId, int newStock) async {
     try {
       await _supabaseClient
+          .schema('ourbit')
           .from('products')
           .update({'stock': newStock}).eq('id', productId);
     } catch (e) {
@@ -348,6 +396,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
     try {
       // Get current stock
       final response = await _supabaseClient
+          .schema('ourbit')
           .from('products')
           .select('stock')
           .eq('id', productId)
@@ -357,6 +406,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
       final newStock = currentStock + quantity;
 
       await _supabaseClient
+          .schema('ourbit')
           .from('products')
           .update({'stock': newStock}).eq('id', productId);
     } catch (e) {
@@ -375,6 +425,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
       }
 
       final response = await _supabaseClient
+          .schema('ourbit')
           .from('discounts')
           .select('*')
           .eq('business_id', businessId)
@@ -400,7 +451,10 @@ class ManagementRepositoryImpl implements ManagementRepository {
         'business_id': businessId,
       };
 
-      await _supabaseClient.from('discounts').insert(discountDataWithBusiness);
+      await _supabaseClient
+          .schema('ourbit')
+          .from('discounts')
+          .insert(discountDataWithBusiness);
     } catch (e) {
       throw Exception('Failed to create discount');
     }
@@ -410,7 +464,11 @@ class ManagementRepositoryImpl implements ManagementRepository {
   Future<void> updateDiscount(
       String id, Map<String, dynamic> discountData) async {
     try {
-      await _supabaseClient.from('discounts').update(discountData).eq('id', id);
+      await _supabaseClient
+          .schema('ourbit')
+          .from('discounts')
+          .update(discountData)
+          .eq('id', id);
     } catch (e) {
       throw Exception('Failed to update discount');
     }
@@ -419,7 +477,11 @@ class ManagementRepositoryImpl implements ManagementRepository {
   @override
   Future<void> deleteDiscount(String id) async {
     try {
-      await _supabaseClient.from('discounts').delete().eq('id', id);
+      await _supabaseClient
+          .schema('ourbit')
+          .from('discounts')
+          .delete()
+          .eq('id', id);
     } catch (e) {
       throw Exception('Failed to delete discount');
     }
@@ -429,6 +491,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
   Future<void> toggleDiscountStatus(String id, bool isActive) async {
     try {
       await _supabaseClient
+          .schema('ourbit')
           .from('discounts')
           .update({'is_active': isActive}).eq('id', id);
     } catch (e) {
@@ -446,6 +509,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
       }
 
       final response = await _supabaseClient
+          .schema('ourbit')
           .from('expenses')
           .select('*')
           .eq('store_id', storeId)
@@ -470,7 +534,10 @@ class ManagementRepositoryImpl implements ManagementRepository {
         'store_id': storeId,
       };
 
-      await _supabaseClient.from('expenses').insert(expenseDataWithStore);
+      await _supabaseClient
+          .schema('ourbit')
+          .from('expenses')
+          .insert(expenseDataWithStore);
     } catch (e) {
       throw Exception('Failed to create expense');
     }
@@ -480,7 +547,11 @@ class ManagementRepositoryImpl implements ManagementRepository {
   Future<void> updateExpense(
       String id, Map<String, dynamic> expenseData) async {
     try {
-      await _supabaseClient.from('expenses').update(expenseData).eq('id', id);
+      await _supabaseClient
+          .schema('ourbit')
+          .from('expenses')
+          .update(expenseData)
+          .eq('id', id);
     } catch (e) {
       throw Exception('Failed to update expense');
     }
@@ -489,7 +560,11 @@ class ManagementRepositoryImpl implements ManagementRepository {
   @override
   Future<void> deleteExpense(String id) async {
     try {
-      await _supabaseClient.from('expenses').delete().eq('id', id);
+      await _supabaseClient
+          .schema('ourbit')
+          .from('expenses')
+          .delete()
+          .eq('id', id);
     } catch (e) {
       throw Exception('Failed to delete expense');
     }
@@ -498,7 +573,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
   @override
   Future<void> markExpenseAsPaid(String id) async {
     try {
-      await _supabaseClient.from('expenses').update({
+      await _supabaseClient.schema('ourbit').from('expenses').update({
         'is_paid': true,
         'paid_at': DateTime.now().toIso8601String()
       }).eq('id', id);
@@ -518,6 +593,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
       }
 
       final response = await _supabaseClient
+          .schema('ourbit')
           .from('loyalty_programs')
           .select('*, customer_loyalty_memberships(count)')
           .eq('business_id', businessId)
@@ -556,6 +632,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
       };
 
       await _supabaseClient
+          .schema('ourbit')
           .from('loyalty_programs')
           .insert(programDataWithBusiness);
     } catch (e) {
@@ -568,6 +645,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
       String id, Map<String, dynamic> programData) async {
     try {
       await _supabaseClient
+          .schema('ourbit')
           .from('loyalty_programs')
           .update(programData)
           .eq('id', id);
@@ -579,7 +657,11 @@ class ManagementRepositoryImpl implements ManagementRepository {
   @override
   Future<void> deleteLoyaltyProgram(String id) async {
     try {
-      await _supabaseClient.from('loyalty_programs').delete().eq('id', id);
+      await _supabaseClient
+          .schema('ourbit')
+          .from('loyalty_programs')
+          .delete()
+          .eq('id', id);
     } catch (e) {
       throw Exception('Failed to delete loyalty program');
     }
@@ -589,6 +671,7 @@ class ManagementRepositoryImpl implements ManagementRepository {
   Future<void> toggleLoyaltyProgramStatus(String id, bool isActive) async {
     try {
       await _supabaseClient
+          .schema('ourbit')
           .from('loyalty_programs')
           .update({'is_active': isActive}).eq('id', id);
     } catch (e) {

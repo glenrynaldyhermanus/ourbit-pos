@@ -9,6 +9,7 @@ class SupabaseService {
   static Future<List<Map<String, dynamic>>> getProducts() async {
     try {
       final response = await client
+          .schema('ourbit')
           .from('products')
           .select('*, categories(name)')
           .eq('is_active', true)
@@ -25,6 +26,7 @@ class SupabaseService {
   static Future<List<Map<String, dynamic>>> getStoreCart(String storeId) async {
     try {
       final response = await client
+          .schema('ourbit')
           .from('store_carts')
           .select('*, products(*)')
           .eq('store_id', storeId);
@@ -41,6 +43,7 @@ class SupabaseService {
     try {
       // Check if product already in cart
       final existingCart = await client
+          .schema('ourbit')
           .from('store_carts')
           .select()
           .eq('store_id', storeId)
@@ -49,6 +52,7 @@ class SupabaseService {
 
       // Update quantity
       await client
+          .schema('ourbit')
           .from('store_carts')
           .update({'quantity': existingCart['quantity'] + quantity})
           .eq('store_id', storeId)
@@ -66,6 +70,7 @@ class SupabaseService {
         await removeFromCart(storeId, productId);
       } else {
         await client
+            .schema('ourbit')
             .from('store_carts')
             .update({'quantity': quantity})
             .eq('store_id', storeId)
@@ -80,6 +85,7 @@ class SupabaseService {
   static Future<void> removeFromCart(String storeId, String productId) async {
     try {
       await client
+          .schema('ourbit')
           .from('store_carts')
           .delete()
           .eq('store_id', storeId)
@@ -92,7 +98,11 @@ class SupabaseService {
 
   static Future<void> clearCart(String storeId) async {
     try {
-      await client.from('store_carts').delete().eq('store_id', storeId);
+      await client
+          .schema('ourbit')
+          .from('store_carts')
+          .delete()
+          .eq('store_id', storeId);
     } catch (e) {
       // TODO: gunakan logger jika perlu
       throw Exception('Failed to clear cart');
@@ -130,6 +140,7 @@ class SupabaseService {
       if (user == null) return null;
 
       final response = await client
+          .schema('common')
           .from('role_assignments')
           .select('store_id')
           .eq('user_id', user.id)
@@ -172,6 +183,7 @@ class SupabaseService {
 
       // Get role assignment data
       final roleResponse = await client
+          .schema('common')
           .from('role_assignments')
           .select('*, businesses(*), stores(*), roles(*)')
           .eq('user_id', user.id)

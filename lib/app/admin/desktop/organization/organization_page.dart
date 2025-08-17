@@ -1,4 +1,3 @@
-import 'package:ourbit_pos/app/admin/desktop/organization/onlinestores/onlinestores_content.dart';
 import 'package:ourbit_pos/app/admin/desktop/organization/staffs/staffs_content.dart';
 import 'package:ourbit_pos/app/admin/desktop/organization/stores/stores_content.dart';
 import 'package:ourbit_pos/app/admin/desktop/organization/widgets/organization_menu_widget.dart';
@@ -31,12 +30,7 @@ class _OrganizationPageState extends State<OrganizationPage> {
       description: 'Kelola data karyawan',
       icon: Icons.badge_outlined,
     ),
-    OrganizationMenuItem(
-      id: 'onlinestores',
-      title: 'Toko Online',
-      description: 'Integrasi toko online',
-      icon: Icons.shopping_bag_outlined,
-    ),
+    // Online store moved to web-only settings
   ];
 
   @override
@@ -103,8 +97,7 @@ class _OrganizationPageState extends State<OrganizationPage> {
         return const StoresContent();
       case 'staffs':
         return const StaffsContent();
-      case 'onlinestores':
-        return const OnlineStoresContent();
+      // onlinestores removed (web-only)
       default:
         return const SizedBox.shrink();
     }

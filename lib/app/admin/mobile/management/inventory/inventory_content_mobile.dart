@@ -3,21 +3,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ourbit_pos/blocs/management_bloc.dart';
 import 'package:ourbit_pos/blocs/management_event.dart';
 import 'package:ourbit_pos/blocs/management_state.dart';
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_dialog.dart';
+import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_select.dart';
+import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_circular_progress.dart';
 import 'package:ourbit_pos/src/data/objects/product.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 
-class InventoryContentMobile extends material.StatefulWidget {
+class InventoryContentMobile extends StatefulWidget {
   const InventoryContentMobile({super.key});
 
   @override
-  material.State<InventoryContentMobile> createState() =>
-      _InventoryContentMobileState();
+  State<InventoryContentMobile> createState() => _InventoryContentMobileState();
 }
 
-class _InventoryContentMobileState
-    extends material.State<InventoryContentMobile> {
+class _InventoryContentMobileState extends State<InventoryContentMobile> {
   String _query = '';
   String _selectedCategory = 'all';
   String _selectedStatus = 'all';
@@ -45,16 +48,16 @@ class _InventoryContentMobileState
     return 'in_stock';
   }
 
-  material.Color _getStatusBaseColor(String status) {
+  Color _getStatusBaseColor(String status) {
     switch (status) {
       case 'out_of_stock':
-        return material.Colors.red;
+        return Colors.red;
       case 'low_stock':
-        return material.Colors.orange;
+        return Colors.orange;
       case 'in_stock':
-        return material.Colors.green;
+        return Colors.green;
       default:
-        return material.Colors.grey;
+        return Colors.gray;
     }
   }
 
@@ -85,58 +88,54 @@ class _InventoryContentMobileState
       // TODO: Implement stock update logic
       material.ScaffoldMessenger.of(context).showSnackBar(
         material.SnackBar(
-          content: material.Text('Stok berhasil diupdate'),
-          backgroundColor: material.Colors.green,
+          content: Text('Stok berhasil diupdate'),
+          backgroundColor: Colors.green,
         ),
       );
     } catch (e) {
       material.ScaffoldMessenger.of(context).showSnackBar(
         material.SnackBar(
-          content: material.Text('Gagal update stok'),
-          backgroundColor: material.Colors.red,
+          content: Text('Gagal update stok'),
+          backgroundColor: Colors.red,
         ),
       );
     }
   }
 
   void _showStockUpdateDialog(Product product) {
-    final stockController = material.TextEditingController(
+    final stockController = TextEditingController(
       text: product.stock.toString(),
     );
 
-    material.showDialog(
+    showDialog(
       context: context,
-      builder: (context) => material.AlertDialog(
-        title: material.Text('Update Stok'),
-        content: material.Column(
-          mainAxisSize: material.MainAxisSize.min,
+      builder: (context) => AlertDialog(
+        title: Text('Update Stok'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            material.Text('Produk: ${product.name}'),
-            const material.SizedBox(height: 16),
-            material.TextField(
+            Text('Produk: ${product.name}'),
+            const SizedBox(height: 16),
+            OurbitTextInput(
               controller: stockController,
-              decoration: const material.InputDecoration(
-                labelText: 'Stok Baru',
-                border: material.OutlineInputBorder(),
-              ),
-              keyboardType: material.TextInputType.number,
+              placeholder: 'Stok Baru',
             ),
           ],
         ),
         actions: [
-          material.TextButton(
-            onPressed: () => material.Navigator.of(context).pop(),
-            child: const material.Text('Batal'),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Batal'),
           ),
-          material.TextButton(
+          TextButton(
             onPressed: () {
               final newStock = int.tryParse(stockController.text);
               if (newStock != null) {
-                material.Navigator.of(context).pop();
+                Navigator.of(context).pop();
                 _updateStock(product, newStock);
               }
             },
-            child: const material.Text('Update'),
+            child: const Text('Update'),
           ),
         ],
       ),
@@ -148,37 +147,47 @@ class _InventoryContentMobileState
     material.showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => material.Container(
-        padding: const material.EdgeInsets.all(16),
-        child: material.Column(
-          mainAxisSize: material.MainAxisSize.min,
-          crossAxisAlignment: material.CrossAxisAlignment.start,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            material.Row(
+            Row(
               children: [
                 material.CircleAvatar(
-                  backgroundColor: material.Colors.blue.shade50,
-                  child: material.Icon(
-                    material.Icons.inventory_2,
-                    color: material.Colors.blue,
+                  backgroundColor: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: 0.1),
+                  child: Icon(
+                    Icons.inventory_2,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
-                const material.SizedBox(width: 12),
-                material.Expanded(
-                  child: material.Column(
-                    crossAxisAlignment: material.CrossAxisAlignment.start,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      material.Text(
+                      Text(
                         product.name,
-                        style: const material.TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
-                          fontWeight: material.FontWeight.bold,
+                          fontWeight: FontWeight.bold,
+                          color: material.Theme.of(context).brightness ==
+                                  material.Brightness.dark
+                              ? AppColors.darkPrimaryText
+                              : AppColors.primaryText,
                         ),
                       ),
-                      material.Text(
+                      Text(
                         product.code ?? '—',
-                        style: material.TextStyle(
-                          color: material.Colors.grey[600],
+                        style: TextStyle(
+                          color: material.Theme.of(context).brightness ==
+                                  material.Brightness.dark
+                              ? AppColors.darkSecondaryText
+                              : AppColors.secondaryText,
                           fontSize: 14,
                         ),
                       ),
@@ -187,7 +196,7 @@ class _InventoryContentMobileState
                 ),
               ],
             ),
-            const material.SizedBox(height: 16),
+            const SizedBox(height: 16),
             _buildDetailRow('Kategori', product.categoryName ?? '-'),
             _buildDetailRow('Stok Saat Ini', product.stock.toString()),
             _buildDetailRow('Stok Minimum', product.minStock.toString()),
@@ -196,23 +205,23 @@ class _InventoryContentMobileState
             _buildDetailRow(
                 'Harga Beli', _formatCurrency(product.purchasePrice)),
             _buildDetailRow('Status', _getStatusText(status)),
-            const material.SizedBox(height: 16),
-            material.Row(
+            const SizedBox(height: 16),
+            Row(
               children: [
-                material.Expanded(
+                Expanded(
                   child: OurbitButton.secondary(
                     onPressed: () {
-                      material.Navigator.of(context).pop();
+                      Navigator.of(context).pop();
                       _showStockUpdateDialog(product);
                     },
                     label: 'Update Stok',
                   ),
                 ),
-                const material.SizedBox(width: 8),
-                material.Expanded(
+                const SizedBox(width: 8),
+                Expanded(
                   child: OurbitButton.primary(
                     onPressed: () {
-                      material.Navigator.of(context).pop();
+                      Navigator.of(context).pop();
                       // TODO: Navigate to product detail/edit
                     },
                     label: 'Edit Produk',
@@ -226,26 +235,36 @@ class _InventoryContentMobileState
     );
   }
 
-  material.Widget _buildDetailRow(String label, String value) {
-    return material.Padding(
-      padding: const material.EdgeInsets.symmetric(vertical: 4),
-      child: material.Row(
-        crossAxisAlignment: material.CrossAxisAlignment.start,
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          material.SizedBox(
+          SizedBox(
             width: 100,
-            child: material.Text(
+            child: Text(
               label,
-              style: const material.TextStyle(
-                fontWeight: material.FontWeight.w500,
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
                 fontSize: 14,
+                color: material.Theme.of(context).brightness ==
+                        material.Brightness.dark
+                    ? AppColors.darkPrimaryText
+                    : AppColors.primaryText,
               ),
             ),
           ),
-          material.Expanded(
-            child: material.Text(
+          Expanded(
+            child: Text(
               value,
-              style: const material.TextStyle(fontSize: 14),
+              style: TextStyle(
+                fontSize: 14,
+                color: material.Theme.of(context).brightness ==
+                        material.Brightness.dark
+                    ? AppColors.darkSecondaryText
+                    : AppColors.secondaryText,
+              ),
             ),
           ),
         ],
@@ -254,78 +273,61 @@ class _InventoryContentMobileState
   }
 
   @override
-  material.Widget build(material.BuildContext context) {
-    return material.Column(
+  Widget build(BuildContext context) {
+    return Column(
       children: [
         // Search and Filters
-        material.Padding(
-          padding: const material.EdgeInsets.all(16),
-          child: material.Column(
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
             children: [
               OurbitTextInput(
                 placeholder: 'Cari produk berdasarkan nama/SKU',
-                leading: const material.Icon(material.Icons.search, size: 16),
+                leading: const Icon(Icons.search, size: 16),
                 onChanged: (v) {
                   setState(() {
                     _query = (v ?? '').trim().toLowerCase();
                   });
                 },
               ),
-              const material.SizedBox(height: 12),
-              material.Row(
+              const SizedBox(height: 12),
+              Row(
                 children: [
-                  material.Expanded(
-                    child: material.DropdownButtonFormField<String>(
+                  Expanded(
+                    child: OurbitSelect<String>(
                       value: _selectedCategory,
-                      decoration: const material.InputDecoration(
-                        border: material.OutlineInputBorder(),
-                        contentPadding: material.EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        labelText: 'Kategori',
+                      items: const ['all'],
+                      itemBuilder: (context, item) => Text(
+                        item == 'all' ? 'Semua Kategori' : item,
                       ),
-                      items: const [
-                        material.DropdownMenuItem(
-                          value: 'all',
-                          child: material.Text('Semua Kategori'),
-                        ),
-                      ],
+                      placeholder: Text('Kategori'),
                       onChanged: (value) {
                         setState(() => _selectedCategory = value ?? 'all');
                       },
                     ),
                   ),
-                  const material.SizedBox(width: 8),
-                  material.Expanded(
-                    child: material.DropdownButtonFormField<String>(
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OurbitSelect<String>(
                       value: _selectedStatus,
-                      decoration: const material.InputDecoration(
-                        border: material.OutlineInputBorder(),
-                        contentPadding: material.EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        labelText: 'Status',
-                      ),
                       items: const [
-                        material.DropdownMenuItem(
-                          value: 'all',
-                          child: material.Text('Semua Status'),
-                        ),
-                        material.DropdownMenuItem(
-                          value: 'in_stock',
-                          child: material.Text('Tersedia'),
-                        ),
-                        material.DropdownMenuItem(
-                          value: 'low_stock',
-                          child: material.Text('Menipis'),
-                        ),
-                        material.DropdownMenuItem(
-                          value: 'out_of_stock',
-                          child: material.Text('Habis'),
-                        ),
+                        'all',
+                        'in_stock',
+                        'low_stock',
+                        'out_of_stock'
                       ],
+                      itemBuilder: (context, item) => Text(
+                        item == 'all'
+                            ? 'Semua Status'
+                            : item == 'in_stock'
+                                ? 'Tersedia'
+                                : item == 'low_stock'
+                                    ? 'Menipis'
+                                    : item == 'out_of_stock'
+                                        ? 'Habis'
+                                        : item,
+                      ),
+                      placeholder: Text('Status'),
                       onChanged: (value) {
                         setState(() => _selectedStatus = value ?? 'all');
                       },
@@ -338,12 +340,12 @@ class _InventoryContentMobileState
         ),
 
         // Inventory List
-        material.Expanded(
+        Expanded(
           child: BlocBuilder<ManagementBloc, ManagementState>(
             builder: (context, state) {
               if (state is ManagementLoading || state is ManagementInitial) {
-                return const material.Center(
-                  child: material.CircularProgressIndicator(),
+                return const Center(
+                  child: OurbitCircularProgress(),
                 );
               }
 
@@ -382,85 +384,107 @@ class _InventoryContentMobileState
               }).toList();
 
               if (filtered.isEmpty) {
-                return const material.Center(
-                  child: material.Text('Tidak ada produk'),
+                return Center(
+                  child: Text(
+                    'Tidak ada produk',
+                    style: TextStyle(
+                      color: material.Theme.of(context).brightness ==
+                              material.Brightness.dark
+                          ? AppColors.darkSecondaryText
+                          : AppColors.secondaryText,
+                    ),
+                  ),
                 );
               }
 
-              return material.ListView.separated(
-                padding: const material.EdgeInsets.symmetric(
+              return ListView.separated(
+                padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 8,
                 ),
                 itemCount: filtered.length,
-                separatorBuilder: (_, __) => const material.SizedBox(height: 8),
+                separatorBuilder: (_, __) => const SizedBox(height: 8),
                 itemBuilder: (context, index) {
                   final product = filtered[index];
                   final status = _computeStatus(product);
                   final base = _getStatusBaseColor(status);
 
-                  return material.Card(
+                  return OurbitCard(
                     child: material.ListTile(
                       leading: material.CircleAvatar(
-                        backgroundColor: material.Colors.blue.shade50,
-                        child: material.Icon(
-                          material.Icons.inventory_2,
-                          color: material.Colors.blue,
+                        backgroundColor: Colors.blue.shade50,
+                        child: Icon(
+                          Icons.inventory_2,
+                          color: Colors.blue,
                         ),
                       ),
-                      title: material.Text(
+                      title: Text(
                         product.name,
-                        style: const material.TextStyle(
-                          fontWeight: material.FontWeight.w600,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: material.Theme.of(context).brightness ==
+                                  material.Brightness.dark
+                              ? AppColors.darkPrimaryText
+                              : AppColors.primaryText,
                         ),
                       ),
-                      subtitle: material.Column(
-                        crossAxisAlignment: material.CrossAxisAlignment.start,
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          material.Text(
+                          Text(
                             'SKU: ${product.code ?? '—'}',
-                            style: material.TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: material.Colors.grey[600],
+                              color: material.Theme.of(context).brightness ==
+                                      material.Brightness.dark
+                                  ? AppColors.darkSecondaryText
+                                  : AppColors.secondaryText,
                             ),
                           ),
-                          const material.SizedBox(height: 4),
-                          material.Text(
+                          const SizedBox(height: 4),
+                          Text(
                             'Kategori: ${product.categoryName ?? '—'}',
-                            style: material.TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: material.Colors.grey[600],
+                              color: material.Theme.of(context).brightness ==
+                                      material.Brightness.dark
+                                  ? AppColors.darkSecondaryText
+                                  : AppColors.secondaryText,
                             ),
                           ),
                         ],
                       ),
-                      trailing: material.Column(
-                        mainAxisAlignment: material.MainAxisAlignment.center,
-                        crossAxisAlignment: material.CrossAxisAlignment.end,
+                      trailing: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          material.Text(
+                          Text(
                             'Stok: ${product.stock}',
-                            style: const material.TextStyle(
-                              fontWeight: material.FontWeight.bold,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: material.Theme.of(context).brightness ==
+                                      material.Brightness.dark
+                                  ? AppColors.darkPrimaryText
+                                  : AppColors.primaryText,
                             ),
                           ),
-                          const material.SizedBox(height: 4),
-                          material.Container(
-                            padding: const material.EdgeInsets.symmetric(
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 4,
                             ),
-                            decoration: material.BoxDecoration(
+                            decoration: BoxDecoration(
                               color: base.withValues(alpha: 0.08),
-                              borderRadius: material.BorderRadius.circular(12),
-                              border: material.Border.all(color: base),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: base),
                             ),
-                            child: material.Text(
+                            child: Text(
                               _getStatusText(status),
-                              style: material.TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 color: base,
-                                fontWeight: material.FontWeight.w500,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
@@ -476,28 +500,28 @@ class _InventoryContentMobileState
         ),
 
         // Bottom Action Bar
-        material.Container(
-          padding: const material.EdgeInsets.all(16),
-          decoration: material.BoxDecoration(
-            color: material.Colors.white,
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: material.Theme.of(context).colorScheme.surface,
             boxShadow: [
-              material.BoxShadow(
-                color: material.Colors.black.withValues(alpha: 0.1),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 4,
-                offset: const material.Offset(0, -2),
+                offset: const Offset(0, -2),
               ),
             ],
           ),
-          child: material.SizedBox(
+          child: SizedBox(
             width: double.infinity,
             child: OurbitButton.primary(
               onPressed: () {
                 // TODO: Implement stock opname
                 material.ScaffoldMessenger.of(context).showSnackBar(
                   material.SnackBar(
-                    content: material.Text(
-                        'Fitur stock opname akan segera tersedia'),
-                    backgroundColor: material.Colors.blue,
+                    content: Text('Fitur stock opname akan segera tersedia'),
+                    backgroundColor:
+                        material.Theme.of(context).colorScheme.primary,
                   ),
                 );
               },

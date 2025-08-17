@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart' as material;
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_dialog.dart';
 import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
+import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_circular_progress.dart';
 import 'package:ourbit_pos/src/core/services/local_storage_service.dart';
 import 'package:ourbit_pos/src/core/utils/logger.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 
-class StaffsContentMobile extends material.StatefulWidget {
+class StaffsContentMobile extends StatefulWidget {
   const StaffsContentMobile({super.key});
 
   @override
-  material.State<StaffsContentMobile> createState() =>
-      _StaffsContentMobileState();
+  State<StaffsContentMobile> createState() => _StaffsContentMobileState();
 }
 
-class _StaffsContentMobileState extends material.State<StaffsContentMobile>
-    with material.TickerProviderStateMixin {
+class _StaffsContentMobileState extends State<StaffsContentMobile>
+    with TickerProviderStateMixin {
   String _query = '';
   String? _businessId;
   String? _storeId;
@@ -25,8 +27,8 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile>
   List<Map<String, dynamic>> _staff = [];
 
   // Animation controllers
-  late material.AnimationController _listController;
-  late material.AnimationController _detailController;
+  late AnimationController _listController;
+  late AnimationController _detailController;
   String? _selectedStaffId;
 
   @override
@@ -37,11 +39,11 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile>
   }
 
   void _initAnimationControllers() {
-    _listController = material.AnimationController(
+    _listController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _detailController = material.AnimationController(
+    _detailController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
@@ -82,6 +84,7 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile>
     try {
       // Get role assignments for business + store
       final ra = await Supabase.instance.client
+          .schema('common')
           .from('role_assignments')
           .select('id, created_at, user_id, role_id')
           .eq('business_id', _businessId as Object)
@@ -99,6 +102,7 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile>
       Map<String, Map<String, dynamic>> rolesById = {};
       if (roleIds.isNotEmpty) {
         final rolesRes = await Supabase.instance.client
+            .schema('common')
             .from('roles')
             .select('id, name')
             .inFilter('id', roleIds.toList());
@@ -108,10 +112,11 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile>
         }
       }
 
-      // Fetch users map
+      // Fetch users map from common.users
       Map<String, Map<String, dynamic>> usersById = {};
       if (userIds.isNotEmpty) {
         final usersRes = await Supabase.instance.client
+            .schema('common')
             .from('users')
             .select('id, email, name, phone')
             .inFilter('id', userIds.toList());
@@ -162,6 +167,7 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile>
     if (confirmed != true) return;
     try {
       await Supabase.instance.client
+          .schema('common')
           .from('role_assignments')
           .delete()
           .eq('id', roleAssignmentId);
@@ -169,8 +175,8 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile>
       if (!mounted) return;
       material.ScaffoldMessenger.of(context).showSnackBar(
         material.SnackBar(
-          content: material.Text('Staff "$name" berhasil dihapus'),
-          backgroundColor: material.Colors.green,
+          content: Text('Staff "$name" berhasil dihapus'),
+          backgroundColor: Colors.green,
         ),
       );
     } catch (e) {
@@ -178,8 +184,8 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile>
       if (!mounted) return;
       material.ScaffoldMessenger.of(context).showSnackBar(
         material.SnackBar(
-          content: material.Text('Gagal menghapus staff'),
-          backgroundColor: material.Colors.red,
+          content: Text('Gagal menghapus staff'),
+          backgroundColor: Colors.red,
         ),
       );
     }
@@ -193,46 +199,61 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile>
         .showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => material.Container(
-        padding: const material.EdgeInsets.all(16),
-        child: material.Column(
-          mainAxisSize: material.MainAxisSize.min,
-          crossAxisAlignment: material.CrossAxisAlignment.start,
+      backgroundColor: material.Theme.of(context).colorScheme.surface,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            material.Row(
+            Row(
               children: [
                 material.CircleAvatar(
-                  backgroundColor: material.Colors.green[50],
-                  child: material.Icon(
-                    material.Icons.person,
-                    color: material.Colors.green,
+                  backgroundColor:
+                      Theme.of(context).brightness == material.Brightness.dark
+                          ? Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withValues(alpha: 0.15)
+                          : Colors.green[50],
+                  child: Icon(
+                    Icons.person,
+                    color:
+                        Theme.of(context).brightness == material.Brightness.dark
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.green,
                   ),
                 ),
-                const material.SizedBox(width: 12),
-                material.Expanded(
-                  child: material.Column(
-                    crossAxisAlignment: material.CrossAxisAlignment.start,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      material.Text(
+                      Text(
                         (staff['name'] ?? '-').toString(),
-                        style: const material.TextStyle(
-                          fontSize: 18,
-                          fontWeight: material.FontWeight.bold,
-                        ),
+                        style: material.Theme.of(context)
+                            .textTheme
+                            .titleLarge
+                            ?.copyWith(fontWeight: material.FontWeight.bold),
                       ),
-                      material.Text(
+                      Text(
                         (staff['role']['name'] ?? '-').toString(),
-                        style: material.TextStyle(
-                          color: material.Colors.grey[600],
-                          fontSize: 14,
-                        ),
+                        style: material.Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(
+                              color: material.Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.8),
+                            ),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-            const material.SizedBox(height: 16),
+            const SizedBox(height: 16),
             _buildAnimatedDetailRow(
                 'Email', (staff['email'] ?? '-').toString(), 0),
             _buildAnimatedDetailRow(
@@ -245,23 +266,23 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile>
                   .format(DateTime.parse(staff['created_at'])),
               3,
             ),
-            const material.SizedBox(height: 16),
-            material.Row(
+            const SizedBox(height: 16),
+            Row(
               children: [
-                material.Expanded(
+                Expanded(
                   child: OurbitButton.secondary(
                     onPressed: () {
-                      material.Navigator.of(context).pop();
+                      Navigator.of(context).pop();
                       // TODO: Open edit form
                     },
                     label: 'Edit',
                   ),
                 ),
-                const material.SizedBox(width: 8),
-                material.Expanded(
+                const SizedBox(width: 8),
+                Expanded(
                   child: OurbitButton.destructive(
                     onPressed: () {
-                      material.Navigator.of(context).pop();
+                      Navigator.of(context).pop();
                       _deleteStaff(
                         (staff['role_assignment_id'] ?? '').toString(),
                         (staff['name'] ?? '-').toString(),
@@ -282,16 +303,15 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile>
     });
   }
 
-  material.Widget _buildAnimatedDetailRow(
-      String label, String value, int index) {
-    return material.TweenAnimationBuilder<double>(
+  Widget _buildAnimatedDetailRow(String label, String value, int index) {
+    return TweenAnimationBuilder<double>(
       duration: Duration(milliseconds: 200 + (index * 50)),
-      tween: material.Tween(begin: 0.0, end: 1.0),
+      tween: Tween(begin: 0.0, end: 1.0),
       builder: (context, opacity, child) {
-        return material.Opacity(
+        return Opacity(
           opacity: opacity,
-          child: material.Transform.translate(
-            offset: material.Offset(0, 10 * (1 - opacity)),
+          child: Transform.translate(
+            offset: Offset(0, 10 * (1 - opacity)),
             child: _buildDetailRow(label, value),
           ),
         );
@@ -299,26 +319,26 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile>
     );
   }
 
-  material.Widget _buildDetailRow(String label, String value) {
-    return material.Padding(
-      padding: const material.EdgeInsets.symmetric(vertical: 4),
-      child: material.Row(
-        crossAxisAlignment: material.CrossAxisAlignment.start,
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          material.SizedBox(
+          SizedBox(
             width: 80,
-            child: material.Text(
+            child: Text(
               label,
-              style: const material.TextStyle(
-                fontWeight: material.FontWeight.w500,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
                 fontSize: 14,
               ),
             ),
           ),
-          material.Expanded(
-            child: material.Text(
+          Expanded(
+            child: Text(
               value,
-              style: const material.TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 14),
             ),
           ),
         ],
@@ -326,41 +346,38 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile>
     );
   }
 
-  material.Widget _buildRoleBadge(String roleName, String userId) {
+  Widget _buildRoleBadge(String roleName, String userId) {
     final isSelected = _selectedStaffId == userId;
 
-    return material.AnimatedContainer(
+    return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      padding: const material.EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
         horizontal: 8,
         vertical: 4,
       ),
-      decoration: material.BoxDecoration(
-        color:
-            isSelected ? material.Colors.blue[100] : material.Colors.blue[50],
-        borderRadius: material.BorderRadius.circular(12),
-        border: isSelected
-            ? material.Border.all(color: material.Colors.blue[300]!, width: 1)
-            : null,
+      decoration: BoxDecoration(
+        color: isSelected ? Colors.blue[100] : Colors.blue[50],
+        borderRadius: BorderRadius.circular(12),
+        border:
+            isSelected ? Border.all(color: Colors.blue[300]!, width: 1) : null,
       ),
-      child: material.Text(
+      child: Text(
         roleName,
-        style: material.TextStyle(
+        style: TextStyle(
           fontSize: 12,
-          color: isSelected
-              ? material.Colors.blue[800]
-              : material.Colors.blue[700],
-          fontWeight: material.FontWeight.w500,
+          color: isSelected ? Colors.blue[800] : Colors.blue[700],
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
   }
 
   @override
-  material.Widget build(material.BuildContext context) {
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     if (_loading) {
-      return const material.Center(
-        child: material.CircularProgressIndicator(),
+      return const Center(
+        child: OurbitCircularProgress(),
       );
     }
 
@@ -374,14 +391,14 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile>
           role.contains(_query);
     }).toList();
 
-    return material.Column(
+    return Column(
       children: [
         // Search
-        material.Padding(
-          padding: const material.EdgeInsets.all(16),
+        Padding(
+          padding: const EdgeInsets.all(16),
           child: OurbitTextInput(
             placeholder: 'Cari staff berdasarkan nama/email/role',
-            leading: const material.Icon(material.Icons.search, size: 16),
+            leading: const Icon(Icons.search, size: 16),
             onChanged: (v) {
               setState(() {
                 _query = (v ?? '').trim().toLowerCase();
@@ -391,70 +408,95 @@ class _StaffsContentMobileState extends material.State<StaffsContentMobile>
         ),
 
         // List
-        material.Expanded(
-          child: material.AnimatedSwitcher(
+        Expanded(
+          child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             child: filtered.isEmpty
-                ? const material.Center(
-                    key: material.ValueKey('empty'),
-                    child: material.Text('Tidak ada staff'),
+                ? Center(
+                    key: const ValueKey('empty'),
+                    child: Text(
+                      'Tidak ada staff',
+                      style: TextStyle(
+                        color: Theme.of(context).brightness ==
+                                material.Brightness.dark
+                            ? AppColors.darkSecondaryText
+                            : AppColors.secondaryText,
+                      ),
+                    ),
                   )
-                : material.FadeTransition(
+                : FadeTransition(
                     opacity: _listController,
-                    child: material.ListView.separated(
-                      key: const material.ValueKey('list'),
-                      padding: const material.EdgeInsets.symmetric(
+                    child: ListView.separated(
+                      key: const ValueKey('list'),
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 8,
                       ),
                       itemCount: filtered.length,
-                      separatorBuilder: (_, __) =>
-                          const material.SizedBox(height: 8),
+                      separatorBuilder: (_, __) => const SizedBox(height: 8),
                       itemBuilder: (context, index) {
                         final s = filtered[index];
-                        return material.TweenAnimationBuilder<double>(
+                        return TweenAnimationBuilder<double>(
                           duration: Duration(milliseconds: 150 + (index * 50)),
-                          tween: material.Tween(begin: 0.0, end: 1.0),
+                          tween: Tween(begin: 0.0, end: 1.0),
                           builder: (context, opacity, child) {
-                            return material.Opacity(
+                            return Opacity(
                               opacity: opacity,
-                              child: material.Transform.translate(
-                                offset: material.Offset(0, 20 * (1 - opacity)),
+                              child: Transform.translate(
+                                offset: Offset(0, 20 * (1 - opacity)),
                                 child: OurbitCard(
                                   child: material.ListTile(
                                     leading: material.CircleAvatar(
-                                      backgroundColor:
-                                          material.Colors.green[50],
-                                      child: material.Icon(
-                                        material.Icons.person,
-                                        color: material.Colors.green,
+                                      backgroundColor: theme.brightness ==
+                                              material.Brightness.dark
+                                          ? theme.colorScheme.primary
+                                              .withValues(alpha: 0.15)
+                                          : Colors.green[50],
+                                      child: Icon(
+                                        Icons.person,
+                                        color: theme.brightness ==
+                                                material.Brightness.dark
+                                            ? theme.colorScheme.primary
+                                            : Colors.green,
                                       ),
                                     ),
-                                    title: material.Text(
+                                    title: Text(
                                       (s['name'] ?? '-').toString(),
-                                      style: const material.TextStyle(
-                                        fontWeight: material.FontWeight.w600,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: Theme.of(context).brightness ==
+                                                material.Brightness.dark
+                                            ? AppColors.darkPrimaryText
+                                            : AppColors.primaryText,
                                       ),
                                     ),
-                                    subtitle: material.Column(
+                                    subtitle: Column(
                                       crossAxisAlignment:
-                                          material.CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        material.Text(
+                                        Text(
                                           (s['email'] ?? '—').toString(),
                                           maxLines: 1,
-                                          overflow:
-                                              material.TextOverflow.ellipsis,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                        .brightness ==
+                                                    material.Brightness.dark
+                                                ? AppColors.darkSecondaryText
+                                                : AppColors.secondaryText,
+                                          ),
                                         ),
-                                        const material.SizedBox(height: 4),
-                                        material.Text(
+                                        const SizedBox(height: 4),
+                                        Text(
                                           (s['phone'] ?? '—').toString(),
                                           maxLines: 1,
-                                          overflow:
-                                              material.TextOverflow.ellipsis,
-                                          style: material.TextStyle(
-                                            fontSize: 12,
-                                            color: material.Colors.grey[600],
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                        .brightness ==
+                                                    material.Brightness.dark
+                                                ? AppColors.darkSecondaryText
+                                                : AppColors.secondaryText,
                                           ),
                                         ),
                                       ],

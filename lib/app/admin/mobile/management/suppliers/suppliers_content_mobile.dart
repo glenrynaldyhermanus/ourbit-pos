@@ -3,30 +3,32 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ourbit_pos/blocs/management_bloc.dart';
 import 'package:ourbit_pos/blocs/management_event.dart';
 import 'package:ourbit_pos/blocs/management_state.dart';
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
-import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_toast.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
+import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_circular_progress.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 
-class SuppliersContentMobile extends material.StatefulWidget {
+class SuppliersContentMobile extends StatefulWidget {
   const SuppliersContentMobile({super.key});
 
   @override
-  material.State<SuppliersContentMobile> createState() =>
-      _SuppliersContentMobileState();
+  State<SuppliersContentMobile> createState() => _SuppliersContentMobileState();
 }
 
-class _SuppliersContentMobileState extends material
-    .State<SuppliersContentMobile> with material.TickerProviderStateMixin {
+class _SuppliersContentMobileState extends State<SuppliersContentMobile>
+    with TickerProviderStateMixin {
   String _query = '';
-  late final material.AnimationController _listController;
+  late final AnimationController _listController;
 
   @override
   void initState() {
     super.initState();
-    material.WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ManagementBloc>().add(LoadSuppliers());
       _listController.forward();
     });
-    _listController = material.AnimationController(
+    _listController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
@@ -39,21 +41,25 @@ class _SuppliersContentMobileState extends material
   }
 
   @override
-  material.Widget build(material.BuildContext context) {
+  Widget build(BuildContext context) {
     return BlocConsumer<ManagementBloc, ManagementState>(
       listener: (context, state) {
         if (state is ManagementError) {
-          OurbitToast.error(
-            context: context,
-            title: 'Gagal',
-            content: state.message,
+          material.ScaffoldMessenger.of(context).showSnackBar(
+            material.SnackBar(
+              content: Text(state.message),
+              backgroundColor: AppColors.error,
+              behavior: material.SnackBarBehavior.floating,
+              shape: material.RoundedRectangleBorder(
+                borderRadius: material.BorderRadius.circular(8),
+              ),
+            ),
           );
         }
       },
       builder: (context, state) {
         if (state is ManagementLoading || state is ManagementInitial) {
-          return const material.Center(
-              child: material.CircularProgressIndicator());
+          return const Center(child: OurbitCircularProgress());
         }
 
         final data = state is SuppliersLoaded
@@ -71,46 +77,52 @@ class _SuppliersContentMobileState extends material
                     phone.contains(q);
               }).toList();
 
-        return material.Column(
+        return Column(
           children: [
-            material.Padding(
-              padding: const material.EdgeInsets.all(16),
-              child: material.TextField(
-                decoration: const material.InputDecoration(
-                  hintText: 'Cari supplier (nama/email/telepon)...',
-                  prefixIcon: material.Icon(material.Icons.search),
-                  border: material.OutlineInputBorder(),
-                ),
-                onChanged: (v) => setState(() => _query = v),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: OurbitTextInput(
+                placeholder: 'Cari supplier (nama/email/telepon)...',
+                leading: const Icon(Icons.search),
+                onChanged: (v) => setState(() => _query = v ?? ''),
               ),
             ),
-            material.Expanded(
-              child: material.AnimatedSwitcher(
+            Expanded(
+              child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
                 child: filtered.isEmpty
-                    ? const material.Center(
-                        key: material.ValueKey('empty'),
-                        child: material.Text('Tidak ada supplier'))
-                    : material.FadeTransition(
-                        key: const material.ValueKey('list'),
+                    ? Center(
+                        key: const ValueKey('empty'),
+                        child: Text(
+                          'Tidak ada supplier',
+                          style: TextStyle(
+                            color: Theme.of(context).brightness ==
+                                    material.Brightness.dark
+                                ? AppColors.darkSecondaryText
+                                : AppColors.secondaryText,
+                          ),
+                        ),
+                      )
+                    : FadeTransition(
+                        key: const ValueKey('list'),
                         opacity: _listController,
-                        child: material.ListView.separated(
-                          padding: const material.EdgeInsets.symmetric(
+                        child: ListView.separated(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 8),
                           itemCount: filtered.length,
                           separatorBuilder: (_, __) =>
-                              const material.SizedBox(height: 8),
+                              const SizedBox(height: 8),
                           itemBuilder: (context, index) {
                             final s = filtered[index];
-                            return material.TweenAnimationBuilder<double>(
+                            return TweenAnimationBuilder<double>(
                               duration:
                                   Duration(milliseconds: 150 + index * 50),
-                              tween: material.Tween(begin: 0.0, end: 1.0),
+                              tween: Tween(begin: 0.0, end: 1.0),
                               builder: (context, t, child) {
-                                return material.Opacity(
+                                return Opacity(
                                   opacity: t,
-                                  child: material.Transform.translate(
-                                    offset: material.Offset(0, 16 * (1 - t)),
+                                  child: Transform.translate(
+                                    offset: Offset(0, 16 * (1 - t)),
                                     child: child,
                                   ),
                                 );
@@ -118,17 +130,25 @@ class _SuppliersContentMobileState extends material
                               child: OurbitCard(
                                 child: material.ListTile(
                                   leading: material.CircleAvatar(
-                                    backgroundColor: material.Colors.purple[50],
-                                    child: const material.Icon(
-                                        material.Icons.business,
-                                        color: material.Colors.purple),
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .primary
+                                        .withValues(alpha: 0.1),
+                                    child: Icon(Icons.business,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary),
                                   ),
-                                  title: material.Text(
+                                  title: Text(
                                     (s['name'] ?? '-').toString(),
-                                    style: const material.TextStyle(
-                                        fontWeight: material.FontWeight.w600),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: Theme.of(context).brightness ==
+                                                material.Brightness.dark
+                                            ? AppColors.darkPrimaryText
+                                            : AppColors.primaryText),
                                   ),
-                                  subtitle: material.Text(
+                                  subtitle: Text(
                                     [
                                       (s['email'] ?? '—').toString(),
                                       (s['phone'] ?? '—').toString(),
@@ -137,12 +157,22 @@ class _SuppliersContentMobileState extends material
                                             x.trim().isNotEmpty && x != '—')
                                         .join(' · '),
                                     maxLines: 2,
-                                    overflow: material.TextOverflow.ellipsis,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        color: Theme.of(context).brightness ==
+                                                material.Brightness.dark
+                                            ? AppColors.darkSecondaryText
+                                            : AppColors.secondaryText),
                                   ),
-                                  trailing: material.Text(
+                                  trailing: Text(
                                       (s['address'] ?? '').toString(),
                                       maxLines: 1,
-                                      overflow: material.TextOverflow.ellipsis),
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          color: Theme.of(context).brightness ==
+                                                  material.Brightness.dark
+                                              ? AppColors.darkSecondaryText
+                                              : AppColors.secondaryText)),
                                   onTap: () {},
                                 ),
                               ),

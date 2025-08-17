@@ -254,12 +254,26 @@ class _CashierPageMobileState extends State<CashierPageMobile>
 
           if (state is CashierLoading) {
             return material.Scaffold(
+              backgroundColor: isDark
+                  ? AppColors.darkSurfaceBackground
+                  : AppColors.surfaceBackground,
               drawer: const SidebarDrawer(),
               appBar: material.AppBar(
                 title: const material.Text('Ourbit Kasir'),
                 backgroundColor: isDark
                     ? AppColors.darkSurfaceBackground
                     : AppColors.surfaceBackground,
+                iconTheme: material.IconThemeData(
+                    color: isDark
+                        ? AppColors.darkPrimaryText
+                        : AppColors.primaryText),
+                titleTextStyle: material.TextStyle(
+                  fontSize: 18,
+                  fontWeight: material.FontWeight.w600,
+                  color: isDark
+                      ? AppColors.darkPrimaryText
+                      : AppColors.primaryText,
+                ),
                 leading: Builder(
                   builder: (context) => material.IconButton(
                     icon: const material.Icon(material.Icons.menu),
@@ -273,12 +287,26 @@ class _CashierPageMobileState extends State<CashierPageMobile>
 
           if (state is CashierError) {
             return material.Scaffold(
+              backgroundColor: isDark
+                  ? AppColors.darkSurfaceBackground
+                  : AppColors.surfaceBackground,
               drawer: const SidebarDrawer(),
               appBar: material.AppBar(
                 title: const material.Text('Ourbit Kasir'),
                 backgroundColor: isDark
                     ? AppColors.darkSurfaceBackground
                     : AppColors.surfaceBackground,
+                iconTheme: material.IconThemeData(
+                    color: isDark
+                        ? AppColors.darkPrimaryText
+                        : AppColors.primaryText),
+                titleTextStyle: material.TextStyle(
+                  fontSize: 18,
+                  fontWeight: material.FontWeight.w600,
+                  color: isDark
+                      ? AppColors.darkPrimaryText
+                      : AppColors.primaryText,
+                ),
                 leading: Builder(
                   builder: (context) => material.IconButton(
                     icon: const material.Icon(material.Icons.menu),
@@ -301,6 +329,9 @@ class _CashierPageMobileState extends State<CashierPageMobile>
                       style: material.TextStyle(
                         fontSize: 18,
                         fontWeight: material.FontWeight.w600,
+                        color: isDark
+                            ? AppColors.darkPrimaryText
+                            : AppColors.primaryText,
                       ),
                     ),
                     const material.SizedBox(height: 8),
@@ -341,12 +372,26 @@ class _CashierPageMobileState extends State<CashierPageMobile>
             }
 
             return material.Scaffold(
+              backgroundColor: isDark
+                  ? AppColors.darkSurfaceBackground
+                  : AppColors.surfaceBackground,
               drawer: const SidebarDrawer(),
               appBar: material.AppBar(
                 title: const material.Text('Ourbit Kasir'),
                 backgroundColor: isDark
                     ? AppColors.darkSurfaceBackground
                     : AppColors.surfaceBackground,
+                iconTheme: material.IconThemeData(
+                    color: isDark
+                        ? AppColors.darkPrimaryText
+                        : AppColors.primaryText),
+                titleTextStyle: material.TextStyle(
+                  fontSize: 18,
+                  fontWeight: material.FontWeight.w600,
+                  color: isDark
+                      ? AppColors.darkPrimaryText
+                      : AppColors.primaryText,
+                ),
                 leading: Builder(
                   builder: (context) => material.IconButton(
                     icon: const material.Icon(material.Icons.menu),
@@ -361,7 +406,8 @@ class _CashierPageMobileState extends State<CashierPageMobile>
                         key: _cartIconKey,
                         icon: const material.Icon(LucideIcons.shoppingCart),
                         onPressed: () {
-                          _showCartBottomSheet(context, cartItems, total);
+                          _showCartBottomSheet(context, cartItems, total,
+                              isDark: isDark);
                         },
                       ),
                       material.Positioned(
@@ -402,7 +448,12 @@ class _CashierPageMobileState extends State<CashierPageMobile>
                         OurbitTextInput(
                           placeholder: 'Cari nama produk...',
                           label: 'Cari Produk',
-                          leading: const material.Icon(material.Icons.search),
+                          leading: material.Icon(
+                            material.Icons.search,
+                            color: isDark
+                                ? AppColors.darkSecondaryText
+                                : AppColors.secondaryText,
+                          ),
                           onChanged: (value) {
                             context
                                 .read<CashierBloc>()
@@ -531,7 +582,7 @@ class _CashierPageMobileState extends State<CashierPageMobile>
                                                   r'(\d{1,3})(?=(\d{3})+(?!\d))'),
                                               (Match m) => '${m[1]}.',
                                             )}',
-                                        style: material.TextStyle(
+                                        style: const material.TextStyle(
                                           fontSize: 18,
                                           fontWeight: material.FontWeight.bold,
                                           color: AppColors.primary,
@@ -628,7 +679,7 @@ class _CashierPageMobileState extends State<CashierPageMobile>
             // Product Name
             material.Text(
               product.name,
-              style: material.TextStyle(
+              style: const material.TextStyle(
                 fontWeight: material.FontWeight.w600,
                 fontSize: 14,
               ),
@@ -643,7 +694,7 @@ class _CashierPageMobileState extends State<CashierPageMobile>
                     RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
                     (Match m) => '${m[1]}.',
                   )}',
-              style: material.TextStyle(
+              style: const material.TextStyle(
                 fontSize: 16,
                 fontWeight: material.FontWeight.bold,
                 color: AppColors.primary,
@@ -730,223 +781,242 @@ class _CashierPageMobileState extends State<CashierPageMobile>
   }
 
   void _showCartBottomSheet(
-    material.BuildContext context,
-    List<dynamic> cartItems,
-    double total,
-  ) {
+      material.BuildContext context, List<dynamic> cartItems, double total,
+      {required bool isDark}) {
+    final bool isDarkSheet = isDark;
     material.showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: material.Colors.transparent,
-      builder: (context) => BlocBuilder<CashierBloc, CashierState>(
+      builder: (sheetContext) => BlocBuilder<CashierBloc, CashierState>(
         builder: (context, state) {
           final items = state is CashierLoaded ? state.cartItems : <dynamic>[];
-
-          return material.Container(
-            height: material.MediaQuery.of(context).size.height * 0.7,
-            decoration: const material.BoxDecoration(
-              color: material.Colors.white,
+          final isDark = isDarkSheet;
+          final bgColor =
+              isDark ? AppColors.darkPrimaryBackground : material.Colors.white;
+          return material.Material(
+            color: bgColor,
+            shape: const material.RoundedRectangleBorder(
               borderRadius: material.BorderRadius.vertical(
                 top: material.Radius.circular(20),
               ),
             ),
-            child: material.Column(
-              children: [
-                // Handle
-                material.Container(
-                  margin: const material.EdgeInsets.only(top: 8),
-                  width: 40,
-                  height: 4,
-                  decoration: material.BoxDecoration(
-                    color: material.Colors.grey[300],
-                    borderRadius: material.BorderRadius.circular(2),
+            child: material.SizedBox(
+              height: material.MediaQuery.of(context).size.height * 0.7,
+              child: material.Column(
+                children: [
+                  // Handle
+                  material.Container(
+                    margin: const material.EdgeInsets.only(top: 8),
+                    width: 40,
+                    height: 4,
+                    decoration: material.BoxDecoration(
+                      color: isDark
+                          ? AppColors.darkBorder
+                          : material.Colors.grey[300],
+                      borderRadius: material.BorderRadius.circular(2),
+                    ),
                   ),
-                ),
 
-                // Header
-                material.Padding(
-                  padding: const material.EdgeInsets.all(16),
-                  child: material.Row(
-                    children: [
-                      const material.Icon(LucideIcons.shoppingCart),
-                      const material.SizedBox(width: 8),
-                      const material.Text(
-                        'Keranjang',
-                        style: material.TextStyle(
-                          fontSize: 18,
-                          fontWeight: material.FontWeight.bold,
+                  // Header
+                  material.Padding(
+                    padding: const material.EdgeInsets.all(16),
+                    child: material.Row(
+                      children: [
+                        material.Icon(
+                          LucideIcons.shoppingCart,
+                          color: isDark
+                              ? AppColors.darkPrimaryText
+                              : AppColors.primaryText,
                         ),
-                      ),
-                      const material.Spacer(),
-                      material.TextButton(
-                        onPressed: () {
-                          _clearCart();
-                          material.Navigator.of(context).pop();
-                        },
-                        child: const material.Text('Kosongkan'),
-                      ),
-                    ],
+                        const material.SizedBox(width: 8),
+                        material.Text(
+                          'Keranjang',
+                          style: material.TextStyle(
+                            fontSize: 18,
+                            fontWeight: material.FontWeight.bold,
+                            color: isDark
+                                ? AppColors.darkPrimaryText
+                                : AppColors.primaryText,
+                          ),
+                        ),
+                        const material.Spacer(),
+                        material.TextButton(
+                          onPressed: () {
+                            _clearCart();
+                            material.Navigator.of(context).pop();
+                          },
+                          child: const material.Text('Kosongkan'),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
 
-                const material.Divider(),
+                  material.Divider(color: isDark ? AppColors.darkBorder : null),
 
-                // Cart Items
-                material.Expanded(
-                  child: material.ListView.builder(
-                    padding:
-                        const material.EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      final isDark = material.Theme.of(context).brightness ==
-                          material.Brightness.dark;
-                      return OurbitCard(
-                        padding: const material.EdgeInsets.all(12),
-                        child: material.Row(
-                          crossAxisAlignment:
-                              material.CrossAxisAlignment.center,
-                          children: [
-                            material.Expanded(
-                              child: material.Column(
-                                crossAxisAlignment:
-                                    material.CrossAxisAlignment.start,
-                                mainAxisSize: material.MainAxisSize.min,
-                                children: [
-                                  material.Text(
-                                    item.product.name,
-                                    style: const material.TextStyle(
-                                      fontWeight: material.FontWeight.w600,
+                  // Cart Items
+                  material.Expanded(
+                    child: material.ListView.builder(
+                      padding:
+                          const material.EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: items.length,
+                      itemBuilder: (context, index) {
+                        final item = items[index];
+                        final isDark = material.Theme.of(context).brightness ==
+                            material.Brightness.dark;
+                        return OurbitCard(
+                          padding: const material.EdgeInsets.all(12),
+                          child: material.Row(
+                            crossAxisAlignment:
+                                material.CrossAxisAlignment.center,
+                            children: [
+                              material.Expanded(
+                                child: material.Column(
+                                  crossAxisAlignment:
+                                      material.CrossAxisAlignment.start,
+                                  mainAxisSize: material.MainAxisSize.min,
+                                  children: [
+                                    material.Text(
+                                      item.product.name,
+                                      style: const material.TextStyle(
+                                        fontWeight: material.FontWeight.w600,
+                                      ),
                                     ),
-                                  ),
-                                  const material.SizedBox(height: 4),
-                                  material.Text(
-                                    'Rp ${item.product.sellingPrice.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\\d{1,3})(?=(\\d{3})+(?!\\d))'), (Match m) => '${m[1]}.')}',
-                                  ),
-                                ],
-                              ),
-                            ),
-                            material.Container(
-                              decoration: material.BoxDecoration(
-                                border: material.Border.all(
-                                  color: isDark
-                                      ? AppColors.darkBorder
-                                      : AppColors.border,
-                                  width: 0.5,
+                                    const material.SizedBox(height: 4),
+                                    material.Text(
+                                      'Rp ${item.product.sellingPrice.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\\d{1,3})(?=(\\d{3})+(?!\\d))'), (Match m) => '${m[1]}.')}',
+                                    ),
+                                  ],
                                 ),
-                                borderRadius:
-                                    material.BorderRadius.circular(12),
                               ),
-                              padding: const material.EdgeInsets.symmetric(
-                                  horizontal: 6),
-                              child: material.Row(
-                                mainAxisSize: material.MainAxisSize.min,
-                                children: [
-                                  material.SizedBox(
-                                    width: 36,
-                                    height: 36,
-                                    child: material.IconButton(
-                                      padding: material.EdgeInsets.zero,
-                                      constraints:
-                                          const material.BoxConstraints(),
-                                      icon: const material.Icon(
-                                          material.Icons.remove),
-                                      onPressed: () => _updateQuantity(
-                                          index, item.quantity - 1),
-                                    ),
+                              material.Container(
+                                decoration: material.BoxDecoration(
+                                  border: material.Border.all(
+                                    color: isDark
+                                        ? AppColors.darkBorder
+                                        : AppColors.border,
+                                    width: 0.5,
                                   ),
-                                  material.Padding(
-                                    padding:
-                                        const material.EdgeInsets.symmetric(
-                                            horizontal: 8),
-                                    child: material.AnimatedSwitcher(
-                                      duration:
-                                          const Duration(milliseconds: 150),
-                                      transitionBuilder: (child, animation) =>
-                                          material.ScaleTransition(
-                                              scale: animation, child: child),
-                                      child: material.Text(
-                                        '${item.quantity}',
-                                        key: material.ValueKey<int>(
-                                            item.quantity),
-                                        style: const material.TextStyle(
-                                          fontWeight: material.FontWeight.bold,
+                                  borderRadius:
+                                      material.BorderRadius.circular(12),
+                                ),
+                                padding: const material.EdgeInsets.symmetric(
+                                    horizontal: 6),
+                                child: material.Row(
+                                  mainAxisSize: material.MainAxisSize.min,
+                                  children: [
+                                    material.SizedBox(
+                                      width: 36,
+                                      height: 36,
+                                      child: material.IconButton(
+                                        padding: material.EdgeInsets.zero,
+                                        constraints:
+                                            const material.BoxConstraints(),
+                                        icon: const material.Icon(
+                                            material.Icons.remove),
+                                        onPressed: () => _updateQuantity(
+                                            index, item.quantity - 1),
+                                      ),
+                                    ),
+                                    material.Padding(
+                                      padding:
+                                          const material.EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                      child: material.AnimatedSwitcher(
+                                        duration:
+                                            const Duration(milliseconds: 150),
+                                        transitionBuilder: (child, animation) =>
+                                            material.ScaleTransition(
+                                                scale: animation, child: child),
+                                        child: material.Text(
+                                          '${item.quantity}',
+                                          key: material.ValueKey<int>(
+                                              item.quantity),
+                                          style: const material.TextStyle(
+                                            fontWeight:
+                                                material.FontWeight.bold,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  material.SizedBox(
-                                    width: 36,
-                                    height: 36,
-                                    child: material.IconButton(
-                                      padding: material.EdgeInsets.zero,
-                                      constraints:
-                                          const material.BoxConstraints(),
-                                      icon: const material.Icon(
-                                          material.Icons.add),
-                                      onPressed: () => _updateQuantity(
-                                          index, item.quantity + 1),
+                                    material.SizedBox(
+                                      width: 36,
+                                      height: 36,
+                                      child: material.IconButton(
+                                        padding: material.EdgeInsets.zero,
+                                        constraints:
+                                            const material.BoxConstraints(),
+                                        icon: const material.Icon(
+                                            material.Icons.add),
+                                        onPressed: () => _updateQuantity(
+                                            index, item.quantity + 1),
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-
-                // Total and Checkout
-                material.Container(
-                  padding: const material.EdgeInsets.all(16),
-                  decoration: material.BoxDecoration(
-                    border: material.Border(
-                      top: material.BorderSide(
-                        color: material.Colors.grey[300]!,
-                      ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ),
-                  child: material.Row(
-                    children: [
-                      material.Expanded(
-                        child: material.Column(
-                          crossAxisAlignment: material.CrossAxisAlignment.start,
-                          mainAxisSize: material.MainAxisSize.min,
-                          children: [
-                            const material.Text(
-                              'Total:',
-                              style: material.TextStyle(
-                                fontSize: 14,
-                                color: material.Colors.grey,
-                              ),
-                            ),
-                            material.Text(
-                              'Rp ${total.toStringAsFixed(0).replaceAllMapped(
-                                    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                                    (Match m) => '${m[1]}.',
-                                  )}',
-                              style: const material.TextStyle(
-                                fontSize: 20,
-                                fontWeight: material.FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ],
+
+                  // Total and Checkout
+                  material.Container(
+                    padding: const material.EdgeInsets.all(16),
+                    decoration: material.BoxDecoration(
+                      border: material.Border(
+                        top: material.BorderSide(
+                          color: isDark
+                              ? AppColors.darkBorder
+                              : material.Colors.grey[300]!,
                         ),
                       ),
-                      OurbitButton.primary(
-                        onPressed: () {
-                          material.Navigator.of(context).pop();
-                          _processPayment();
-                        },
-                        label: 'Bayar',
-                      ),
-                    ],
+                    ),
+                    child: material.Row(
+                      children: [
+                        material.Expanded(
+                          child: material.Column(
+                            crossAxisAlignment:
+                                material.CrossAxisAlignment.start,
+                            mainAxisSize: material.MainAxisSize.min,
+                            children: [
+                              material.Text(
+                                'Total:',
+                                style: material.TextStyle(
+                                  fontSize: 14,
+                                  color: isDark
+                                      ? AppColors.darkSecondaryText
+                                      : material.Colors.grey,
+                                ),
+                              ),
+                              material.Text(
+                                'Rp ${total.toStringAsFixed(0).replaceAllMapped(
+                                      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                                      (Match m) => '${m[1]}.',
+                                    )}',
+                                style: const material.TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: material.FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        OurbitButton.primary(
+                          onPressed: () {
+                            material.Navigator.of(context).pop();
+                            _processPayment();
+                          },
+                          label: 'Bayar',
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },

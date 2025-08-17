@@ -3,32 +3,35 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ourbit_pos/blocs/management_bloc.dart';
 import 'package:ourbit_pos/blocs/management_event.dart';
 import 'package:ourbit_pos/blocs/management_state.dart';
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/data/objects/product.dart';
 import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
-import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_toast.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
+import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_circular_progress.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 
-class ProductsContentMobile extends material.StatefulWidget {
+class ProductsContentMobile extends StatefulWidget {
   const ProductsContentMobile({super.key});
 
   @override
-  material.State<ProductsContentMobile> createState() =>
-      _ProductsContentMobileState();
+  State<ProductsContentMobile> createState() => _ProductsContentMobileState();
 }
 
-class _ProductsContentMobileState extends material.State<ProductsContentMobile>
-    with material.TickerProviderStateMixin {
+class _ProductsContentMobileState extends State<ProductsContentMobile>
+    with TickerProviderStateMixin {
   String _query = '';
-  late final material.AnimationController _listController;
+  late final AnimationController _listController;
 
   @override
   void initState() {
     super.initState();
     // Trigger load products once
-    material.WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ManagementBloc>().add(LoadProducts());
       _listController.forward();
     });
-    _listController = material.AnimationController(
+    _listController = AnimationController(
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
@@ -41,37 +44,48 @@ class _ProductsContentMobileState extends material.State<ProductsContentMobile>
   }
 
   @override
-  material.Widget build(material.BuildContext context) {
+  Widget build(BuildContext context) {
     return BlocConsumer<ManagementBloc, ManagementState>(
       listener: (context, state) {
         if (state is ManagementError) {
-          OurbitToast.error(
-            context: context,
-            title: 'Gagal',
-            content: state.message,
+          material.ScaffoldMessenger.of(context).showSnackBar(
+            material.SnackBar(
+              content: material.Text(state.message),
+              backgroundColor: AppColors.error,
+              behavior: material.SnackBarBehavior.floating,
+              shape: material.RoundedRectangleBorder(
+                borderRadius: material.BorderRadius.circular(8),
+              ),
+            ),
           );
         }
       },
       builder: (context, state) {
         if (state is ManagementLoading || state is ManagementInitial) {
-          return const material.Center(
-              child: material.CircularProgressIndicator());
+          return const Center(child: OurbitCircularProgress());
         }
 
         if (state is ManagementError) {
-          return material.Center(
-            child: material.Column(
-              mainAxisSize: material.MainAxisSize.min,
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const material.Icon(material.Icons.error_outline,
-                    color: material.Colors.red, size: 48),
-                const material.SizedBox(height: 12),
-                material.Text(state.message),
-                const material.SizedBox(height: 12),
-                material.ElevatedButton(
+                const Icon(Icons.error_outline, color: Colors.amber, size: 48),
+                const SizedBox(height: 12),
+                Text(
+                  state.message,
+                  style: TextStyle(
+                    color:
+                        Theme.of(context).brightness == material.Brightness.dark
+                            ? AppColors.darkSecondaryText
+                            : AppColors.secondaryText,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                OurbitButton.primary(
                   onPressed: () =>
                       context.read<ManagementBloc>().add(LoadProducts()),
-                  child: const material.Text('Muat Ulang'),
+                  label: 'Muat Ulang',
                 ),
               ],
             ),
@@ -86,46 +100,52 @@ class _ProductsContentMobileState extends material.State<ProductsContentMobile>
                     (p) => p.name.toLowerCase().contains(_query.toLowerCase()))
                 .toList();
 
-        return material.Column(
+        return Column(
           children: [
             // Search
-            material.Padding(
-              padding: const material.EdgeInsets.all(16),
-              child: material.TextField(
-                decoration: const material.InputDecoration(
-                  hintText: 'Cari produk...',
-                  prefixIcon: material.Icon(material.Icons.search),
-                  border: material.OutlineInputBorder(),
-                ),
-                onChanged: (v) => setState(() => _query = v),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: OurbitTextInput(
+                placeholder: 'Cari produk...',
+                leading: const Icon(Icons.search),
+                onChanged: (v) => setState(() => _query = v ?? ''),
               ),
             ),
 
             // List
-            material.Expanded(
-              child: material.AnimatedSwitcher(
+            Expanded(
+              child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
                 child: filtered.isEmpty
-                    ? const material.Center(
-                        key: material.ValueKey('empty'),
-                        child: material.Text('Tidak ada produk'))
-                    : material.FadeTransition(
-                        key: const material.ValueKey('list'),
+                    ? Center(
+                        key: const ValueKey('empty'),
+                        child: Text(
+                          'Tidak ada produk',
+                          style: TextStyle(
+                            color: Theme.of(context).brightness ==
+                                    material.Brightness.dark
+                                ? AppColors.darkSecondaryText
+                                : AppColors.secondaryText,
+                          ),
+                        ),
+                      )
+                    : FadeTransition(
+                        key: const ValueKey('list'),
                         opacity: _listController,
-                        child: material.ListView.separated(
-                          padding: const material.EdgeInsets.symmetric(
+                        child: ListView.separated(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 8),
                           itemBuilder: (context, index) {
                             final product = filtered[index];
-                            return material.TweenAnimationBuilder<double>(
+                            return TweenAnimationBuilder<double>(
                               duration:
                                   Duration(milliseconds: 150 + index * 50),
-                              tween: material.Tween(begin: 0.0, end: 1.0),
+                              tween: Tween(begin: 0.0, end: 1.0),
                               builder: (context, t, child) {
-                                return material.Opacity(
+                                return Opacity(
                                   opacity: t,
-                                  child: material.Transform.translate(
-                                    offset: material.Offset(0, 16 * (1 - t)),
+                                  child: Transform.translate(
+                                    offset: Offset(0, 16 * (1 - t)),
                                     child: child,
                                   ),
                                 );
@@ -133,28 +153,41 @@ class _ProductsContentMobileState extends material.State<ProductsContentMobile>
                               child: OurbitCard(
                                 child: material.ListTile(
                                   leading: material.CircleAvatar(
-                                    backgroundColor: material.Colors.blue[50],
-                                    child: material.Text(
+                                    backgroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .primary
+                                        .withValues(alpha: 0.1),
+                                    child: Text(
                                       product.name.isNotEmpty
                                           ? product.name[0].toUpperCase()
                                           : '?',
-                                      style: const material.TextStyle(
-                                        color: material.Colors.blue,
-                                        fontWeight: material.FontWeight.bold,
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
-                                  title: material.Text(
+                                  title: Text(
                                     product.name,
-                                    style: const material.TextStyle(
-                                        fontWeight: material.FontWeight.w600),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: Theme.of(context).brightness ==
+                                                material.Brightness.dark
+                                            ? AppColors.darkPrimaryText
+                                            : AppColors.primaryText),
                                   ),
-                                  subtitle: material.Text(
+                                  subtitle: Text(
                                     'Harga: Rp ${product.sellingPrice.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}\nStok: ${product.stock}',
+                                    style: TextStyle(
+                                        color: Theme.of(context).brightness ==
+                                                material.Brightness.dark
+                                            ? AppColors.darkSecondaryText
+                                            : AppColors.secondaryText),
                                   ),
                                   isThreeLine: true,
-                                  trailing: const material.Icon(
-                                      material.Icons.chevron_right),
+                                  trailing: const Icon(Icons.chevron_right),
                                   onTap: () {
                                     // Placeholder action; future: open detail/edit sheet
                                   },
@@ -163,7 +196,7 @@ class _ProductsContentMobileState extends material.State<ProductsContentMobile>
                             );
                           },
                           separatorBuilder: (_, __) =>
-                              const material.SizedBox(height: 8),
+                              const SizedBox(height: 8),
                           itemCount: filtered.length,
                         ),
                       ),

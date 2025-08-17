@@ -77,6 +77,7 @@ class _OnlineStoresContentState extends State<OnlineStoresContent> {
     if (_businessId == null || _businessId!.isEmpty) return;
     try {
       final res = await Supabase.instance.client
+          .schema('ourbit')
           .from('business_online_settings')
           .select('*')
           .eq('business_id', _businessId as Object)
@@ -113,10 +114,12 @@ class _OnlineStoresContentState extends State<OnlineStoresContent> {
     if (_businessId == null || _businessId!.isEmpty) return;
     try {
       final storesRes = await Supabase.instance.client
+          .schema('common')
           .from('stores')
           .select('id, name, is_online_delivery_active')
           .eq('business_id', _businessId as Object);
       final warehousesRes = await Supabase.instance.client
+          .schema('ourbit')
           .from('warehouses')
           .select('id, name, is_online_delivery_active')
           .eq('business_id', _businessId as Object);
@@ -157,16 +160,21 @@ class _OnlineStoresContentState extends State<OnlineStoresContent> {
 
         if (_onlineSettingsId != null) {
           await supabase
+              .schema('ourbit')
               .from('business_online_settings')
               .update(settingsData)
               .eq('id', _onlineSettingsId as Object);
         } else {
-          await supabase.from('business_online_settings').insert(settingsData);
+          await supabase
+              .schema('ourbit')
+              .from('business_online_settings')
+              .insert(settingsData);
         }
       } else {
         // Deactivate = delete settings if exists
         if (_onlineSettingsId != null) {
           await supabase
+              .schema('ourbit')
               .from('business_online_settings')
               .delete()
               .eq('id', _onlineSettingsId as Object);
@@ -212,6 +220,7 @@ class _OnlineStoresContentState extends State<OnlineStoresContent> {
     setState(() => _togglingStores.add(id));
     try {
       await Supabase.instance.client
+          .schema('common')
           .from('stores')
           .update({'is_online_delivery_active': isActive}).eq('id', id);
       setState(() {
@@ -245,6 +254,7 @@ class _OnlineStoresContentState extends State<OnlineStoresContent> {
     setState(() => _togglingWarehouses.add(id));
     try {
       await Supabase.instance.client
+          .schema('ourbit')
           .from('warehouses')
           .update({'is_online_delivery_active': isActive}).eq('id', id);
       setState(() {

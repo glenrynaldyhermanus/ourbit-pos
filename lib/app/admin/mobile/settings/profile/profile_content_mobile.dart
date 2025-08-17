@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart' as material;
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
 import 'package:ourbit_pos/src/core/utils/logger.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
+import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_circular_progress.dart';
 
-class ProfileContentMobile extends material.StatefulWidget {
+class ProfileContentMobile extends StatefulWidget {
   const ProfileContentMobile({super.key});
 
   @override
-  material.State<ProfileContentMobile> createState() =>
-      _ProfileContentMobileState();
+  State<ProfileContentMobile> createState() => _ProfileContentMobileState();
 }
 
-class _ProfileContentMobileState extends material.State<ProfileContentMobile> {
+class _ProfileContentMobileState extends State<ProfileContentMobile> {
   bool _loading = false;
   bool _saving = false;
   String? _userId;
 
-  final material.TextEditingController _nameController =
-      material.TextEditingController();
-  final material.TextEditingController _emailController =
-      material.TextEditingController();
-  final material.TextEditingController _phoneController =
-      material.TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
 
   @override
   void initState() {
@@ -73,8 +73,8 @@ class _ProfileContentMobileState extends material.State<ProfileContentMobile> {
       if (!mounted) return;
       material.ScaffoldMessenger.of(context).showSnackBar(
         material.SnackBar(
-          content: material.Text('Profil berhasil diperbarui'),
-          backgroundColor: material.Colors.green,
+          content: Text('Profil berhasil diperbarui'),
+          backgroundColor: Colors.green,
         ),
       );
     } catch (e) {
@@ -82,8 +82,8 @@ class _ProfileContentMobileState extends material.State<ProfileContentMobile> {
       if (!mounted) return;
       material.ScaffoldMessenger.of(context).showSnackBar(
         material.SnackBar(
-          content: material.Text('Gagal memperbarui profil'),
-          backgroundColor: material.Colors.red,
+          content: Text('Gagal memperbarui profil'),
+          backgroundColor: Colors.red,
         ),
       );
     } finally {
@@ -92,78 +92,68 @@ class _ProfileContentMobileState extends material.State<ProfileContentMobile> {
   }
 
   @override
-  material.Widget build(material.BuildContext context) {
+  Widget build(BuildContext context) {
     if (_loading) {
-      return const material.Center(
-        child: material.CircularProgressIndicator(),
+      return const Center(
+        child: OurbitCircularProgress(),
       );
     }
 
-    return material.SingleChildScrollView(
-      padding: const material.EdgeInsets.all(16),
-      child: material.Column(
-        crossAxisAlignment: material.CrossAxisAlignment.start,
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          material.Text(
+          Text(
             'Profil Pengguna',
-            style: material.Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: material.FontWeight.bold,
-                ),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).brightness == material.Brightness.dark
+                  ? AppColors.darkPrimaryText
+                  : AppColors.primaryText,
+            ),
           ),
-          const material.SizedBox(height: 8),
-          material.Text(
+          const SizedBox(height: 8),
+          Text(
             'Kelola informasi profil Anda',
-            style: material.Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: material.Colors.grey[600],
-                ),
+            style: TextStyle(
+              color: Theme.of(context).brightness == material.Brightness.dark
+                  ? AppColors.darkSecondaryText
+                  : AppColors.secondaryText,
+            ),
           ),
-          const material.SizedBox(height: 24),
+          const SizedBox(height: 24),
 
           // Profile Form
-          material.Card(
-            child: material.Padding(
-              padding: const material.EdgeInsets.all(16),
-              child: material.Column(
-                crossAxisAlignment: material.CrossAxisAlignment.start,
-                children: [
-                  material.Text(
-                    'Informasi Pribadi',
-                    style: material.Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: material.FontWeight.w600),
-                  ),
-                  const material.SizedBox(height: 16),
-                  OurbitTextInput(
-                    controller: _nameController,
-                    placeholder: 'Nama lengkap',
-                  ),
-                  const material.SizedBox(height: 12),
-                  material.TextField(
-                    controller: _emailController,
-                    decoration: const material.InputDecoration(
-                      labelText: 'Email',
-                      border: material.OutlineInputBorder(),
-                    ),
-                    enabled: false,
-                  ),
-                  const material.SizedBox(height: 12),
-                  OurbitTextInput(
-                    controller: _phoneController,
-                    placeholder: 'Nomor telepon',
-                  ),
-                  const material.SizedBox(height: 16),
-                  material.SizedBox(
-                    width: double.infinity,
-                    child: OurbitButton.primary(
-                      onPressed: _saving ? null : _saveProfile,
-                      label: _saving ? 'Menyimpan...' : 'Simpan Perubahan',
-                    ),
-                  ),
-                ],
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              OurbitTextInput(
+                controller: _nameController,
+                placeholder: 'Nama lengkap',
               ),
-            ),
+              const SizedBox(height: 12),
+              OurbitTextInput(
+                controller: _emailController,
+                placeholder: 'Email',
+              ),
+              const SizedBox(height: 12),
+              OurbitTextInput(
+                controller: _phoneController,
+                placeholder: 'Nomor telepon',
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: OurbitButton.primary(
+                  onPressed: _saving ? null : _saveProfile,
+                  label: _saving ? 'Menyimpan...' : 'Simpan Perubahan',
+                ),
+              ),
+            ],
           ),
         ],
       ),

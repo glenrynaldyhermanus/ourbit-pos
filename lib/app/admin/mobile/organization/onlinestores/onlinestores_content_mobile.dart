@@ -3,6 +3,9 @@ import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_switch.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_area.dart';
+import 'package:ourbit_pos/src/widgets/ui/form/ourbit_select.dart';
+import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_circular_progress.dart';
+import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
 import 'package:ourbit_pos/src/core/services/local_storage_service.dart';
 import 'package:ourbit_pos/src/core/utils/logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -80,6 +83,7 @@ class _OnlineStoresContentMobileState
     if (_businessId == null || _businessId!.isEmpty) return;
     try {
       final res = await Supabase.instance.client
+          .schema('ourbit')
           .from('business_online_settings')
           .select('*')
           .eq('business_id', _businessId as Object)
@@ -116,6 +120,7 @@ class _OnlineStoresContentMobileState
     try {
       // Load stores
       final storesRes = await Supabase.instance.client
+          .schema('common')
           .from('stores')
           .select('id, name, address, is_online_delivery_enabled')
           .eq('business_id', _businessId as Object);
@@ -125,6 +130,7 @@ class _OnlineStoresContentMobileState
 
       // Load warehouses
       final warehousesRes = await Supabase.instance.client
+          .schema('ourbit')
           .from('warehouses')
           .select('id, name, address, is_online_delivery_enabled')
           .eq('business_id', _businessId as Object);
@@ -153,11 +159,13 @@ class _OnlineStoresContentMobileState
 
       if (_onlineSettingsId != null) {
         await Supabase.instance.client
+            .schema('ourbit')
             .from('business_online_settings')
             .update(data)
             .eq('id', _onlineSettingsId!);
       } else {
         final res = await Supabase.instance.client
+            .schema('ourbit')
             .from('business_online_settings')
             .insert(data)
             .select()
@@ -192,6 +200,7 @@ class _OnlineStoresContentMobileState
     setState(() {});
     try {
       await Supabase.instance.client
+          .schema('common')
           .from('stores')
           .update({'is_online_delivery_enabled': enabled}).eq('id', storeId);
       await _loadLocations();
@@ -209,7 +218,7 @@ class _OnlineStoresContentMobileState
     _togglingWarehouses.add(warehouseId);
     setState(() {});
     try {
-      await Supabase.instance.client.from('warehouses').update(
+      await Supabase.instance.client.schema('ourbit').from('warehouses').update(
           {'is_online_delivery_enabled': enabled}).eq('id', warehouseId);
       await _loadLocations();
     } catch (e) {
@@ -224,7 +233,7 @@ class _OnlineStoresContentMobileState
   material.Widget build(material.BuildContext context) {
     if (_loading) {
       return const material.Center(
-        child: material.CircularProgressIndicator(),
+        child: OurbitCircularProgress(),
       );
     }
 
@@ -250,7 +259,7 @@ class _OnlineStoresContentMobileState
           const material.SizedBox(height: 24),
 
           // Online Store Settings
-          material.Card(
+          OurbitCard(
             child: material.Padding(
               padding: const material.EdgeInsets.all(16),
               child: material.Column(
@@ -322,21 +331,19 @@ class _OnlineStoresContentMobileState
                         ?.copyWith(fontWeight: material.FontWeight.w600),
                   ),
                   const material.SizedBox(height: 8),
-                  material.DropdownButtonFormField<int>(
+                  OurbitSelect<int>(
                     value: _stockTracking,
-                    decoration: const material.InputDecoration(
-                      border: material.OutlineInputBorder(),
-                      contentPadding: material.EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                    items: const [1, 2, 3],
+                    itemBuilder: (context, item) => material.Text(
+                      item == 1
+                          ? 'Real-time'
+                          : item == 2
+                              ? 'Manual'
+                              : item == 3
+                                  ? 'Tidak ada'
+                                  : item.toString(),
                     ),
-                    items: const [
-                      material.DropdownMenuItem(
-                          value: 1, child: material.Text('Real-time')),
-                      material.DropdownMenuItem(
-                          value: 2, child: material.Text('Manual')),
-                      material.DropdownMenuItem(
-                          value: 3, child: material.Text('Tidak ada')),
-                    ],
+                    placeholder: material.Text('Pelacakan Stok'),
                     onChanged: (value) {
                       if (value != null) {
                         setState(() => _stockTracking = value);
@@ -358,7 +365,7 @@ class _OnlineStoresContentMobileState
           const material.SizedBox(height: 24),
 
           // Delivery Locations
-          material.Card(
+          OurbitCard(
             child: material.Padding(
               padding: const material.EdgeInsets.all(16),
               child: material.Column(

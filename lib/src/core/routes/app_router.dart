@@ -12,6 +12,8 @@ import 'package:ourbit_pos/app/admin/desktop/reports/reports_page.dart';
 import 'package:ourbit_pos/app/admin/mobile/reports/reports_page_mobile.dart';
 import 'package:ourbit_pos/app/admin/desktop/settings/settings_page.dart';
 import 'package:ourbit_pos/app/admin/mobile/settings/settings_page_mobile.dart';
+import 'package:ourbit_pos/app/admin/desktop/help/help_page.dart';
+import 'package:ourbit_pos/app/admin/mobile/help/help_page_mobile.dart';
 import 'package:ourbit_pos/app/admin/mobile/cashier/cashier_page_mobile.dart';
 import 'package:ourbit_pos/app/admin/mobile/cashier/payment/payment_page_mobile.dart';
 import 'package:ourbit_pos/app/admin/mobile/cashier/payment/success_page_mobile.dart';
@@ -28,6 +30,7 @@ class AppRouter {
   static const String organizationRoute = '/organization';
   static const String reportsRoute = '/reports';
   static const String settingsRoute = '/settings';
+  static const String helpRoute = '/help';
   static const String paymentRoute = '/payment';
   static const String successRoute = '/success';
 
@@ -184,6 +187,17 @@ class AppRouter {
           Responsive.isMobile(context)
               ? const SettingsPageMobile()
               : const SettingsPage(),
+        ),
+      ),
+      GoRoute(
+        path: helpRoute,
+        name: 'help',
+        pageBuilder: (context, state) => _buildPageWithFadeTransition(
+          context,
+          state,
+          Responsive.isMobile(context)
+              ? const HelpPageMobile()
+              : const HelpPage(),
         ),
       ),
       GoRoute(

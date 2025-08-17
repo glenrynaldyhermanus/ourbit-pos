@@ -108,7 +108,7 @@ class _StoreFormSheetState extends State<StoreFormSheet> {
       if (widget.store != null) {
         // Update
         final id = widget.store!['id'];
-        await supabase.from('stores').update({
+        await supabase.schema('common').from('stores').update({
           ...payload,
           'updated_at': DateTime.now().toIso8601String()
         }).eq('id', id);
@@ -117,7 +117,7 @@ class _StoreFormSheetState extends State<StoreFormSheet> {
         if (widget.businessId == null || widget.businessId!.isEmpty) {
           throw Exception('businessId tidak tersedia');
         }
-        await supabase.from('stores').insert([
+        await supabase.schema('common').from('stores').insert([
           {
             ...payload,
             'business_id': widget.businessId,

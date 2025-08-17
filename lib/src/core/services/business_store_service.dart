@@ -32,6 +32,7 @@ class BusinessStoreService {
 
       // Get user's role assignments
       final roleAssignmentsResponse = await _supabaseClient
+          .schema('common')
           .from('role_assignments')
           .select('*')
           .eq('user_id', user.id);
@@ -46,6 +47,7 @@ class BusinessStoreService {
 
       // Get business data
       final businessResponse = await _supabaseClient
+          .schema('common')
           .from('businesses')
           .select('*')
           .eq('id', roleAssignment['business_id'])
@@ -53,6 +55,7 @@ class BusinessStoreService {
 
       // Get store data
       final storeResponse = await _supabaseClient
+          .schema('common')
           .from('stores')
           .select('*')
           .eq('id', roleAssignment['store_id'])
@@ -60,6 +63,7 @@ class BusinessStoreService {
 
       // Get role data
       final roleResponse = await _supabaseClient
+          .schema('common')
           .from('roles')
           .select('*')
           .eq('id', roleAssignment['role_id'])
@@ -152,6 +156,7 @@ class BusinessStoreService {
       }
 
       final response = await _supabaseClient
+          .schema('common')
           .from('stores')
           .select('*')
           .eq('business_id', businessId)
@@ -172,13 +177,18 @@ class BusinessStoreService {
       }
 
       // Get role assignment for this store
-      final roleAssignmentResponse =
-          await _supabaseClient.from('role_assignments').select('''
+      final roleAssignmentResponse = await _supabaseClient
+          .schema('common')
+          .from('role_assignments')
+          .select('''
             *,
             business:businesses(*),
             store:stores(*),
             role:roles(*)
-          ''').eq('user_id', user.id).eq('store_id', storeId).single();
+          ''')
+          .eq('user_id', user.id)
+          .eq('store_id', storeId)
+          .single();
 
       // Save new store data
       await LocalStorageService.saveStoreData(roleAssignmentResponse['store']);

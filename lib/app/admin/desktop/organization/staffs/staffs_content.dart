@@ -73,6 +73,7 @@ class _StaffsContentState extends State<StaffsContent> {
     try {
       // Get role assignments for business + store
       final ra = await Supabase.instance.client
+          .schema('common')
           .from('role_assignments')
           .select('id, created_at, user_id, role_id')
           .eq('business_id', _businessId as Object)
@@ -90,6 +91,7 @@ class _StaffsContentState extends State<StaffsContent> {
       Map<String, Map<String, dynamic>> rolesById = {};
       if (roleIds.isNotEmpty) {
         final rolesRes = await Supabase.instance.client
+            .schema('common')
             .from('roles')
             .select('id, name')
             .inFilter('id', roleIds.toList());
@@ -99,12 +101,13 @@ class _StaffsContentState extends State<StaffsContent> {
         }
       }
 
-      // Try fetch user profiles (best-effort). Assuming table 'profiles' exists.
+      // Fetch users from common.users
       Map<String, Map<String, dynamic>> usersById = {};
       if (userIds.isNotEmpty) {
         try {
           final usersRes = await Supabase.instance.client
-              .from('profiles')
+              .schema('common')
+              .from('users')
               .select('id, email, name, phone')
               .inFilter('id', userIds.toList());
           for (final u in (usersRes as List)) {
@@ -156,6 +159,7 @@ class _StaffsContentState extends State<StaffsContent> {
       final id = item['role_assignment_id']?.toString();
       if (id == null || id.isEmpty) return;
       await Supabase.instance.client
+          .schema('common')
           .from('role_assignments')
           .delete()
           .eq('id', id);

@@ -277,12 +277,13 @@ class PosCart extends StatelessWidget {
                 // Quantity controls
                 Row(
                   children: [
-                    OurbitIconButton.destructive(
+                    OurbitIconButton.primary(
                       onPressed: () =>
                           onUpdateQuantity(index, item.quantity - 1),
                       icon: const Icon(
                         Icons.remove,
                         size: 16,
+                        color: Colors.white,
                       ),
                       size: 24,
                     ),
@@ -320,6 +321,7 @@ class PosCart extends StatelessWidget {
                       icon: const Icon(
                         Icons.add,
                         size: 16,
+                        color: Colors.white,
                       ),
                       size: 24,
                     ),

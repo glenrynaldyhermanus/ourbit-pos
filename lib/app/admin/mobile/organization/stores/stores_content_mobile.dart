@@ -1,30 +1,34 @@
 import 'package:flutter/material.dart' as material;
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_text_input.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_button.dart';
 import 'package:ourbit_pos/src/widgets/ui/form/ourbit_dialog.dart';
 import 'package:ourbit_pos/src/widgets/ui/layout/ourbit_card.dart';
+import 'package:ourbit_pos/src/widgets/ui/feedback/ourbit_circular_progress.dart';
 import 'package:ourbit_pos/src/core/services/local_storage_service.dart';
 import 'package:ourbit_pos/src/core/utils/logger.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class StoresContentMobile extends material.StatefulWidget {
+class StoresContentMobile extends StatefulWidget {
   const StoresContentMobile({super.key});
 
   @override
-  material.State<StoresContentMobile> createState() =>
-      _StoresContentMobileState();
+  State<StoresContentMobile> createState() => _StoresContentMobileState();
 }
 
-class _StoresContentMobileState extends material.State<StoresContentMobile>
-    with material.TickerProviderStateMixin {
+class _StoresContentMobileState extends State<StoresContentMobile>
+    with TickerProviderStateMixin {
   String _query = '';
   String? _businessId;
   bool _loading = false;
   List<Map<String, dynamic>> _stores = [];
-  
+  Map<String, String> _businessFieldOptions = {};
+
   // Animation controllers
-  late material.AnimationController _listController;
-  late material.AnimationController _detailController;
+  late AnimationController _listController;
+  late AnimationController _detailController;
+  // ignore: unused_field
   String? _selectedStoreId;
 
   @override
@@ -35,11 +39,11 @@ class _StoresContentMobileState extends material.State<StoresContentMobile>
   }
 
   void _initAnimationControllers() {
-    _listController = material.AnimationController(
+    _listController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _detailController = material.AnimationController(
+    _detailController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
@@ -58,6 +62,7 @@ class _StoresContentMobileState extends material.State<StoresContentMobile>
       final businessData = await LocalStorageService.getBusinessData();
       final idValue = businessData?['id'];
       _businessId = idValue is String ? idValue : (idValue?.toString());
+      await _loadBusinessFieldOptions();
       await _loadStores();
     } catch (e) {
       Logger.error('STORES_MOBILE_INIT_ERROR: $e');
@@ -69,6 +74,26 @@ class _StoresContentMobileState extends material.State<StoresContentMobile>
     }
   }
 
+  Future<void> _loadBusinessFieldOptions() async {
+    try {
+      final res = await Supabase.instance.client
+          .schema('common')
+          .from('options')
+          .select('key, value')
+          .eq('type', 'business_field');
+      final map = <String, String>{};
+      for (final e in (res as List)) {
+        final m = Map<String, dynamic>.from(e);
+        final k = (m['key'] ?? '').toString();
+        final v = (m['value'] ?? '').toString();
+        if (k.isNotEmpty) map[k] = v;
+      }
+      _businessFieldOptions = map;
+    } catch (e) {
+      Logger.error('STORES_MOBILE_LOAD_OPTIONS_ERROR: $e');
+    }
+  }
+
   Future<void> _loadStores() async {
     if (_businessId == null || _businessId!.isEmpty) {
       Logger.error('STORES_MOBILE_LOAD: businessId null/empty');
@@ -77,6 +102,7 @@ class _StoresContentMobileState extends material.State<StoresContentMobile>
     }
     try {
       final res = await Supabase.instance.client
+          .schema('common')
           .from('stores')
           .select()
           .eq('business_id', _businessId as Object);
@@ -101,22 +127,26 @@ class _StoresContentMobileState extends material.State<StoresContentMobile>
     );
     if (confirmed != true) return;
     try {
-      await Supabase.instance.client.from('stores').delete().eq('id', id);
+      await Supabase.instance.client
+          .schema('common')
+          .from('stores')
+          .delete()
+          .eq('id', id);
       await _loadStores();
       if (!mounted) return;
       material.ScaffoldMessenger.of(context).showSnackBar(
         material.SnackBar(
-          content: material.Text('Toko "$name" berhasil dihapus'),
-          backgroundColor: material.Colors.green,
+          content: Text('Toko "$name" berhasil dihapus'),
+          backgroundColor: Colors.green,
         ),
       );
     } catch (e) {
       Logger.error('DELETE_STORE_MOBILE_ERROR: $e');
       if (!mounted) return;
       material.ScaffoldMessenger.of(context).showSnackBar(
-        material.SnackBar(
-          content: material.Text('Gagal menghapus toko'),
-          backgroundColor: material.Colors.red,
+        const material.SnackBar(
+          content: Text('Gagal menghapus toko'),
+          backgroundColor: Colors.red,
         ),
       );
     }
@@ -125,51 +155,70 @@ class _StoresContentMobileState extends material.State<StoresContentMobile>
   void _showStoreDetail(Map<String, dynamic> store) {
     _selectedStoreId = store['id']?.toString();
     _detailController.forward();
-    
-    material.showModalBottomSheet(
+
+    material
+        .showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => material.Container(
-        padding: const material.EdgeInsets.all(16),
-        child: material.Column(
-          mainAxisSize: material.MainAxisSize.min,
-          crossAxisAlignment: material.CrossAxisAlignment.start,
+      backgroundColor: material.Theme.of(context).colorScheme.surface,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            material.Row(
+            Row(
               children: [
                 material.CircleAvatar(
-                  backgroundColor: material.Colors.blue[50],
-                  child: material.Icon(
-                    material.Icons.store,
-                    color: material.Colors.blue,
+                  backgroundColor: material.Theme.of(context).brightness ==
+                          material.Brightness.dark
+                      ? Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.15)
+                      : Colors.blue[50],
+                  child: Icon(
+                    Icons.store,
+                    color:
+                        Theme.of(context).brightness == material.Brightness.dark
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.blue,
                   ),
                 ),
-                const material.SizedBox(width: 12),
-                material.Expanded(
-                  child: material.Column(
-                    crossAxisAlignment: material.CrossAxisAlignment.start,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      material.Text(
+                      Text(
                         (store['name'] ?? '-').toString(),
-                        style: const material.TextStyle(
-                          fontSize: 18,
-                          fontWeight: material.FontWeight.bold,
-                        ),
+                        style: material.Theme.of(context)
+                            .textTheme
+                            .titleLarge
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
-                      material.Text(
-                        (store['business_field'] ?? '-').toString(),
-                        style: material.TextStyle(
-                          color: material.Colors.grey[600],
-                          fontSize: 14,
-                        ),
+                      Text(
+                        _businessFieldOptions[
+                                (store['business_field'] ?? '').toString()] ??
+                            (store['business_field'] ?? '-').toString(),
+                        style: material.Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(
+                              color: material.Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.8),
+                            ),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-            const material.SizedBox(height: 16),
-            _buildAnimatedDetailRow('Alamat', (store['address'] ?? '-').toString(), 0),
+            const SizedBox(height: 16),
+            _buildAnimatedDetailRow(
+                'Alamat', (store['address'] ?? '-').toString(), 0),
             _buildAnimatedDetailRow(
               'Telepon',
               '${store['phone_country_code'] ?? ''} ${store['phone_number'] ?? ''}',
@@ -177,24 +226,25 @@ class _StoresContentMobileState extends material.State<StoresContentMobile>
             ),
             _buildAnimatedDetailRow(
                 'Tipe', store['is_branch'] == true ? 'Cabang' : 'Pusat', 2),
-            _buildAnimatedDetailRow('Mata Uang', (store['currency'] ?? '-').toString(), 3),
-            const material.SizedBox(height: 16),
-            material.Row(
+            _buildAnimatedDetailRow(
+                'Mata Uang', (store['currency'] ?? '-').toString(), 3),
+            const SizedBox(height: 16),
+            Row(
               children: [
-                material.Expanded(
+                Expanded(
                   child: OurbitButton.secondary(
                     onPressed: () {
-                      material.Navigator.of(context).pop();
+                      Navigator.of(context).pop();
                       // TODO: Open edit form
                     },
                     label: 'Edit',
                   ),
                 ),
-                const material.SizedBox(width: 8),
-                material.Expanded(
+                const SizedBox(width: 8),
+                Expanded(
                   child: OurbitButton.destructive(
                     onPressed: () {
-                      material.Navigator.of(context).pop();
+                      Navigator.of(context).pop();
                       _deleteStore(
                         (store['id'] ?? '').toString(),
                         (store['name'] ?? '-').toString(),
@@ -208,21 +258,22 @@ class _StoresContentMobileState extends material.State<StoresContentMobile>
           ],
         ),
       ),
-    ).then((_) {
+    )
+        .then((_) {
       _selectedStoreId = null;
       _detailController.reset();
     });
   }
 
-  material.Widget _buildAnimatedDetailRow(String label, String value, int index) {
-    return material.TweenAnimationBuilder<double>(
+  Widget _buildAnimatedDetailRow(String label, String value, int index) {
+    return TweenAnimationBuilder<double>(
       duration: Duration(milliseconds: 200 + (index * 50)),
-      tween: material.Tween(begin: 0.0, end: 1.0),
+      tween: Tween(begin: 0.0, end: 1.0),
       builder: (context, opacity, child) {
-        return material.Opacity(
+        return Opacity(
           opacity: opacity,
-          child: material.Transform.translate(
-            offset: material.Offset(0, 10 * (1 - opacity)),
+          child: Transform.translate(
+            offset: Offset(0, 10 * (1 - opacity)),
             child: _buildDetailRow(label, value),
           ),
         );
@@ -230,26 +281,26 @@ class _StoresContentMobileState extends material.State<StoresContentMobile>
     );
   }
 
-  material.Widget _buildDetailRow(String label, String value) {
-    return material.Padding(
-      padding: const material.EdgeInsets.symmetric(vertical: 4),
-      child: material.Row(
-        crossAxisAlignment: material.CrossAxisAlignment.start,
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          material.SizedBox(
+          SizedBox(
             width: 80,
-            child: material.Text(
+            child: Text(
               label,
-              style: const material.TextStyle(
-                fontWeight: material.FontWeight.w500,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
                 fontSize: 14,
               ),
             ),
           ),
-          material.Expanded(
-            child: material.Text(
+          Expanded(
+            child: Text(
               value,
-              style: const material.TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 14),
             ),
           ),
         ],
@@ -257,46 +308,12 @@ class _StoresContentMobileState extends material.State<StoresContentMobile>
     );
   }
 
-  material.Widget _buildStoreTypeBadge(bool isBranch, String storeId) {
-    final isSelected = _selectedStoreId == storeId;
-    final isBranchStore = isBranch;
-    
-    return material.AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      padding: const material.EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 4,
-      ),
-      decoration: material.BoxDecoration(
-        color: isSelected 
-            ? (isBranchStore ? material.Colors.orange[100] : material.Colors.green[100])
-            : (isBranchStore ? material.Colors.orange[50] : material.Colors.green[50]),
-        borderRadius: material.BorderRadius.circular(12),
-        border: isSelected 
-            ? material.Border.all(
-                color: isBranchStore ? material.Colors.orange[300]! : material.Colors.green[300]!,
-                width: 1,
-              )
-            : null,
-      ),
-      child: material.Text(
-        isBranchStore ? 'Cabang' : 'Pusat',
-        style: material.TextStyle(
-          fontSize: 12,
-          color: isSelected 
-              ? (isBranchStore ? material.Colors.orange[800] : material.Colors.green[800])
-              : (isBranchStore ? material.Colors.orange[700] : material.Colors.green[700]),
-          fontWeight: material.FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
   @override
-  material.Widget build(material.BuildContext context) {
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     if (_loading) {
-      return const material.Center(
-        child: material.CircularProgressIndicator(),
+      return const Center(
+        child: OurbitCircularProgress(),
       );
     }
 
@@ -310,14 +327,14 @@ class _StoresContentMobileState extends material.State<StoresContentMobile>
           field.contains(_query);
     }).toList();
 
-    return material.Column(
+    return Column(
       children: [
         // Search
-        material.Padding(
-          padding: const material.EdgeInsets.all(16),
+        Padding(
+          padding: const EdgeInsets.all(16),
           child: OurbitTextInput(
             placeholder: 'Cari toko berdasarkan nama/alamat/bidang usaha',
-            leading: const material.Icon(material.Icons.search, size: 16),
+            leading: const Icon(Icons.search, size: 16),
             onChanged: (v) {
               setState(() {
                 _query = (v ?? '').trim().toLowerCase();
@@ -327,84 +344,99 @@ class _StoresContentMobileState extends material.State<StoresContentMobile>
         ),
 
         // List
-        material.Expanded(
-          child: material.AnimatedSwitcher(
+        Expanded(
+          child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             child: filtered.isEmpty
-                ? const material.Center(
-                    key: material.ValueKey('empty'),
-                    child: material.Text('Tidak ada toko'),
+                ? Center(
+                    key: const ValueKey('empty'),
+                    child: Text(
+                      'Tidak ada toko',
+                      style: TextStyle(
+                        color: Theme.of(context).brightness ==
+                                material.Brightness.dark
+                            ? AppColors.darkSecondaryText
+                            : AppColors.secondaryText,
+                      ),
+                    ),
                   )
-                : material.FadeTransition(
+                : FadeTransition(
                     opacity: _listController,
-                    child: material.ListView.separated(
-                      key: const material.ValueKey('list'),
-                      padding: const material.EdgeInsets.symmetric(
+                    child: ListView.separated(
+                      key: const ValueKey('list'),
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 8,
                       ),
                       itemCount: filtered.length,
-                      separatorBuilder: (_, __) =>
-                          const material.SizedBox(height: 8),
+                      separatorBuilder: (_, __) => const SizedBox(height: 8),
                       itemBuilder: (context, index) {
                         final s = filtered[index];
-                        return material.TweenAnimationBuilder<double>(
+                        return TweenAnimationBuilder<double>(
                           duration: Duration(milliseconds: 150 + (index * 50)),
-                          tween: material.Tween(begin: 0.0, end: 1.0),
+                          tween: Tween(begin: 0.0, end: 1.0),
                           builder: (context, opacity, child) {
-                            return material.Opacity(
+                            return Opacity(
                               opacity: opacity,
-                              child: material.Transform.translate(
-                                offset: material.Offset(0, 20 * (1 - opacity)),
+                              child: Transform.translate(
+                                offset: Offset(0, 20 * (1 - opacity)),
                                 child: OurbitCard(
                                   child: material.ListTile(
                                     leading: material.CircleAvatar(
-                                      backgroundColor: material.Colors.blue[50],
-                                      child: material.Icon(
-                                        material.Icons.store,
-                                        color: material.Colors.blue,
+                                      backgroundColor: theme.brightness ==
+                                              material.Brightness.dark
+                                          ? theme.colorScheme.primary
+                                              .withValues(alpha: 0.15)
+                                          : Colors.blue[50],
+                                      child: Icon(
+                                        Icons.store,
+                                        color: theme.brightness ==
+                                                material.Brightness.dark
+                                            ? theme.colorScheme.primary
+                                            : Colors.blue,
                                       ),
                                     ),
-                                    title: material.Text(
+                                    title: Text(
                                       (s['name'] ?? '-').toString(),
-                                      style: const material.TextStyle(
-                                        fontWeight: material.FontWeight.w600,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: Theme.of(context).brightness ==
+                                                material.Brightness.dark
+                                            ? AppColors.darkPrimaryText
+                                            : AppColors.primaryText,
                                       ),
                                     ),
-                                    subtitle: material.Column(
-                                      crossAxisAlignment: material.CrossAxisAlignment.start,
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        material.Text(
-                                          (s['business_field'] ?? '—').toString(),
+                                        Text(
+                                          _businessFieldOptions[
+                                                  (s['business_field'] ?? '')
+                                                      .toString()] ??
+                                              (s['business_field'] ?? '—')
+                                                  .toString(),
                                           maxLines: 1,
-                                          overflow: material.TextOverflow.ellipsis,
-                                        ),
-                                        const material.SizedBox(height: 4),
-                                        material.Text(
-                                          (s['address'] ?? '—').toString(),
-                                          maxLines: 1,
-                                          overflow: material.TextOverflow.ellipsis,
-                                          style: material.TextStyle(
-                                            fontSize: 12,
-                                            color: material.Colors.grey[600],
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                        .brightness ==
+                                                    material.Brightness.dark
+                                                ? AppColors.darkSecondaryText
+                                                : AppColors.secondaryText,
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    trailing: material.Column(
-                                      mainAxisAlignment: material.MainAxisAlignment.center,
-                                      crossAxisAlignment: material.CrossAxisAlignment.end,
-                                      children: [
-                                        _buildStoreTypeBadge(
-                                          s['is_branch'] == true,
-                                          (s['id'] ?? '').toString(),
-                                        ),
-                                        const material.SizedBox(height: 4),
-                                        material.Text(
-                                          (s['currency'] ?? '—').toString(),
-                                          style: material.TextStyle(
-                                            fontSize: 12,
-                                            color: material.Colors.grey[600],
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          (s['address'] ?? '—').toString(),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                        .brightness ==
+                                                    material.Brightness.dark
+                                                ? AppColors.darkSecondaryText
+                                                : AppColors.secondaryText,
                                           ),
                                         ),
                                       ],

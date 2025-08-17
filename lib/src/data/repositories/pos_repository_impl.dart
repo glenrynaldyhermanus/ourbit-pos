@@ -24,10 +24,12 @@ class PosRepositoryImpl implements PosRepository {
 
       Logger.debug(' getProducts - querying products for storeId: $storeId');
       final response = await _supabaseClient
+          .schema('ourbit')
           .from('products')
           .select('*, categories(name)')
           .eq('store_id', storeId)
           .eq('is_active', true)
+          .filter('deleted_at', 'is', null)
           .order('created_at', ascending: false);
 
       Logger.debug(' getProducts - raw response length: ${response.length}');
@@ -48,10 +50,12 @@ class PosRepositoryImpl implements PosRepository {
     try {
       // Get categories that have products in this store
       final response = await _supabaseClient
+          .schema('ourbit')
           .from('categories')
           .select('*, products!inner(*)')
           .eq('products.store_id', storeId)
           .eq('products.is_active', true)
+          .filter('products.deleted_at', 'is', null)
           .order('name', ascending: true);
 
       return (response as List).map((category) {
@@ -73,6 +77,7 @@ class PosRepositoryImpl implements PosRepository {
   Future<List<CartItem>> getStoreCart(String storeId) async {
     try {
       final response = await _supabaseClient
+          .schema('ourbit')
           .from('store_carts')
           .select('*, products(*)')
           .eq('store_id', storeId)
@@ -90,6 +95,7 @@ class PosRepositoryImpl implements PosRepository {
     try {
       // Check if product already in cart
       final existingCart = await _supabaseClient
+          .schema('ourbit')
           .from('store_carts')
           .select()
           .eq('store_id', storeId)
@@ -99,13 +105,14 @@ class PosRepositoryImpl implements PosRepository {
       if (existingCart != null) {
         // Update quantity
         await _supabaseClient
+            .schema('ourbit')
             .from('store_carts')
             .update({'quantity': existingCart['quantity'] + quantity})
             .eq('store_id', storeId)
             .eq('product_id', productId);
       } else {
         // Insert new cart item
-        await _supabaseClient.from('store_carts').insert({
+        await _supabaseClient.schema('ourbit').from('store_carts').insert({
           'store_id': storeId,
           'product_id': productId,
           'quantity': quantity,
@@ -125,6 +132,7 @@ class PosRepositoryImpl implements PosRepository {
         await removeFromCart(storeId, productId);
       } else {
         await _supabaseClient
+            .schema('ourbit')
             .from('store_carts')
             .update({'quantity': quantity})
             .eq('store_id', storeId)
@@ -140,6 +148,7 @@ class PosRepositoryImpl implements PosRepository {
   Future<void> removeFromCart(String storeId, String productId) async {
     try {
       await _supabaseClient
+          .schema('ourbit')
           .from('store_carts')
           .delete()
           .eq('store_id', storeId)
@@ -154,6 +163,7 @@ class PosRepositoryImpl implements PosRepository {
   Future<void> clearCart(String storeId) async {
     try {
       await _supabaseClient
+          .schema('ourbit')
           .from('store_carts')
           .delete()
           .eq('store_id', storeId);
@@ -168,6 +178,7 @@ class PosRepositoryImpl implements PosRepository {
       String storeId) async {
     try {
       final response = await _supabaseClient
+          .schema('ourbit')
           .from('store_payment_methods')
           .select('id, payment_method_id, payment_methods(*, payment_types(*))')
           .eq('store_id', storeId)
@@ -200,6 +211,7 @@ class PosRepositoryImpl implements PosRepository {
 
     // Insert sale
     final sale = await _supabaseClient
+        .schema('ourbit')
         .from('sales')
         .insert({
           'store_id': storeId,
@@ -221,7 +233,7 @@ class PosRepositoryImpl implements PosRepository {
 
     // Insert sale items and update stock + inventory log
     for (final item in cartItems) {
-      await _supabaseClient.from('sales_items').insert({
+      await _supabaseClient.schema('ourbit').from('sales_items').insert({
         'sale_id': saleId,
         'product_id': item.product.id,
         'quantity': item.quantity,
@@ -232,6 +244,7 @@ class PosRepositoryImpl implements PosRepository {
       });
 
       final productRow = await _supabaseClient
+          .schema('ourbit')
           .from('products')
           .select('stock')
           .eq('id', item.product.id)
@@ -240,10 +253,14 @@ class PosRepositoryImpl implements PosRepository {
       final newStock = currentStock - item.quantity;
 
       await _supabaseClient
+          .schema('ourbit')
           .from('products')
           .update({'stock': newStock}).eq('id', item.product.id);
 
-      await _supabaseClient.from('inventory_transactions').insert({
+      await _supabaseClient
+          .schema('ourbit')
+          .from('inventory_transactions')
+          .insert({
         'product_id': item.product.id,
         'store_id': storeId,
         'type': 2,
@@ -258,7 +275,10 @@ class PosRepositoryImpl implements PosRepository {
     }
 
     // Finance transaction
-    await _supabaseClient.from('financial_transactions').insert({
+    await _supabaseClient
+        .schema('ourbit')
+        .from('financial_transactions')
+        .insert({
       'store_id': storeId,
       'transaction_date': now.toIso8601String(),
       'transaction_type': 'income',
@@ -270,7 +290,11 @@ class PosRepositoryImpl implements PosRepository {
     });
 
     // Clear cart
-    await _supabaseClient.from('store_carts').delete().eq('store_id', storeId);
+    await _supabaseClient
+        .schema('ourbit')
+        .from('store_carts')
+        .delete()
+        .eq('store_id', storeId);
 
     return saleId;
   }

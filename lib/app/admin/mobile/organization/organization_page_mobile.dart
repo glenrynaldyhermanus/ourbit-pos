@@ -1,72 +1,82 @@
 import 'package:flutter/material.dart' as material;
 import 'package:ourbit_pos/src/widgets/navigation/sidebar_drawer.dart';
+import 'package:ourbit_pos/src/core/theme/app_theme.dart';
+import 'package:ourbit_pos/src/core/services/theme_service.dart';
+import 'package:provider/provider.dart';
 import 'package:ourbit_pos/app/admin/mobile/organization/stores/stores_content_mobile.dart';
 import 'package:ourbit_pos/app/admin/mobile/organization/staffs/staffs_content_mobile.dart';
-import 'package:ourbit_pos/app/admin/mobile/organization/onlinestores/onlinestores_content_mobile.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
 
-class OrganizationPageMobile extends material.StatefulWidget {
+class OrganizationPageMobile extends material.StatelessWidget {
   const OrganizationPageMobile({super.key});
 
   @override
-  material.State<OrganizationPageMobile> createState() =>
-      _OrganizationPageMobileState();
-}
-
-class _OrganizationPageMobileState
-    extends material.State<OrganizationPageMobile>
-    with material.SingleTickerProviderStateMixin {
-  late material.TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = material.TabController(length: 3, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
   material.Widget build(material.BuildContext context) {
-    return material.Scaffold(
-      appBar: material.AppBar(
-        title: const material.Text('Organisasi'),
-        leading: material.Builder(
-          builder: (context) => material.IconButton(
-            icon: const material.Icon(material.Icons.menu),
-            onPressed: () => material.Scaffold.of(context).openDrawer(),
-          ),
-        ),
-        bottom: material.TabBar(
-          controller: _tabController,
-          tabs: const [
-            material.Tab(
-              icon: material.Icon(material.Icons.store),
-              text: 'Toko',
+    final theme = material.Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    const List<material.Tab> tabs = [
+      material.Tab(text: 'Toko'),
+      material.Tab(text: 'Staff'),
+    ];
+
+    return material.DefaultTabController(
+      length: tabs.length,
+      child: Consumer<ThemeService>(
+        builder: (context, themeService, _) {
+          final bool isDark = themeService.isDarkMode;
+          return material.Scaffold(
+            backgroundColor: isDark
+                ? AppColors.darkSurfaceBackground
+                : AppColors.surfaceBackground,
+            appBar: material.AppBar(
+              backgroundColor: isDark
+                  ? AppColors.darkSurfaceBackground
+                  : AppColors.surfaceBackground,
+              foregroundColor:
+                  isDark ? AppColors.darkPrimaryText : AppColors.primaryText,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              surfaceTintColor: material.Colors.transparent,
+              shadowColor: material.Colors.transparent,
+              title: const material.Text('Organisasi'),
+              leading: material.Builder(
+                builder: (context) => material.IconButton(
+                  icon: const material.Icon(material.Icons.menu),
+                  onPressed: () => material.Scaffold.of(context).openDrawer(),
+                ),
+              ),
+              bottom: material.TabBar(
+                isScrollable: true,
+                indicator: material.UnderlineTabIndicator(
+                  borderSide: material.BorderSide(
+                    width: 2,
+                    color: colorScheme.primary,
+                  ),
+                ),
+                labelColor: colorScheme.primary,
+                unselectedLabelColor: isDark
+                    ? AppColors.darkSecondaryText
+                    : AppColors.secondaryText,
+                dividerColor: isDark ? AppColors.darkBorder : AppColors.border,
+                labelStyle: material.Theme.of(context).textTheme.titleMedium,
+                unselectedLabelStyle:
+                    material.Theme.of(context).textTheme.titleMedium,
+                tabs: tabs,
+              ),
             ),
-            material.Tab(
-              icon: material.Icon(material.Icons.people),
-              text: 'Staff',
+            drawer: const SidebarDrawer(),
+            body: material.Container(
+              color: isDark
+                  ? AppColors.darkPrimaryBackground
+                  : AppColors.primaryBackground,
+              child: const material.TabBarView(
+                children: [
+                  StoresContentMobile(),
+                  StaffsContentMobile(),
+                ],
+              ),
             ),
-            material.Tab(
-              icon: material.Icon(LucideIcons.shoppingCart),
-              text: 'Online',
-            ),
-          ],
-        ),
-      ),
-      drawer: const SidebarDrawer(),
-      body: material.TabBarView(
-        controller: _tabController,
-        children: const [
-          StoresContentMobile(),
-          StaffsContentMobile(),
-          OnlineStoresContentMobile(),
-        ],
+          );
+        },
       ),
     );
   }

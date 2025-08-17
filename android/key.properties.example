@@ -1,7 +1,0 @@
-# Salin file ini menjadi key.properties lalu isi kredensial keystore Anda.
-# Pastikan jangan commit key.properties ke repository.
-
-storeFile=app/upload-keystore.jks
-storePassword=GANTI_DENGAN_PASSWORD_STORE
-keyAlias=upload
-keyPassword=GANTI_DENGAN_PASSWORD_KEY
